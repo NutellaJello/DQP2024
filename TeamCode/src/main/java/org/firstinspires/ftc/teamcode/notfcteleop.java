@@ -70,8 +70,9 @@ public class notfcteleop extends LinearOpMode {
         while (opModeIsActive()) {
 
             telemetry.addData("claw Postition: ", Double.toString(claw.getPosition()));
+            telemetry.addData("pivot Postition: ", Double.toString(pivot.getPosition()));
             telemetry.addData("rotational Postition: ", Double.toString(rotation.getPosition()));
-      //      telemetry.addData("CFlateral Postition: ", Double.toString(cfLateral.getPosition()));
+
 
 
             // origonally y is neg, x is pos
@@ -121,32 +122,29 @@ public class notfcteleop extends LinearOpMode {
 
       //      motorCF.setPower(gamepad2.left_stick_y * dampS);
 
-            double rotationpos = 0.3;
-            double pivotpos = 0.4;
+            double rotationpos = 0.29;
+            double pivotpos = 0.7;
 
             if (gamepad2.dpad_left){
-                pivotpos += 0.05;
+                pivot.setPosition(0.7);
             }
             else if (gamepad2.dpad_right){
-                pivotpos -= 0.05;
+                pivot.setPosition(0.6);
             }
             pivot.setPosition(pivotpos);
 
-            if(gamepad2.y){
-                rotationpos += 0.05;
-                //rotation.setPosition();
+            if(gamepad2.dpad_up){
+                rotation.setPosition(0.4);
             }
-            else if(gamepad2.a){
-                rotationpos -=0.05;
-                //rotation.setPosition();
+            if(gamepad2.dpad_down){
+                rotation.setPosition(0.29);
             }
-            rotation.setPosition(rotationpos);
             //open claw is left bumper, right is close
             if (gamepad2.left_bumper){
                 claw.setPosition(0.5);
             }
             if(gamepad2.right_bumper){
-                claw.setPosition(0.2);
+                claw.setPosition(0.22);
             }
 
 
