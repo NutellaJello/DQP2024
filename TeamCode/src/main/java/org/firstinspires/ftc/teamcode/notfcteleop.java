@@ -22,7 +22,7 @@ public class notfcteleop extends LinearOpMode {
         // Make sure your ID's match your configuration
 
         double dampS = 0.85;
-        double dampSpeedRatio = 0.6;
+        double dampSpeedRatio = 0.8;
         double dampTurnRatio  = 1;
         DcMotor motorFrontLeft = hardwareMap.dcMotor.get("FL"); //0
         DcMotor motorFrontRight = hardwareMap.dcMotor.get("FR"); //1
@@ -59,6 +59,7 @@ public class notfcteleop extends LinearOpMode {
         claw.setPosition(0.3);
         rotation.setPosition(0);
         pivot.setPosition(0.3);
+        double pivotpos = 0.55;
 
         // Retrieve the IMU from the hardware map
         IMU imu = hardwareMap.get(IMU.class, "imu");
@@ -94,11 +95,19 @@ public class notfcteleop extends LinearOpMode {
 
             double y = Range.clip(-gamepad1.left_stick_y, -1, 1);
             //left stick x value
-            double x = Range.clip(gamepad1.left_stick_x, -1, 1);
+            double x = Range.clip(-gamepad1.left_stick_x, -1, 1);
             //right stick x value
             double rx = Range.clip(-gamepad1.right_stick_x, -1, 1);
 
             //    double arct = 0;
+
+            if(gamepad1.right_bumper){
+                dampSpeedRatio = 0.2;
+                dampTurnRatio = 0.3;
+            }else{
+                dampSpeedRatio = 0.8;
+                dampTurnRatio = 0.8;
+            }
 
             double flPower = (y - x) * dampSpeedRatio + dampTurnRatio * rx;
             double frPower = (y + x) * dampSpeedRatio - dampTurnRatio * rx;
@@ -125,21 +134,33 @@ public class notfcteleop extends LinearOpMode {
 
             motorCF.setPower(gamepad2.left_stick_y * dampS);
 
-            double pivotpos = 0.7;
 
+/*
             if (gamepad2.dpad_left){
-                pivot.setPosition(0.3);
+                //pivot.setPosition(1);
+                pivotpos += 0.0051;
             }
             else if (gamepad2.dpad_right){
-                pivot.setPosition(0);
+                //pivot.setPosition(0);
+                pivotpos -= 0.0051;
+            }else{
+                //pivotpos =0.5;
+            }*/
+            if (gamepad2.right_stick_button){
+                pivotpos=0.525;
             }
-            //pivot.setPosition(pivotpos);
+            pivotpos += ( 0.005* gamepad2.right_stick_x);
+            pivot.setPosition(pivotpos);
+
 
             if(gamepad2.dpad_up){
-                rotation.setPosition(0.7);
+                rotation.setPosition(0.73);
             }
             if(gamepad2.dpad_down){
-                rotation.setPosition(0.03);
+                rotation.setPosition(0.05);
+            }
+            if(gamepad2.dpad_right){
+                rotation.setPosition(0.39);
             }
             //open claw is left bumper, right is close
             if (gamepad2.left_bumper){
@@ -151,12 +172,12 @@ public class notfcteleop extends LinearOpMode {
 
 
             if (gamepad2.y) {
-                cfPosition = 1;
+                cfPosition = 0.95;
             } else if (gamepad2.a) {
                 cfPosition = 0.07;
             }
             else if (gamepad2.b){
-                cfPosition = 0.13;
+                cfPosition = 0.3;
             }
             // 0.13 bar height
             cfLateral.setPosition(cfPosition);
