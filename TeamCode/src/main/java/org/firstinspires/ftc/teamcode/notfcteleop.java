@@ -30,13 +30,13 @@ public class notfcteleop extends LinearOpMode {
         DcMotor motorBackRight = hardwareMap.dcMotor.get("BR"); //3
 
         //initalizing for the cf intake
-     //   DcMotor motorCF = hardwareMap.dcMotor.get("CF"); // expansion port 0
-        // CRServo makes the servo go past 360, makes it continuous
+       DcMotor motorCF = hardwareMap.dcMotor.get("CF"); // expansion port 0
+
 
 
         // all servos for claw
         //expansion
- //       Servo cfLateral = hardwareMap.servo.get("cfLateral"); //0
+        Servo cfLateral = hardwareMap.servo.get("cfLateral"); //0
         Servo claw = hardwareMap.servo.get("claw"); // 1
         Servo pivot = hardwareMap.servo.get ("pivot"); //  2
         Servo rotation = hardwareMap.servo.get("rotation"); // 3
@@ -51,10 +51,14 @@ public class notfcteleop extends LinearOpMode {
         motorFrontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         motorBackLeft.setDirection(DcMotorSimple.Direction.REVERSE);
 
+        pivot.setDirection(Servo.Direction.REVERSE);
+
         double cfPosition = 0.07;
 
         // temp testing
         claw.setPosition(0.3);
+        rotation.setPosition(0);
+        pivot.setPosition(0.3);
 
         // Retrieve the IMU from the hardware map
         IMU imu = hardwareMap.get(IMU.class, "imu");
@@ -68,7 +72,7 @@ public class notfcteleop extends LinearOpMode {
         if (isStopRequested()) return;
 
         while (opModeIsActive()) {
-
+            telemetry.addData("cfposition: ", Double.toString(cfLateral.getPosition()));
             telemetry.addData("claw Postition: ", Double.toString(claw.getPosition()));
             telemetry.addData("pivot Postition: ", Double.toString(pivot.getPosition()));
             telemetry.addData("rotational Postition: ", Double.toString(rotation.getPosition()));
@@ -119,32 +123,30 @@ public class notfcteleop extends LinearOpMode {
 
 
 
+            motorCF.setPower(gamepad2.left_stick_y * dampS);
 
-      //      motorCF.setPower(gamepad2.left_stick_y * dampS);
-
-            double rotationpos = 0.29;
             double pivotpos = 0.7;
 
             if (gamepad2.dpad_left){
-                pivot.setPosition(0.7);
+                pivot.setPosition(0.3);
             }
             else if (gamepad2.dpad_right){
-                pivot.setPosition(0.6);
+                pivot.setPosition(0);
             }
-            pivot.setPosition(pivotpos);
+            //pivot.setPosition(pivotpos);
 
             if(gamepad2.dpad_up){
-                rotation.setPosition(0.4);
+                rotation.setPosition(0.7);
             }
             if(gamepad2.dpad_down){
-                rotation.setPosition(0.29);
+                rotation.setPosition(0.03);
             }
             //open claw is left bumper, right is close
             if (gamepad2.left_bumper){
-                claw.setPosition(0.5);
+                claw.setPosition(0.58);
             }
             if(gamepad2.right_bumper){
-                claw.setPosition(0.22);
+                claw.setPosition(0.08);
             }
 
 
@@ -157,7 +159,7 @@ public class notfcteleop extends LinearOpMode {
                 cfPosition = 0.13;
             }
             // 0.13 bar height
-     //       cfLateral.setPosition(cfPosition);
+            cfLateral.setPosition(cfPosition);
 
             telemetry.update();
         }
