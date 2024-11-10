@@ -14,35 +14,32 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 
 // this teleop is fieldcentric, when joystick moves up, the robot will always more forward
-@TeleOp (name="DQP 2024 teleop")
+@TeleOp (name="Field Centric Teleop")
 public class teleop extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
-        // Declare our motors
-        // Make sure your ID's match your configuration
         double dampS = 0.85;
+        double dampSpeedRatio = 0.8;
+        double dampTurnRatio  = 1;
         DcMotor motorFrontLeft = hardwareMap.dcMotor.get("FL"); //0
         DcMotor motorFrontRight = hardwareMap.dcMotor.get("FR"); //1
         DcMotor motorBackLeft = hardwareMap.dcMotor.get("BL"); //2
         DcMotor motorBackRight = hardwareMap.dcMotor.get("BR"); //3
 
-        //initalizing for the cf intake, may have to reverse motor
-
+        //initalizing for the cf intake
         DcMotor motorCF = hardwareMap.dcMotor.get("CF"); // expansion port 0
-//
-//        Servo cfLateral = hardwareMap.servo.get("");
-//        Servo cfLI = hardwareMap.servo.get("");
-//        Servo cfRI = hardwareMap.servo.get("");
-        // CRServo makes the servo go past 360, makes it continuous
 
 
-       // CRServo slide = (CRServo) hardwareMap.servo.get("slide"); //0
-        Servo cfLateral = hardwareMap.servo.get("cfLateral"); //1
-        CRServo rclaw = hardwareMap.get(CRServo.class, "rightclaw"); // CH port 2
-        CRServo lclaw = hardwareMap.get(CRServo.class, "leftclaw"); // CH port 3
+
+        // all servos for claw
+        //expansion
+        Servo cfLateral = hardwareMap.servo.get("cfLateral"); //0
+        Servo claw = hardwareMap.servo.get("claw"); // 1
+        Servo pivot = hardwareMap.servo.get ("pivot"); //  2
+        Servo rotation = hardwareMap.servo.get("rotation"); // 3
 
 // Reverse the direction of the left claw
-        lclaw.setDirection(CRServo.Direction.REVERSE);
+        //  lclaw.setDirection(CRServo.Direction.REVERSE);)
 
         // Reverse the right side motors. This may be wrong for your setup.
         // If your robot moves backwards when commanded to go forwards,
@@ -51,7 +48,15 @@ public class teleop extends LinearOpMode {
         motorFrontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         motorBackLeft.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        double cfPosition = 0.13;
+        pivot.setDirection(Servo.Direction.REVERSE);
+
+        double cfPosition = 0.07;
+
+        // temp testing
+        claw.setPosition(0.3);
+        rotation.setPosition(0);
+        pivot.setPosition(0.3);
+        double pivotpos = 0.55;
 
         // Retrieve the IMU from the hardware map
         IMU imu = hardwareMap.get(IMU.class, "imu");
@@ -75,8 +80,8 @@ public class teleop extends LinearOpMode {
 
             // origonally y is neg, x is pos
             double y = -gamepad1.left_stick_y;
-            double x = -gamepad1.left_stick_x;
-            double rx = -gamepad1.right_stick_x;
+            double x = gamepad1.left_stick_x;
+            double rx = gamepad1.right_stick_x;
 
             // This button choice was made so that it is hard to hit on accident,
             // it can be freely changed based on preference.
@@ -112,69 +117,45 @@ public class teleop extends LinearOpMode {
             motorCF.setPower(gamepad2.left_stick_y * dampS);
 
 
-            if(gamepad2.left_trigger> 0){
-                lclaw.setPower(0.6);
-                rclaw.setPower(0.6);
+            motorCF.setPower(gamepad2.left_stick_y * dampS);
+
+
+            if (gamepad2.right_stick_button){
+                pivotpos=0.525;
             }
-            else if (gamepad2.right_trigger > 0){
-                lclaw.setPower(-0.1);
-                rclaw.setPower(-0.1);
-            }
-            else{
-                lclaw.setPower(0);
-                rclaw.setPower(0);
-            }
+            pivotpos += ( 0.005* gamepad2.right_stick_x);
+            pivot.setPosition(pivotpos);
 
 
             if(gamepad2.dpad_up){
-                cfPosition = 1;
+                rotation.setPosition(0.73);
             }
-            else if (gamepad2.dpad_down) {
+            if(gamepad2.dpad_down){
+                rotation.setPosition(0.05);
+            }
+            if(gamepad2.dpad_right){
+                rotation.setPosition(0.39);
+            }
+            //open claw is left bumper, right is close
+            if (gamepad2.left_bumper){
+                claw.setPosition(0.58);
+            }
+            if(gamepad2.right_bumper){
+                claw.setPosition(0.08);
+            }
+
+
+            if (gamepad2.y) {
+                cfPosition = 0.95;
+            } else if (gamepad2.a) {
                 cfPosition = 0.07;
             }
-            else if (gamepad2.dpad_right){
-                cfPosition = 0.13;
+            else if (gamepad2.b){
+                cfPosition = 0.3;
             }
             // 0.13 bar height
             cfLateral.setPosition(cfPosition);
 
-
-            /*
-            // for the opening claw, use left bumper on gamepad2
-            double clawPosition = 0.4;
-
-            if (gamepad2.left_bumper){
-                clawPosition += 0.05;
-            }
-            claw.setPosition(clawPosition);
-
-
-
-
-            // for rotational, dpadleft rotates it counterclock, dp right rotate clock
-            double rpos = 0.4;
-            if (gamepad2.dpad_left){
-                 rpos -= 0.05;
-            }
-            else if(gamepad2.dpad_right){
-                rpos += 0.05;
-            }
-            rotclaw.setPosition(rpos);
-
-
-            // up down claw
-            double lpos = 0.4;
-            if (gamepad2.y){
-                lpos -= 0.05;
-            }
-            else if(gamepad2.a){
-                lpos += 0.05;
-            }
-            latclaw.setPosition(lpos);
-
-
-
-             */
             telemetry.update();
         }
     }

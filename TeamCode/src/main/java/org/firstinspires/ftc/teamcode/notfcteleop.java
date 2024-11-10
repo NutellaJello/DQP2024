@@ -14,7 +14,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 
 // this teleop is  not fieldcentric
-@TeleOp
+@TeleOp(name = "Not Field Centric Teleop")
 public class notfcteleop extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
@@ -97,7 +97,7 @@ public class notfcteleop extends LinearOpMode {
             //left stick x value
             double x = Range.clip(-gamepad1.left_stick_x, -1, 1);
             //right stick x value
-            double rx = Range.clip(-gamepad1.right_stick_x, -1, 1);
+            double rx = Range.clip(gamepad1.right_stick_x, -1, 1);
 
             //    double arct = 0;
 
@@ -135,17 +135,6 @@ public class notfcteleop extends LinearOpMode {
             motorCF.setPower(gamepad2.left_stick_y * dampS);
 
 
-/*
-            if (gamepad2.dpad_left){
-                //pivot.setPosition(1);
-                pivotpos += 0.0051;
-            }
-            else if (gamepad2.dpad_right){
-                //pivot.setPosition(0);
-                pivotpos -= 0.0051;
-            }else{
-                //pivotpos =0.5;
-            }*/
             if (gamepad2.right_stick_button){
                 pivotpos=0.525;
             }
