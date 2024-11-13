@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.IMU;
@@ -14,6 +15,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 
 // this teleop is  not fieldcentric
+@Disabled
 @TeleOp(name = "Not Field Centric Teleop")
 public class notfcteleop extends LinearOpMode {
     @Override

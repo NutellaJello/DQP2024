@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.IMU;
@@ -14,6 +15,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 
 // this teleop is fieldcentric, when joystick moves up, the robot will always more forward
+@Disabled
 @TeleOp (name="Field Centric Teleop")
 public class teleop extends LinearOpMode {
     @Override

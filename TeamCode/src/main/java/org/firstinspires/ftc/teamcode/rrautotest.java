@@ -132,7 +132,7 @@ public class rrautotest extends LinearOpMode {
             public void onOpened() {
                 // Set MJPEG format to increase FPS
                 telemetry.addData("Camera", "Opened successfully");
-                telemetry.addData("centerX = " + detectionRed.getCenterX());
+                telemetry.addData("centerX = ", detectionRed.getCenterX());
                 telemetry.update();
                 webcam.startStreaming(640, 480, OpenCvCameraRotation.UPRIGHT);
             }
