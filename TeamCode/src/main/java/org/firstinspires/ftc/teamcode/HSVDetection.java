@@ -16,7 +16,7 @@ public class HSVDetection extends OpenCvPipeline {
     public HSVDetection(OpenCvWebcam webcam, Telemetry telemetry) {
         this.webcam = webcam;
         this.telemetry = telemetry;
-    }
+    } //
     @Override
     public Mat processFrame(Mat input) {
         // Convert the image to HSV color space

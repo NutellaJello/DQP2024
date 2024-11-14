@@ -231,7 +231,7 @@ public class dqp2425 extends LinearOpMode{
 
 //            if (gamepad2.x) claw.setPosition(0);
 //            if (gamepad2.y) claw.setPosition(0.2);
-
+//
 
         }
 
