@@ -11,6 +11,8 @@ import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
+
 @Config
 @TeleOp(name = "dqp2425", group = "TeleOp")
 
@@ -38,14 +40,8 @@ public class dqp2425 extends LinearOpMode{
     @Override
     public void runOpMode() {
         double dampS = 0.85;
-        double dampSpeedRatio = 0.8;
-        double dampTurnRatio  = -1;
-        DcMotor motorFrontLeft = hardwareMap.dcMotor.get("FL"); //0
-        DcMotor motorFrontRight = hardwareMap.dcMotor.get("FR"); //1
-        DcMotor motorBackLeft = hardwareMap.dcMotor.get("BL"); //2
-        DcMotor motorBackRight = hardwareMap.dcMotor.get("BR"); //3
-        motorFrontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-        motorBackLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        Drivetrain drivetrain = new Drivetrain(hardwareMap);
+
         IMU imu = hardwareMap.get(IMU.class, "imu");
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
                 RevHubOrientationOnRobot.LogoFacingDirection.UP,
@@ -84,42 +80,8 @@ public class dqp2425 extends LinearOpMode{
                 imu.resetYaw();
             }
 
-            double y = Range.clip(-gamepad1.left_stick_y, -1, 1);
-            //left stick x value
-            double x = Range.clip(-gamepad1.left_stick_x, -1, 1);
-            //right stick x value
-            double rx = Range.clip(-gamepad1.right_stick_x, -1, 1);
+            drivetrain.Teleop(gamepad1, telemetry);
 
-            //    double arct = 0;
-
-            if(gamepad1.right_bumper){
-                dampSpeedRatio = 0.2;
-                dampTurnRatio = -0.3;
-            }else{
-                dampSpeedRatio = 0.8;
-                dampTurnRatio = -0.8;
-            }
-
-            double flPower = (y - x) * dampSpeedRatio + dampTurnRatio * rx;
-            double frPower = (y + x) * dampSpeedRatio - dampTurnRatio * rx;
-            double blPower = (y + x) * dampSpeedRatio + dampTurnRatio * rx;
-            double brPower = (y - x) * dampSpeedRatio - dampTurnRatio * rx;
-
-            double maxFront = Math.max(flPower, frPower);
-            double maxBack = Math.max(blPower, brPower);
-            double maxPower = Math.max(maxFront, maxBack);
-
-            if (maxPower > 1.0) {
-                flPower /= maxPower;
-                frPower /= maxPower;
-                blPower /= maxPower;
-                brPower /= maxPower;
-            }
-            //finally moving the motors
-            motorFrontLeft.setPower(flPower);
-            motorBackLeft.setPower(blPower);
-            motorFrontRight.setPower(frPower);
-            motorBackRight.setPower(brPower);
             double idkman=-this.gamepad2.left_stick_y;
             if (idkman>0) {
                 if (slides2pos>0.43) slides2pos-=idkman/1000;
