@@ -210,7 +210,8 @@ public class dqp2425 extends LinearOpMode{
             }
 
             if(gamepad2.left_stick_button){
-                slides.setTargetPosition(-1338);
+                slides.setPower(0.9);
+                slides.setTargetPosition(-1108);
                 rot2pos=0.1285;
                 rotation2.setPosition(rot2pos);
             }
@@ -220,7 +221,7 @@ public class dqp2425 extends LinearOpMode{
                 //transfer();
                 slides.setTargetPosition(0);
                 slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                slides.setPower(0.6);
+                slides.setPower(0.8);
                 claw2pos=0.54;
                 rot2pos=0.985;
                 rotation2.setPosition(rot2pos);
@@ -295,7 +296,7 @@ public class dqp2425 extends LinearOpMode{
             if (gamepad2.dpad_up) {
                 slides.setTargetPosition(-2300);
                 slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                slides.setPower(0.8);
+                slides.setPower(1);
                 c1=1;
 
             }
@@ -331,7 +332,7 @@ public class dqp2425 extends LinearOpMode{
                 c3=0;
                 slides.setTargetPosition(0);
                 slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                slides.setPower(0.6);
+                slides.setPower(1);
                 claw2pos=0.25;
                 claw2.setPosition(claw2pos);
 
