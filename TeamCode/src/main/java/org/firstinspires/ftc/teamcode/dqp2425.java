@@ -211,7 +211,7 @@ public class dqp2425 extends LinearOpMode{
 
             if(gamepad2.left_stick_button){
                 slides.setTargetPosition(-1338);
-                rot2pos=0.0385;
+                rot2pos=0.1285;
                 rotation2.setPosition(rot2pos);
             }
 //
