@@ -203,9 +203,15 @@ public class dqp2425 extends LinearOpMode{
                 rotation2.setPosition(rot2pos);
             }
             if (gamepad2.right_trigger>0) {
-                if (rot2pos<0.1727) rot2pos+=gamepad2.right_trigger/100;
-                else rot2pos=0.1727;
+                if (rot2pos<0.985) rot2pos+=gamepad2.right_trigger/100;
+                else rot2pos=0.985;
 //                rot2pos=0.85;
+                rotation2.setPosition(rot2pos);
+            }
+
+            if(gamepad2.left_stick_button){
+                slides.setTargetPosition(-1338);
+                rot2pos=0.0385;
                 rotation2.setPosition(rot2pos);
             }
 //
@@ -216,7 +222,7 @@ public class dqp2425 extends LinearOpMode{
                 slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 slides.setPower(0.6);
                 claw2pos=0.54;
-                rot2pos=0;
+                rot2pos=0.985;
                 rotation2.setPosition(rot2pos);
                 claw2.setPosition(claw2pos);
                 clawpos=0.08;
@@ -295,8 +301,8 @@ public class dqp2425 extends LinearOpMode{
             }
             if (c1==1 && Math.abs(slides.getCurrentPosition()+2300)<=100) {
                 c1=0;
-                rot2pos=0.35;
-                rotation2.setPosition(0.134);
+                rot2pos=0.2513;
+                rotation2.setPosition(rot2pos);
                 slides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             }
             if (gamepad2.dpad_down) {
@@ -316,7 +322,7 @@ public class dqp2425 extends LinearOpMode{
             if (c2==2 && Math.abs(claw2.getPosition()-claw2pos)<=0.000001) {
                 c2=0;
                 f=0;
-                rot2pos=0;
+                rot2pos=0.989;
                 rotation2.setPosition(rot2pos);
                 c3=1;
 
@@ -334,31 +340,5 @@ public class dqp2425 extends LinearOpMode{
         }
 
     }
-    public void transfer(){
-        slides.setTargetPosition(0);
-        slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        slides.setPower(0.6);
-        claw2pos=0.54;
-        rot2pos=0;
-        rotation2.setPosition(rot2pos);
-        claw2.setPosition(claw2pos);
-        clawpos=0.08;
-        claw.setPosition(clawpos);
-        sleep(500);
-        rotpos=0.28;
-        rotation.setPosition(rotpos);
-        pivotpos=0.437;
-        pivot.setPosition(pivotpos);
-        sleep(500);
-        slides2pos=0.70;
-        slides2.setPosition(slides2pos);
-        sleep(1000);
-        claw2.setPosition(0.25);
-        sleep(500);
-        claw.setPosition(0.47);
-        sleep(500);
-        slides2pos=0.68;
-        slides2.setPosition(slides2pos);
 
-    }
 }
