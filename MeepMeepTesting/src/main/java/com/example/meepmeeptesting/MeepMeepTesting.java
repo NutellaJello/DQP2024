@@ -10,24 +10,27 @@ import org.rowlandhall.meepmeep.roadrunner.entity.RoadRunnerBotEntity;
 public class MeepMeepTesting {
     public static void main(String[] args) {
         MeepMeep meepMeep = new MeepMeep(800);
-
+        // for BlueSideBasket
+        /*
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
                 .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
-                .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(new Pose2d(-16, -60, Math.toRadians(90)))
-                       // from start goes to place, splines to place brick
+                .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(new Pose2d(-16, -60, Math.toRadians(270)))
+                        .setReversed(true)
 
-                        .splineTo(new Vector2d(-8, -40), Math.toRadians(90))
+                        .splineTo(new Vector2d(-8, -30), Math.toRadians(90))
 
-                        .waitSeconds(1)
+                        .waitSeconds(3)
 
+                        .lineTo(new Vector2d(-8,-53))
+
+                        .turn(Math.toRadians(180))
+
+                        .setReversed(false)
 
                         .strafeLeft(42)
 
                         .waitSeconds(1)
-
-
-
 
                         .lineToSplineHeading(new Pose2d(-60, -53, Math.toRadians(45)))
 
@@ -47,42 +50,37 @@ public class MeepMeepTesting {
 
                         .turn(Math.toRadians(-60))
 
+                        .build());
 
+         */
 
-//                       .turn(Math.toRadians(-30))
-//
-//                        .back(15)
+        // for observation zone
+//        /*
+        RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
+                // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
+                .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
+                .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(new Pose2d(16, -60, Math.toRadians(270)))
+                        .setReversed(true)
 
-                        // second cycle. has to turn or else really wonky.
-//                        .turn(Math.toRadians(40))
-//
-//                        .splineTo(new Vector2d(-34, 0), 0)
-//
-//                        .back(5)
-//
-//                        .splineTo(new Vector2d(-55, -55), Math.toRadians(230))
-//
-//                        // Third cycle
-//                        .turn(Math.toRadians(40))
-//
-//                        .splineTo(new Vector2d(-34, 0), 0)
-//
-//                        .back(5)
-//
-//                        .splineTo(new Vector2d(-55, -55), Math.toRadians(230))
-//
-//                        // 4th cycle
-//                        .turn(Math.toRadians(40))
-//
-//                        .splineTo(new Vector2d(-34, 0), 0)
-//
-//                        .back(5)
-//
-//                        .splineTo(new Vector2d(-55, -55), Math.toRadians(230))
-//
+                        .lineTo(new Vector2d(16,-32))
+
+                        .waitSeconds(3)
+
+                        .lineTo(new Vector2d(16,-40))
+
+                        .turn(Math.toRadians(-90))
+
+                        .setReversed(false)
+
+                        .lineTo(new Vector2d(25,-40))
+
+                        .waitSeconds(1)
+
+                        .lineToSplineHeading(new Pose2d(25, -10, Math.toRadians(180)))
 
 
                         .build());
+//         */
 
 
         meepMeep.setBackground(MeepMeep.Background.FIELD_INTOTHEDEEP_JUICE_DARK)

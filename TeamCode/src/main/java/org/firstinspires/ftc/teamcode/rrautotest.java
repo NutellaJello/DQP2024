@@ -27,123 +27,140 @@ import com.qualcomm.robotcore.hardware.Servo;
 @Config
 @Autonomous(name = "BLUE_TEST_AUTO_PIXEL", group = "Autonomous")
 public class rrautotest extends LinearOpMode {
-//    public class Lift {
-//        private DcMotorEx lift;
-//
-//        public Lift(HardwareMap hardwareMap) {
-//            lift = hardwareMap.get(DcMotorEx.class, "liftMotor");
-//            lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-//            lift.setDirection(DcMotorSimple.Direction.FORWARD);
-//        }
-//
-//        public class LiftUp implements Action {
-//            private boolean initialized = false;
-//
-//            @Override
-//            public boolean run(@NonNull TelemetryPacket packet) {
-//                if (!initialized) {
-//                    lift.setPower(0.8);
-//                    initialized = true;
-//                }
-//
-//                double pos = lift.getCurrentPosition();
-//                packet.put("liftPos", pos);
-//                if (pos < 3000.0) {
-//                    return true;
-//                } else {
-//                    lift.setPower(0);
-//                    return false;
-//                }
-//            }
-//        }
-//        public Action liftUp() {
-//            return new LiftUp();
-//        }
-//
-//        public class LiftDown implements Action {
-//            private boolean initialized = false;
-//
-//            @Override
-//            public boolean run(@NonNull TelemetryPacket packet) {
-//                if (!initialized) {
-//                    lift.setPower(-0.8);
-//                    initialized = true;
-//                }
-//
-//                double pos = lift.getCurrentPosition();
-//                packet.put("liftPos", pos);
-//                if (pos > 100.0) {
-//                    return true;
-//                } else {
-//                    lift.setPower(0);
-//                    return false;
-//                }
-//            }
-//        }
-//        public Action liftDown(){
-//            return new LiftDown();
-//        }
-//    }
-//
-//    public class Claw {
-//        private Servo claw;
-//
-//        public Claw(HardwareMap hardwareMap) {
-//            claw = hardwareMap.get(Servo.class, "claw");
-//        }
-//
-//        public class CloseClaw implements Action {
-//            @Override
-//            public boolean run(@NonNull TelemetryPacket packet) {
-//                claw.setPosition(0.55);
-//                return false;
-//            }
-//        }
-//        public Action closeClaw() {
-//            return new CloseClaw();
-//        }
-//
-//        public class OpenClaw implements Action {
-//            @Override
-//            public boolean run(@NonNull TelemetryPacket packet) {
-//                claw.setPosition(1.0);
-//                return false;
-//            }
-//        }
-//        public Action openClaw() {
-//            return new OpenClaw();
-//        }
-//    }
-//
+    private DcMotor slides;
+    private Servo slides2;
+    private Servo rotation;
+    private Servo pivot;
+    private Servo claw;
+    private Servo claw2;
+    private Servo rotation2;
+    private DcMotor hang;
+
+    public class Lift {
+        private DcMotorEx lift;
+
+        public Lift(HardwareMap hardwareMap) {
+            slides=hardwareMap.get(DcMotor.class, "slides");// outtake, EPM 0
+
+            slides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            slides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            slides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        }
+
+        public class LiftUp implements Action {
+            private boolean initialized = false;
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                if (!initialized) {
+                    slides.setPower(0.0);
+                    initialized = true;
+                }
+
+
+                slides.setTargetPosition(-100); // need to change!!!
+                slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                slides.setPower(0.4);
+
+                return true;
+            }
+        }
+        public Action liftUp() {
+            return new LiftUp();
+        }
+
+        public class LiftDown implements Action {
+            private boolean initialized = false;
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                if (!initialized) {
+                    slides.setPower(0.0);
+                    initialized = true;
+                }
+
+
+                slides.setTargetPosition(10); // need to change!!!
+                slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                slides.setPower(0.4);
+
+                return true;
+            }
+        }
+        public Action liftDown(){
+            return new LiftDown();
+        }
+    }
+
+    public class Claw {
+        private Servo claw;
+
+        public Claw(HardwareMap hardwareMap) {
+            claw = hardwareMap.get(Servo.class, "claw");
+        }
+
+        public class CloseClaw implements Action {
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                claw.setPosition(0.55);
+                return false;
+            }
+        }
+        public Action closeClaw() {
+            return new CloseClaw();
+        }
+
+        public class OpenClaw implements Action {
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                claw.setPosition(0.54);
+                return false;
+            }
+        }
+        public Action openClaw() {
+            return new OpenClaw();
+        }
+    }
+
     @Override
     public void runOpMode() {
         //Pose2d initialPose = new Pose2d(-16, -60, Math.toRadians(90));
-        Pose2d initialPose = new Pose2d(16, -10, Math.toRadians(180));
+        Pose2d initialPose = new Pose2d(-16, -60, Math.toRadians(270));
         MecanumDrive drive = new MecanumDrive(hardwareMap, initialPose);
-        // Claw claw = new Claw(hardwareMap);
-        // Lift lift = new Lift(hardwareMap);
 
-        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        OpenCvWebcam webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
-        HSVDetection detectionRed = new HSVDetection(webcam, telemetry);
-        webcam.setPipeline(detectionRed);
 
-        webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
-            public void onOpened() {
-                // Set MJPEG format to increase FPS
-                telemetry.addData("Camera", "Opened successfully");
-                telemetry.addData("centerX = ", detectionRed.getCenterX());
-                telemetry.update();
-                webcam.startStreaming(640, 480, OpenCvCameraRotation.UPRIGHT);
-            }
+        slides2=hardwareMap.get(Servo.class, "slides2");// intake, EPS 0 "AXONMAX"
+        rotation=hardwareMap.get(Servo.class, "rotation"); // EPS 3
+        pivot=hardwareMap.get(Servo.class, "pivot"); // EPS 2
+        claw=hardwareMap.get(Servo.class, "claw"); // EPS 1
+        claw2=hardwareMap.get(Servo.class, "claw2"); // EPS 4
+        rotation2=hardwareMap.get(Servo.class, "rotation2"); // EPS 5
+        hang=hardwareMap.get(DcMotor.class, "hang"); // EPM 1
 
-            @Override
-            public void onError(int errorCode) {
-                telemetry.addData("Error", "Camera failed to open with error code: " + errorCode);
-                telemetry.update();
-            }
+        hang.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        });
+
+//        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+//        OpenCvWebcam webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
+//        HSVDetection detectionRed = new HSVDetection(webcam, telemetry);
+//        webcam.setPipeline(detectionRed);
+//
+//        webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+//            public void onOpened() {
+//                // Set MJPEG format to increase FPS
+////                telemetry.addData("Camera", "Opened successfully");
+////                telemetry.addData("centerX = ", detectionRed.getCenterX());
+////                telemetry.update();
+////                webcam.startStreaming(640, 480, OpenCvCameraRotation.UPRIGHT);
+//            }
+//
+//            @Override
+//            public void onError(int errorCode) {
+//                telemetry.addData("Error", "Camera failed to open with error code: " + errorCode);
+//                telemetry.update();
+//            }
+//
+//        });
 
 
         waitForStart();
@@ -155,7 +172,7 @@ public class rrautotest extends LinearOpMode {
         int visionOutputPosition = 1;
         int cameraCenterX = 320;
         while(opModeIsActive()) {
-            int detectedCenterX = detectionRed.getCenterX();  // Get detected object's X position
+          //  int detectedCenterX = detectionRed.getCenterX();  // Get detected object's X position
 
 
 
@@ -194,7 +211,8 @@ public class rrautotest extends LinearOpMode {
 //                .waitSeconds(2)
 //                .strafeTo(new Vector2d(46, 30))
 //                .waitSeconds(3);
-            TrajectoryActionBuilder tab3 = drive.actionBuilder(initialPose);
+            TrajectoryActionBuilder tab3 = drive.actionBuilder(initialPose)
+            /* object detection
             if (detectedCenterX != -1) {  // Object is detected
                 if (detectedCenterX < cameraCenterX - 10) {
                     // Object is to the left, turn left slightly
@@ -210,35 +228,36 @@ public class rrautotest extends LinearOpMode {
                 telemetry.addData("No object detected", true);
             }
 
-            tab3.turnTo(Math.toRadians(90));
-  /* created path for cycling
-                .splineTo(new Vector2d(-8, -40), Math.toRadians(90))
-
-                .waitSeconds(1)
-
-                .strafeTo(new Vector2d(-50,-40))
+             */
 
 
-                .waitSeconds(1)
 
-                .splineToLinearHeading(new Pose2d(-58,-53,Math.toRadians(45)),0)
+            .splineTo(new Vector2d(-8, -40), Math.toRadians(270))
 
-                .waitSeconds(1)
+                    .waitSeconds(1)
 
-                .turnTo(Math.toRadians(90))
+                    .strafeTo(new Vector2d(-50,-40))
 
-                .waitSeconds(2)
+                    .waitSeconds(1)
 
-                .turnTo(Math.toRadians(45))
+                    .splineToLinearHeading(new Pose2d(-58,-53,Math.toRadians(45)),0)
 
-                .waitSeconds(2)
+                    .waitSeconds(1)
 
-                .turnTo(Math.toRadians(120))
+                    .turnTo(Math.toRadians(90))
 
-                .waitSeconds(2)
+                    .waitSeconds(2)
 
-                .turnTo(Math.toRadians(45));
-*/
+                    .turnTo(Math.toRadians(45))
+
+                    .waitSeconds(2)
+
+                    .turnTo(Math.toRadians(120))
+
+                    .waitSeconds(2)
+
+                    .turnTo(Math.toRadians(45));
+
 
 
             Action trajectoryActionCloseOut = tab3.fresh()

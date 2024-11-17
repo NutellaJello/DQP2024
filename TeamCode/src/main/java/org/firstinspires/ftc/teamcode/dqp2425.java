@@ -4,22 +4,22 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.subsystems.Claws.IntakeClaw;
 import org.firstinspires.ftc.teamcode.subsystems.Claws.OutakeClaw;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
+import org.firstinspires.ftc.teamcode.subsystems.slides.IntakeSlide;
 
 @Config
 @TeleOp(name = "dqp2425", group = "TeleOp")
 
 public class dqp2425 extends LinearOpMode{
     private DcMotor slides;
-    private Servo slides2;
+    private IntakeSlide intakeSlide;
     private Servo rotation;
     private Servo pivot;
     private IntakeClaw intakeClaw;
@@ -44,6 +44,7 @@ public class dqp2425 extends LinearOpMode{
     public void runOpMode() {
         double dampS = 0.85;
         Drivetrain drivetrain = new Drivetrain(hardwareMap);
+        intakeSlide = new IntakeSlide(hardwareMap);
 
         IMU imu = hardwareMap.get(IMU.class, "imu");
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
@@ -53,7 +54,7 @@ public class dqp2425 extends LinearOpMode{
 
         double tgtPower = 0;
         slides=hardwareMap.get(DcMotor.class, "slides");// outtake, EPM 0
-        slides2=hardwareMap.get(Servo.class, "slides2");// intake, EPS 0 "AXONMAX"
+//        slides2=hardwareMap.get(Servo.class, "slides2");// intake, EPS 0 "AXONMAX"
         rotation=hardwareMap.get(Servo.class, "rotation"); // EPS 3
         pivot=hardwareMap.get(Servo.class, "pivot"); // EPS 2
 //        claw=hardwareMap.get(Servo.class, "claw"); // EPS 1
@@ -73,7 +74,7 @@ public class dqp2425 extends LinearOpMode{
         waitForStart();
         while (opModeIsActive()) {
             tgtPower=this.gamepad2.left_stick_y;
-            telemetry.addData("slides2", slides2pos);
+//            telemetry.addData("slides2", slides2pos);
             telemetry.addData("claw", clawpos);
             telemetry.addData("pivot", pivotpos);
             telemetry.addData("rotation", rotpos);
@@ -86,21 +87,22 @@ public class dqp2425 extends LinearOpMode{
             }
 
             drivetrain.Teleop(gamepad1, telemetry);
+            intakeSlide.Teleop(gamepad2,telemetry);
 
-            double idkman=-this.gamepad2.left_stick_y;
-            if (idkman>0) {
-                if (slides2pos>0.43) slides2pos-=idkman/1000;
-                else slides2pos=0.43;
-            }
-            if (idkman<0) {
-                if (slides2pos<0.71) slides2pos-=idkman/1000;
-                else slides2pos=0.71;
-            }
-            if(this.gamepad2.left_stick_button){
-                slides2pos=0.70;
-            }
-
-            slides2.setPosition(slides2pos);
+//            double idkman=-this.gamepad2.left_stick_y;
+//            if (idkman>0) {
+//                if (slides2pos>0.43) slides2pos-=idkman/1000;
+//                else slides2pos=0.43;
+//            }
+//            if (idkman<0) {
+//                if (slides2pos<0.71) slides2pos-=idkman/1000;
+//                else slides2pos=0.71;
+//            }
+//            if(this.gamepad2.left_stick_button){
+//                slides2pos=0.70;
+//            }
+//
+//            slides2.setPosition(slides2pos);
 
             if (gamepad2.right_stick_y > 0) {
                 slides.setTargetPosition(slides.getCurrentPosition() +100);
@@ -255,14 +257,14 @@ public class dqp2425 extends LinearOpMode{
         pivot.setPosition(pivotpos);
         sleep(500);
         slides2pos=0.70;
-        slides2.setPosition(slides2pos);
+        intakeSlide.setPosition(slides2pos);
         sleep(1000);
         outakeClaw.setPosition(0.25);
         sleep(500);
         intakeClaw.setPosition(0.41);
         sleep(500);
         slides2pos=0.6;
-        slides2.setPosition(slides2pos);
+        intakeSlide.setPosition(slides2pos);
 
     }
 }
