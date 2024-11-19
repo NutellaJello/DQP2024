@@ -35,17 +35,175 @@ public class BlueSideBasket extends LinearOpMode {
     private DcMotor slides;
     private Servo slides2, rotation, pivot, claw, claw2, rotation2;
 
+    public class intakeClaw {
+        private Servo intakeClaw;
+
+        public intakeClaw(HardwareMap hardwareMap) {
+            intakeClaw = hardwareMap.get(Servo.class, "claw");
+        }
+        public class CloseClaw implements Action {
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                intakeClaw.setPosition(0.55);
+                return false;
+            }
+        }
+        public Action closeClaw() {
+            return new CloseClaw();
+        }
+    }
+
+    public class intakeRotation {
+        private Servo intakeRotation;
+
+        public intakeRotation(HardwareMap hardwareMap) {
+            intakeRotation = hardwareMap.get(Servo.class, "rotation");
+        }
+        public class IntakeRotDown implements Action {
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                intakeRotation.setPosition(0.25);
+                return false;
+            }
+        }
+        public Action intakeRotDown() {
+            return new IntakeRotDown();
+        }
+
+        public class IntakeRotUp implements Action {
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                intakeRotation.setPosition(0.97);
+                return false;
+            }
+        }
+        public Action intakeRotUp() {
+            return new IntakeRotDown();
+        }
+        public void setPosition(double value){
+            intakeRotation.setPosition(value);
+        }
+    }
+    public class intakeSlides {
+        private Servo intakeSlides;
+
+        public intakeSlides(HardwareMap hardwareMap) {
+            intakeSlides = hardwareMap.get(Servo.class, "slides2");
+        }
+
+        public class MoveOutIntake implements Action {
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                intakeSlides.setPosition(0.5726);
+                return false; // Single execution, action is complete
+            }
+        }
+
+        public Action moveToPosition() {
+            return new MoveOutIntake();
+        }
+        public class RetractIntake implements Action {
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                intakeSlides.setPosition(0.69);
+                return false; // Single execution, action is complete
+            }
+        }
+
+        public Action retractPosition() {
+            return new RetractIntake();
+        }
+
+        public void setPosition(double value){
+            intakeSlides.setPosition(value);
+        }
+    }
+
+    public class outtakeClaw {
+        private Servo outtakeClaw;
+
+        public outtakeClaw(HardwareMap hardwareMap) {
+            outtakeClaw = hardwareMap.get(Servo.class, "claw2");
+        }
+        public class CloseClaw implements Action {
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                outtakeClaw.setPosition(0.25);
+                return false;
+            }
+        }
+        public Action closeClaw() {
+            return new CloseClaw();
+        }
+
+        public class OpenClaw implements Action {
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                outtakeClaw.setPosition(0.54);
+                return false;
+            }
+        }
+        public Action openClaw() {
+            return new OpenClaw();
+        }
+        public void setPosition(double value){
+            outtakeClaw.setPosition(value);
+        }
+    }
+
+    public class outtakeRotation {
+        private Servo outtakeRotation;
+
+        public outtakeRotation(HardwareMap hardwareMap) {
+            outtakeRotation = hardwareMap.get(Servo.class, "rotation2");
+        }
+        public class OuttakeRotDown implements Action {
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                outtakeRotation.setPosition(0.25);
+                return false;
+            }
+        }
+        public Action outtakeRotDown() {
+            return new OuttakeRotDown();
+        }
+
+        public class OuttakeRotUp implements Action {
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                outtakeRotation.setPosition(0.97);
+                return false;
+            }
+        }
+        public Action outtakeRotUp() {
+            return new OuttakeRotUp();
+        }
+        public void setPosition(double value){
+            outtakeRotation.setPosition(value);
+        }
+    }
+
+
+
+
     @Override
     public void runOpMode() {
         // Initialize drivetrain and mechanisms
         MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(-16, -60, Math.toRadians(270)));
 
+        intakeClaw intakeClaw = new intakeClaw(hardwareMap);
+        intakeRotation intakeRotation = new intakeRotation(hardwareMap);
+        intakeSlides intakeSlides = new intakeSlides(hardwareMap);
+
+        outtakeClaw outtakeClaw = new outtakeClaw(hardwareMap);
+        //outtakeRotation outtakeRotation = new outtakeRotation(hardwareMap);
+
         slides = hardwareMap.get(DcMotor.class, "slides");
         slides2 = hardwareMap.get(Servo.class, "slides2");
-        rotation = hardwareMap.get(Servo.class, "rotation");
+        //rotation = hardwareMap.get(Servo.class, "rotation");
         pivot = hardwareMap.get(Servo.class, "pivot");
-        claw = hardwareMap.get(Servo.class, "claw");
-        claw2 = hardwareMap.get(Servo.class, "claw2");
+      //  claw = hardwareMap.get(Servo.class, "claw");
+      //  claw2 = hardwareMap.get(Servo.class, "claw2");
         rotation2 = hardwareMap.get(Servo.class, "rotation2");
 
         // Configure motor and servo settings
@@ -54,42 +212,38 @@ public class BlueSideBasket extends LinearOpMode {
         slides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         //Ensure intake does not move around
-        slides2.setPosition(0.69);
+        intakeSlides.setPosition(0.69);
 
         //Hold Spece
         rotation2.setPosition(0.173);
-        claw2.setPosition(0.25);
+        outtakeClaw.setPosition(0.25);
 
 
         // Autonomous Actions
         TrajectoryActionBuilder tab1 = drive.actionBuilder(new Pose2d(-16, -60, Math.toRadians(270)))
                 .setReversed(true)
-                //.splineTo(new Vector2d(-8, -32), Math.toRadians(90))
-                .lineToY(-32)
+                .lineToY(-29)
                 .waitSeconds(1);
         Action movement1 = tab1.build();
 
-        TrajectoryActionBuilder tab2 = drive.actionBuilder(new Pose2d(-8, -30, Math.toRadians(270)))
-                .lineToY(-53)
-                .turn(Math.toRadians(180))
-                .strafeTo(new Vector2d(-45,-53))
+        TrajectoryActionBuilder tab2 = drive.actionBuilder(new Pose2d(-16, -29, Math.toRadians(270)))
+                .lineToY(-40)
+                .turn(Math.toRadians(179.5))
+                .waitSeconds(0.1)
+                .strafeTo(new Vector2d(-50,-40))
                 .waitSeconds(1);
         Action movement2 = tab2.build();
 
+        TrajectoryActionBuilder tab3 = drive.actionBuilder(new Pose2d(-45, -53, Math.toRadians(90)))
+                .splineTo(new Vector2d(-60, -53), Math.toRadians(45));
+        Action movement3 = tab3.build();
+
         // Use utility methods to create actions
         Action slidesUp = createMotorAction(slides, -1100, 0.8);      // Slides up
-        Action slidesPartDown = createMotorAction(slides, -400, 0.6); // Slides partially down
+        Action slidesPartDown = createMotorAction(slides, -275, 0.2); // Slides partially down
         Action slidesDown = createMotorAction(slides,-10 , 0.6);       // Slides down
-        Action slides2out = createServoAction(slides2, 0.4); // PLEASE ADJUST!!!
-        Action slides2in = createServoAction(slides2, 0.70); // PLEASE ADJUST!!!
-        Action openClaw = createServoAction(claw, 0.54);             // Open claw
-        Action closeClaw = createServoAction(claw, 0.25);
-        Action rotate2Base = createServoAction(rotation2, 0);           // outtake rotate to equilibrium
-        Action rotateBase = createServoAction(rotation, 0.4); // CHANGE
 
         ArrayList<Action> pickSampleActions = new ArrayList<>();
-        pickSampleActions.add(slides2out);
-        pickSampleActions.add(rotateBase);
         pickSampleActions.add(slidesDown);
 
         Action pickSample = new ConcurrentAction(pickSampleActions);
@@ -102,19 +256,19 @@ public class BlueSideBasket extends LinearOpMode {
         // Execute autonomous sequence
         Actions.runBlocking(
                 new SequentialAction(
-                        movement1,   // Moving to the submersible
                         slidesUp,
+                         movement1,   // Moving to the submersible
                         slidesPartDown,
-                        openClaw,
-                        rotate2Base,
-                        movement2
-                        // intake out
-                        // rotation to pick sample
-                        // open then close the claw
-                        // rotate back
-                        // retract intake
+                        outtakeClaw.openClaw(),
+                      //  rotate2Base,
+                        movement2,
+                        intakeSlides.moveToPosition(),
+                        intakeRotation.intakeRotDown(),
+                        intakeClaw.closeClaw(),
+                        intakeRotation.intakeRotUp(),
+                        intakeSlides.retractPosition()
                         // transfer to outtake claw
-                        // spline to position, check MeepMeep
+                        //movement3
                         // slidesUp
                         // rotate2 0.173
                         // open claw
@@ -163,18 +317,6 @@ public class BlueSideBasket extends LinearOpMode {
     }
 
 
-    /**
-     * Utility method to create an action for a servo to move to a target position.
-     */
-    private Action createServoAction(Servo servo, double position) {
-        return new Action() {
-            @Override
-            public boolean run(@NonNull TelemetryPacket packet) {
-                servo.setPosition(position);
-                return false;  // Single execution
-            }
-        };
-    }
 
   /**
    * Combining multiple Utility methods into one action.

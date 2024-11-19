@@ -17,7 +17,7 @@ public class IntakeSlide {
     }
 
     public void Teleop(Gamepad gamepad, Telemetry telemetry, boolean showTelemetry){ //Code to be run in Teleop Mode void Loop at top level
-        double joystick = gamepad.left_stick_y;
+        double joystick = -gamepad.left_stick_y;
         if (joystick>0) {
             if (intakepos>0.43) intakepos-=joystick/1000;
             else intakepos=0.43;

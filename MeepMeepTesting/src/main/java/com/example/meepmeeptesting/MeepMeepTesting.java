@@ -11,7 +11,7 @@ public class MeepMeepTesting {
     public static void main(String[] args) {
         MeepMeep meepMeep = new MeepMeep(800);
         // for BlueSideBasket
-        /*
+    //    /*
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
                 .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
@@ -22,7 +22,7 @@ public class MeepMeepTesting {
 
                         .waitSeconds(3)
 
-                        .lineTo(new Vector2d(-8,-53))
+                        .lineTo(new Vector2d(-8,-40))
 
                         .turn(Math.toRadians(180))
 
@@ -52,10 +52,10 @@ public class MeepMeepTesting {
 
                         .build());
 
-         */
+//         */
 
         // for observation zone
-//        /*
+        /*
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
                 .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
@@ -80,7 +80,7 @@ public class MeepMeepTesting {
 
 
                         .build());
-//         */
+         */
 
 
         meepMeep.setBackground(MeepMeep.Background.FIELD_INTOTHEDEEP_JUICE_DARK)
