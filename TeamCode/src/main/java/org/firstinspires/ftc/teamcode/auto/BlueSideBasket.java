@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.auto;
+package org.firstinspires.ftc.teamcode;
 import androidx.annotation.NonNull;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
@@ -79,7 +79,7 @@ public class BlueSideBasket extends LinearOpMode {
                         public boolean run(@NonNull TelemetryPacket packet) {
                             intakeRotation.setPosition(0.97);
                             return false;
-                        }}, new SleepAction(0.6)
+                        }}, new SleepAction(0.4)
             );
         }
 
@@ -90,7 +90,7 @@ public class BlueSideBasket extends LinearOpMode {
                         public boolean run(@NonNull TelemetryPacket packet) {
                             intakeRotation.setPosition(0.28);
                             return false;
-                        }}, new SleepAction(0.6)
+                        }}, new SleepAction(0.4)
             );
         }
         public void setPosition(double value){
@@ -111,7 +111,7 @@ public class BlueSideBasket extends LinearOpMode {
                         public boolean run(@NonNull TelemetryPacket packet) {
                             intakeSlides.setPosition(0.5726);
                             return false;
-                        }}, new SleepAction(1.6)
+                        }}, new SleepAction(1.4)
             );
         }
 
@@ -123,7 +123,7 @@ public class BlueSideBasket extends LinearOpMode {
                         public boolean run(@NonNull TelemetryPacket packet) {
                             intakeSlides.setPosition(0.702);
                             return false;
-                        }}, new SleepAction(1.6)
+                        }}, new SleepAction(1.4)
             );
         }
 
