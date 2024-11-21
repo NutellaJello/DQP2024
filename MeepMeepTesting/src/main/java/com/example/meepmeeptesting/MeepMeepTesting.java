@@ -11,7 +11,7 @@ public class MeepMeepTesting {
     public static void main(String[] args) {
         MeepMeep meepMeep = new MeepMeep(800);
         // for BlueSideBasket
-    //    /*
+        /*
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
                 .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
@@ -52,35 +52,57 @@ public class MeepMeepTesting {
 
                         .build());
 
-//         */
+         */
 
         // for observation zone
-        /*
+  //      /*
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
                 .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
-                .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(new Pose2d(16, -60, Math.toRadians(270)))
-                        .setReversed(true)
+                .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(new Pose2d(8, -60, Math.toRadians(270)))
+                        //.setReversed(true)
 
-                        .lineTo(new Vector2d(16,-32))
+                        .lineTo(new Vector2d(8,-32))
 
-                        .waitSeconds(3)
+                      //  .waitSeconds(1)
 
-                        .lineTo(new Vector2d(16,-40))
+                        //.lineTo(new Vector2d(16,-42))
 
-                        .turn(Math.toRadians(-90))
+                        .turn(Math.toRadians(180))
 
                         .setReversed(false)
 
-                        .lineTo(new Vector2d(25,-40))
+                        .lineTo(new Vector2d(45,-42))
 
-                        .waitSeconds(1)
+                      //  .waitSeconds(1)
 
-                        .lineToSplineHeading(new Pose2d(25, -10, Math.toRadians(180)))
+                        .lineTo(new Vector2d(60,-42))
+
+                        .lineTo(new Vector2d(46,-46))
+
+                        .turn(Math.toRadians(180))
+
+                        .splineTo(new Vector2d(8,-32), Math.toRadians(270))
+                       // .splineToLinearHeading(new Pose2d(8,-32,Math.toRadians(270)))
+
+//                        .splineTo(new Vector2d(48,-10),Math.toRadians(90))
+//
+//                        .lineTo(new Vector2d(60,-10))
+//
+//                        .strafeLeft(40)
+//
+//                        .lineTo(new Vector2d(46,-46))
+//
+//                        .turn(Math.toRadians(90))
+//
+//                        .splineTo(new Vector2d(8,-32),Math.toRadians(270))
+
+
+
 
 
                         .build());
-         */
+   //      */
 
 
         meepMeep.setBackground(MeepMeep.Background.FIELD_INTOTHEDEEP_JUICE_DARK)

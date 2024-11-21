@@ -31,7 +31,7 @@ import java.util.List;
 
 @Config
 @Autonomous
-public class BlueSideBasket extends LinearOpMode {
+public class RedSideBasket extends LinearOpMode {
 
     // Declare motors and servos
     private DcMotor slides;
@@ -232,7 +232,7 @@ public class BlueSideBasket extends LinearOpMode {
         outtakeClaw.setPosition(0.38);
 //        outtakeClaw.setPosition(0.25);
 
-
+// need to use pose mapping
         // Autonomous Actions
         TrajectoryActionBuilder tab4 = drive.actionBuilder(new Pose2d(-16,-60,Math.toRadians(270)))
                 .setReversed(true)
