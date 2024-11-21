@@ -79,7 +79,7 @@ public class BlueSideBasket extends LinearOpMode {
                         public boolean run(@NonNull TelemetryPacket packet) {
                             intakeRotation.setPosition(0.97);
                             return false;
-                        }}, new SleepAction(0.4)
+                        }}, new SleepAction(0.6)
             );
         }
 
@@ -90,7 +90,7 @@ public class BlueSideBasket extends LinearOpMode {
                         public boolean run(@NonNull TelemetryPacket packet) {
                             intakeRotation.setPosition(0.28);
                             return false;
-                        }}, new SleepAction(0.4)
+                        }}, new SleepAction(0.6)
             );
         }
         public void setPosition(double value){
