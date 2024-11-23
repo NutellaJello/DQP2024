@@ -301,7 +301,7 @@ public class BlueSideBasket extends LinearOpMode {
                         intakeSlides.retractPosition(),
                         outtakeClaw.closeClaw(),
                         new SleepAction(0.1),
-                        intakeClaw.openClaw(),
+                        intakeClaw.openClaw(),//
                         new ParallelAction(movement3, new SequentialAction(
                                 slidesUp,
                                 outtakeRotation.outtakeRotUp()

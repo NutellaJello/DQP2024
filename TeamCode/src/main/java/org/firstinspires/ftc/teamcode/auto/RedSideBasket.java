@@ -250,7 +250,7 @@ public class RedSideBasket extends LinearOpMode {
                 .waitSeconds(0.1)
                 .turn(Math.toRadians(179.5));
         Action movement1 = tab1.build();
-
+//
         TrajectoryActionBuilder tab3 = drive.actionBuilder(mirrorPose.apply(new Pose2d(-45.5, -42, Math.toRadians(90))))
                 .strafeTo(mirrorVector.apply(new Vector2d(-60, -53))).turnTo(Math.toRadians(45-180));
         Action movement3 = tab3.build();

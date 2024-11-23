@@ -340,7 +340,7 @@ public class dqp2425 extends LinearOpMode{
                 slides.setPower(1);
                 claw2pos=0.33;
                 claw2.setPosition(claw2pos);
-
+//
             }
 
         }

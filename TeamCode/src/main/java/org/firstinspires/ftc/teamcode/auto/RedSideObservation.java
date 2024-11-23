@@ -271,7 +271,7 @@ public class RedSideObservation extends LinearOpMode {
 
 //        outtakeClaw.setPosition(0.25);
 
-
+//
         // Autonomous Actions
         TrajectoryActionBuilder tab1 = drive.actionBuilder(mirrorPose.apply(new Pose2d(6,-60,Math.toRadians(270))))
                 .setReversed(true)
