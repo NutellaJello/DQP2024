@@ -109,7 +109,7 @@ public class BlueSideBasket extends LinearOpMode {
                     new Action(){
                         @Override
                         public boolean run(@NonNull TelemetryPacket packet) {
-                            intakeSlides.setPosition(0.5726);
+                            intakeSlides.setPosition(0.57);
                             return false;
                         }}, new SleepAction(1.4)
             );
@@ -242,22 +242,22 @@ public class BlueSideBasket extends LinearOpMode {
 
         Action movement4=tab4.build();
         TrajectoryActionBuilder tab1 = drive.actionBuilder(new Pose2d(-10, -29, Math.toRadians(270)))
-                .strafeTo(new Vector2d(-45,-42))
+                .strafeTo(new Vector2d(-47,-42))
                 .waitSeconds(0.1)
-                .turn(Math.toRadians(179.5));
+                .turn(Math.toRadians(179));
         Action movement1 = tab1.build();
 
-        TrajectoryActionBuilder tab3 = drive.actionBuilder(new Pose2d(-45, -42, Math.toRadians(90)))
-                .strafeTo(new Vector2d(-60, -53)).turnTo(Math.toRadians(45));
+        TrajectoryActionBuilder tab3 = drive.actionBuilder(new Pose2d(-46, -43, Math.toRadians(90)))
+                .strafeTo(new Vector2d(-62, -54)).turnTo(Math.toRadians(45));
         Action movement3 = tab3.build();
 
 
-        TrajectoryActionBuilder tab2 = drive.actionBuilder(new Pose2d(-60, -53, Math.toRadians(45)))
-                .splineTo(new Vector2d(-55.5,-41), Math.toRadians(90));
+        TrajectoryActionBuilder tab2 = drive.actionBuilder(new Pose2d(-62, -54, Math.toRadians(45)))
+                .splineTo(new Vector2d(-56,-42), Math.toRadians(89.5));
         Action movement2 = tab2.build();
 
-        TrajectoryActionBuilder tab5 = drive.actionBuilder(new Pose2d(-55.5,-41, Math.toRadians(90)))
-                .strafeTo(new Vector2d(-60,-53)).turnTo(Math.toRadians(45));
+        TrajectoryActionBuilder tab5 = drive.actionBuilder(new Pose2d(-55.5,-42, Math.toRadians(90)))
+                .strafeTo(new Vector2d(-61,-54)).turnTo(Math.toRadians(45));
         Action movement5 = tab5.build();
 
 
@@ -300,6 +300,7 @@ public class BlueSideBasket extends LinearOpMode {
                         intakeRotation.intakeRotUp(),
                         intakeSlides.retractPosition(),
                         outtakeClaw.closeClaw(),
+                        new SleepAction(0.1),
                         intakeClaw.openClaw(),
                         new ParallelAction(movement3, new SequentialAction(
                                 slidesUp,

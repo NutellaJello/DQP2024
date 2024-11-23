@@ -180,7 +180,7 @@ public class dqp2425 extends LinearOpMode{
             }
             if (gamepad2.left_bumper) {
 
-                claw2pos=0.36;
+                claw2pos=0.34;
                 claw2.setPosition(claw2pos);
             }
             if (gamepad2.x) {
@@ -263,8 +263,8 @@ public class dqp2425 extends LinearOpMode{
                 if ((slides2.getPosition() - slides2pos) <= 0.00001) {
                     a2 += 0.015;
                     if (a2 >= 3) {
-
-                        claw2.setPosition(0.33);
+                        claw2pos = 0.34;
+                        claw2.setPosition(claw2pos);
                         a1 = 4;
                         a2 = 0;
 

@@ -246,12 +246,12 @@ public class RedSideBasket extends LinearOpMode {
 
         Action movement4=tab4.build();
         TrajectoryActionBuilder tab1 = drive.actionBuilder(mirrorPose.apply(new Pose2d(-10, -29, Math.toRadians(270))))
-                .strafeTo(mirrorVector.apply(new Vector2d(-45,-42)))
+                .strafeTo(mirrorVector.apply(new Vector2d(-45.5,-42)))
                 .waitSeconds(0.1)
                 .turn(Math.toRadians(179.5));
         Action movement1 = tab1.build();
 
-        TrajectoryActionBuilder tab3 = drive.actionBuilder(mirrorPose.apply(new Pose2d(-45, -42, Math.toRadians(90))))
+        TrajectoryActionBuilder tab3 = drive.actionBuilder(mirrorPose.apply(new Pose2d(-45.5, -42, Math.toRadians(90))))
                 .strafeTo(mirrorVector.apply(new Vector2d(-60, -53))).turnTo(Math.toRadians(45-180));
         Action movement3 = tab3.build();
 
