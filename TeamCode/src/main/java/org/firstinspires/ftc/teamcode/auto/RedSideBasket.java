@@ -81,9 +81,9 @@ public class RedSideBasket extends LinearOpMode {
                     new Action(){
                         @Override
                         public boolean run(@NonNull TelemetryPacket packet) {
-                            intakeRotation.setPosition(0.97);
+                            intakeRotation.setPosition(0.989);
                             return false;
-                        }}, new SleepAction(0.4)
+                        }}, new SleepAction(0.6)
             );
         }
 
@@ -94,7 +94,7 @@ public class RedSideBasket extends LinearOpMode {
                         public boolean run(@NonNull TelemetryPacket packet) {
                             intakeRotation.setPosition(0.28);
                             return false;
-                        }}, new SleepAction(0.4)
+                        }}, new SleepAction(0.6)
             );
         }
         public void setPosition(double value){
@@ -113,9 +113,9 @@ public class RedSideBasket extends LinearOpMode {
                     new Action(){
                         @Override
                         public boolean run(@NonNull TelemetryPacket packet) {
-                            intakeSlides.setPosition(0.5726);
+                            intakeSlides.setPosition(0.565);
                             return false;
-                        }}, new SleepAction(1.4)
+                        }}, new SleepAction(1.3)
             );
         }
 
@@ -127,7 +127,7 @@ public class RedSideBasket extends LinearOpMode {
                         public boolean run(@NonNull TelemetryPacket packet) {
                             intakeSlides.setPosition(0.702);
                             return false;
-                        }}, new SleepAction(1.4)
+                        }}, new SleepAction(1.3)
             );
         }
 
@@ -225,6 +225,7 @@ public class RedSideBasket extends LinearOpMode {
         //  claw2 = hardwareMap.get(Servo.class, "claw2");
         rotation2 = hardwareMap.get(Servo.class, "rotation2");
 
+
         // Configure motor and servo settings
         slides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         slides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -235,7 +236,10 @@ public class RedSideBasket extends LinearOpMode {
         //Hold Spece
         rotation2.setPosition(0.143);
         outtakeClaw.setPosition(0.38);
-//        outtakeClaw.setPosition(0.25);
+      //  rotation.setPosition(0.437);
+        pivot.setPosition(0.437);
+
+
         // Autonomous Actions
 
         TrajectoryActionBuilder tab4 = drive.actionBuilder(mirrorPose.apply(new Pose2d(-16,-60,Math.toRadians(270))))
@@ -246,35 +250,40 @@ public class RedSideBasket extends LinearOpMode {
 
         Action movement4=tab4.build();
         TrajectoryActionBuilder tab1 = drive.actionBuilder(mirrorPose.apply(new Pose2d(-10, -29, Math.toRadians(270))))
-                .strafeTo(mirrorVector.apply(new Vector2d(-45.5,-42)))
+                .lineToY(34)
+                .strafeTo(mirrorVector.apply(new Vector2d(-46.5,-42.4)))
                 .waitSeconds(0.1)
                 .turn(Math.toRadians(179.5));
         Action movement1 = tab1.build();
 //
-        TrajectoryActionBuilder tab3 = drive.actionBuilder(mirrorPose.apply(new Pose2d(-45.5, -42, Math.toRadians(90))))
-                .strafeTo(mirrorVector.apply(new Vector2d(-60, -53))).turnTo(Math.toRadians(45-180));
+        TrajectoryActionBuilder tab3 = drive.actionBuilder(mirrorPose.apply(new Pose2d(-45.5, -42.4, Math.toRadians(90))))
+                .strafeTo(mirrorVector.apply(new Vector2d(-59, -56))).turnTo(Math.toRadians(45-180));
         Action movement3 = tab3.build();
 
-        TrajectoryActionBuilder tab2 = drive.actionBuilder(mirrorPose.apply(new Pose2d(-60, -53, Math.toRadians(45))))
-                .splineTo(mirrorVector.apply(new Vector2d(-55.5,-41)), Math.toRadians(90-180));
+        TrajectoryActionBuilder tab2 = drive.actionBuilder(mirrorPose.apply(new Pose2d(-59, -56, Math.toRadians(45))))
+                .splineTo(mirrorVector.apply(new Vector2d(-55.8,-42.4)), Math.toRadians(90-180));
         Action movement2 = tab2.build();
 
-        TrajectoryActionBuilder tab5 = drive.actionBuilder(mirrorPose.apply(new Pose2d(-55.5,-41, Math.toRadians(90))))
-                .strafeTo(mirrorVector.apply(new Vector2d(-60,-53))).turnTo(Math.toRadians(45-180));
+        TrajectoryActionBuilder tab5 = drive.actionBuilder(mirrorPose.apply(new Pose2d(-55.8,-42.4, Math.toRadians(90))))
+                .strafeTo(mirrorVector.apply(new Vector2d(-59,-56))).turnTo(Math.toRadians(45-180));
         Action movement5 = tab5.build();
+
+        TrajectoryActionBuilder tab6 = drive.actionBuilder(mirrorPose.apply(new Pose2d(-55.8,-42.4, Math.toRadians(90))))
+                .strafeTo(mirrorVector.apply(new Vector2d(-59,-56))).turnTo(Math.toRadians(45-180));
+        Action movement6 = tab5.build();
 
 
 
 
 
         // Use utility methods to create actions
-        Action slidesUp = createMotorAction(slides, -2300, 0.8);      // Slides up
-        Action slidesPartUp=createMotorAction(slides,-1000,0.8);
-        Action slidesPartDown = createMotorAction(slides, -430, 0.2); // Slides partially down
-        Action slidesDown = createMotorAction(slides,-5 , 0.6);       // Slides down
-        Action slidesDown2 = createMotorAction(slides, -5, 0.6);
-        Action slidesUp2 = createMotorAction(slides, -2300, 0.8);
-        Action slidesDown3 = createMotorAction(slides, -5, 0.6);
+        Action slidesUp = createMotorAction(slides, -2300, 0.9);      // Slides up
+        Action slidesPartUp=createMotorAction(slides,-1050,0.9);
+        Action slidesPartDown = createMotorAction(slides, -400, 0.2); // Slides partially down
+        Action slidesDown = createMotorAction(slides,-5 , 0.9);       // Slides down
+        Action slidesDown2 = createMotorAction(slides, -5, 0.9);
+        Action slidesUp2 = createMotorAction(slides, -2300, 0.9);
+        Action slidesDown3 = createMotorAction(slides, -5, 0.93);
         ArrayList<Action> pickSampleActions = new ArrayList<>();
         pickSampleActions.add(slidesDown);
 

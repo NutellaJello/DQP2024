@@ -76,9 +76,9 @@ public class MeepMeepTesting {
 
                       //  .waitSeconds(1)
 
-                        .lineTo(new Vector2d(60,-42))
+                      //  .lineTo(new Vector2d(60,-42))
 
-                        .lineTo(new Vector2d(46,-46))
+                       // .lineTo(new Vector2d(46,-46))
 
                         .turn(Math.toRadians(180))
 

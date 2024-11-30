@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.auto;
 import androidx.annotation.NonNull;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
@@ -280,12 +280,12 @@ public class RedSideObservation extends LinearOpMode {
 
         TrajectoryActionBuilder tab2 = drive.actionBuilder(mirrorPose.apply(new Pose2d(0, -29, Math.toRadians(270))))
                 .lineToY(35)
-                .strafeTo(mirrorVector.apply(new Vector2d(42,-42.2)))
+                .strafeTo(mirrorVector.apply(new Vector2d(41.5,-42.2)))
                 .waitSeconds(0.1)
                 .turn(Math.toRadians(179.5));
         Action movement2 = tab2.build();
 
-        TrajectoryActionBuilder back1=drive.actionBuilder(mirrorPose.apply(new Pose2d(42,-42.2,Math.toRadians(90))))
+        TrajectoryActionBuilder back1=drive.actionBuilder(mirrorPose.apply(new Pose2d(41.5,-42.2,Math.toRadians(90))))
                 .lineToY(50);
         Action b1 = back1.build();
         TrajectoryActionBuilder tab3 = drive.actionBuilder(mirrorPose.apply(new Pose2d(42, -50, Math.toRadians(90))))

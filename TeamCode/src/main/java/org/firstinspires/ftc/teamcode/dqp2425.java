@@ -75,6 +75,8 @@ public class dqp2425 extends LinearOpMode{
         rotation.setPosition(0.28);
         rotation2.setPosition(0.989);
 
+
+
         waitForStart();
         while (opModeIsActive()) {
             tgtPower=this.gamepad2.left_stick_y;
@@ -153,6 +155,11 @@ public class dqp2425 extends LinearOpMode{
                 slides.setTargetPosition(slides.getCurrentPosition() -100);
                 slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 slides.setPower(gamepad2.right_stick_y);
+            }
+            if(gamepad1.y){
+                slides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                slides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                slides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             }
             telemetry.addData("slides", slides.getCurrentPosition());
 
