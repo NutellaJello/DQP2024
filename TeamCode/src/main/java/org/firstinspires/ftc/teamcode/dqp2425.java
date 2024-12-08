@@ -67,10 +67,14 @@ public class dqp2425 extends LinearOpMode{
         hang=hardwareMap.get(DcMotor.class, "hang"); // EPM 1
 
         hang.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        hang.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        hang.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         slides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         slides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         slides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        slides.setTargetPosition(-660);
+        slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         claw.setPosition(0.47);
         rotation.setPosition(0.28);
         rotation2.setPosition(0.989);
@@ -88,10 +92,8 @@ public class dqp2425 extends LinearOpMode{
             telemetry.addData("rotation2", rot2pos);
             telemetry.addData("outtake",slides.getCurrentPosition());
             telemetry.addData("a1", a1);
+            telemetry.addData("hang", hang.getCurrentPosition());
             telemetry.update();
-            if (gamepad1.left_bumper) {
-                imu.resetYaw();
-            }
 
             double y = Range.clip(-gamepad1.left_stick_y, -1, 1);
             //left stick x value
@@ -129,7 +131,7 @@ public class dqp2425 extends LinearOpMode{
             motorBackLeft.setPower(blPower);
             motorFrontRight.setPower(frPower);
             motorBackRight.setPower(brPower);
-            double idkman=-this.gamepad2.left_stick_y;
+            double idkman=this.gamepad2.left_stick_y;
             if (idkman>0) {
                 if (slides2pos>0.43) slides2pos-=idkman/400;
                 else slides2pos=0.43;
@@ -166,10 +168,17 @@ public class dqp2425 extends LinearOpMode{
 
 
             if (this.gamepad1.right_trigger>0) {
-                hang.setPower(this.gamepad1.right_trigger/2.0);
+                hang.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                hang.setPower(-this.gamepad1.right_trigger/1.5);
             }
             if (this.gamepad1.left_trigger>0) {
-                hang.setPower(-this.gamepad1.left_trigger/3.0);
+                hang.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                hang.setPower(this.gamepad1.left_trigger/1.5);
+            }
+            if (gamepad1.left_bumper) {
+                hang.setTargetPosition(2200);
+                hang.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                hang.setPower(0.8);
             }
 //
             if (gamepad2.a) {
