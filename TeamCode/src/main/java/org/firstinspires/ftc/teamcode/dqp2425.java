@@ -23,21 +23,51 @@ public class dqp2425 extends LinearOpMode{
     private Servo claw2;
     private Servo rotation2;
     private DcMotor hang;
-    double pivotpos=0.437;
-    double clawpos=0.2;
-    double rotpos=1;
-    double claw2pos=0.38;
-    double rot2pos=0;
-    double slides2pos=0.68;
+
+    double pivotpos=0.41;
+    double pivotnuetral = 0.41;
+
+
+    //intake claw
+    double clawpos=0.47;
+    double clawin = 0;
+    double clawout = 0;
+
+    //intake rotation
+    double rotpos= 1;
+    double rotin = 0.28;
+    double rotout = 0.95;
+    int slidesnuetral = -283;
+
+    //outtake claw
+    double claw2pos=0.33;
+    double claw2close = 0.33;
+    double claw2open = 0.1;
+
+
+    //outtake arm rotation
+    double rot2pos=0.7;
+    double rot2down = 0.776;
+    double rot2out = 0.12;
+    double rot2wall = 0.98;
+
+    //intake axon
+    double slides2pos=0.486;
+    double slides2out = 0.73;
+    double slides2in= 0.486;
+
 
     double f = 0;
     int c1=0;
     int c2=0;
     int c3=0;
 
+    int b1=0;
+
     int a1=0;
     double a2=0;
 
+    boolean start = true;
 
     @Override
     public void runOpMode() {
@@ -71,8 +101,14 @@ public class dqp2425 extends LinearOpMode{
         slides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         slides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         slides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        //*********INIT POSITIONS**********
+        claw.setPosition(0.47);
         rotation.setPosition(0.28);
-        rotation2.setPosition(0.989);
+        rotation2.setPosition(0.7);
+
+
+
 
         waitForStart();
         while (opModeIsActive()) {
@@ -88,6 +124,13 @@ public class dqp2425 extends LinearOpMode{
             telemetry.update();
             if (gamepad1.left_bumper) {
                 imu.resetYaw();
+            }
+            if(start){
+                slides.setTargetPosition(slidesnuetral);
+                slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+
+                start=false;
             }
 
             double y = Range.clip(-gamepad1.left_stick_y, -1, 1);
@@ -126,30 +169,38 @@ public class dqp2425 extends LinearOpMode{
             motorBackLeft.setPower(blPower);
             motorFrontRight.setPower(frPower);
             motorBackRight.setPower(brPower);
-            double idkman=-this.gamepad2.left_stick_y;
-            if (idkman>0) {
-                if (slides2pos>0.43) slides2pos-=idkman/1000;
-                else slides2pos=0.43;
+            double idkman= this.gamepad2.left_stick_y;
+            slides2pos -= idkman/800;
+            if(slides2pos >0.8){
+                slides2pos = 0.8;
             }
-            if (idkman<0) {
-                if (slides2pos<0.71) slides2pos-=idkman/1000;
-                else slides2pos=0.71;
+            if (slides2pos<slides2in){
+                slides2pos = slides2in;
             }
+            if(gamepad2.b){
+                slides2pos=slides2out;
+            }
+
 
 
             slides2.setPosition(slides2pos);
 
 
-
+            slides.setPower(1);
             if (gamepad2.right_stick_y > 0) {
                 slides.setTargetPosition(slides.getCurrentPosition() +100);
                 slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                slides.setPower(gamepad2.right_stick_y * 1.2);
+                //slides.setPower(gamepad2.right_stick_y );
             }
             if (gamepad2.right_stick_y < 0) {
                 slides.setTargetPosition(slides.getCurrentPosition() -100);
                 slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                slides.setPower(gamepad2.right_stick_y);
+                //slides.setPower(gamepad2.right_stick_y);
+            }
+            if(gamepad1.y){
+                slides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                slides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                slides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             }
             telemetry.addData("slides", slides.getCurrentPosition());
 
@@ -163,51 +214,86 @@ public class dqp2425 extends LinearOpMode{
             }
 //
             if (gamepad2.a) {
-                rotpos=0.97;
+                rotpos=rotout;
                 rotation.setPosition(rotpos);
             }
             if (gamepad2.dpad_left) {
-                rotpos=0.28;
+                rotpos=rotin;
                 rotation.setPosition(rotpos);
             }
             if (gamepad2.right_bumper) {
 
-                claw2pos=0;
+                claw2pos = claw2close;
                 claw2.setPosition(claw2pos);
             }
             if (gamepad2.left_bumper) {
 
-                claw2pos=0.38;
+                claw2pos=claw2open;
                 claw2.setPosition(claw2pos);
             }
             if (gamepad2.x) {
-                clawpos=0.15;
+                clawpos=0.08;
                 claw.setPosition(clawpos);
             }
             if (gamepad2.y) {
                 clawpos=0.47;
                 claw.setPosition(clawpos);
             }
-            pivotpos+=gamepad2.left_stick_x*0.01;
+            pivotpos-=gamepad2.left_stick_x*0.01;
+
+            if (pivotpos>1) {
+                pivotpos=1;
+            }
+            if (pivotpos<0){
+                pivotpos=0;
+            }
+
             pivot.setPosition(pivotpos);
-            if (pivotpos>0.9) {
-                pivotpos=0.9;
+            rot2pos-=gamepad2.left_trigger/100;
+            rot2pos += gamepad2.right_trigger/100;
+            if(rot2pos<0){
+                rot2pos=0;
             }
-            if (pivotpos<0.2){
-                pivotpos=0.2;
+            if(rot2pos >1){
+                rot2pos =1;
             }
-            if (gamepad2.left_trigger>0) {
-                if (rot2pos>0) rot2pos-=gamepad2.left_trigger/100;
-                else rot2pos=0;
-//                rot2pos=0;
-                rotation2.setPosition(rot2pos);
-            }
+
+
+
             if (gamepad2.right_trigger>0) {
-                if (rot2pos<0.985) rot2pos+=gamepad2.right_trigger/100;
-                else rot2pos=0.985;
-//                rot2pos=0.85;
-                rotation2.setPosition(rot2pos);
+                if (rot2pos<0.985){
+                    rot2pos+=gamepad2.right_trigger/100;
+                }
+                else{
+                    rot2pos=0.985;
+                }
+//
+
             }
+
+            if(gamepad2.dpad_right){
+                rot2pos= rot2wall;
+                b1 = 1;
+
+
+            }
+            if(b1==1){
+                f+=0.025;
+                if(f>=1){
+                    b1=2;
+                }
+            }
+            if(b1==2){
+                f=0;
+                slides.setTargetPosition(-10);
+                slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                claw2pos = claw2open;
+                claw2.setPosition(claw2pos);
+                b1=0;
+            }
+
+
+            rotation2.setPosition(rot2pos);
 
             if(gamepad2.left_stick_button){
                 slides.setPower(0.9);
@@ -219,11 +305,11 @@ public class dqp2425 extends LinearOpMode{
             // AUTOMATION STUFF
             if (gamepad2.right_stick_button) {
                 //transfer();
-                slides.setTargetPosition(-10);
+                slides.setTargetPosition(slidesnuetral);
                 slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 slides.setPower(0.8);
-                claw2pos=0;
-                rot2pos=0.985;
+                claw2pos=claw2open;
+                rot2pos=rot2down;
                 rotation2.setPosition(rot2pos);
                 claw2.setPosition(claw2pos);
                 clawpos=0.08;
@@ -238,7 +324,7 @@ public class dqp2425 extends LinearOpMode{
                         a1=2;
                         rotpos=0.28;
                         rotation.setPosition(rotpos);
-                        pivotpos=0.437;
+                        pivotpos=pivotnuetral;
                         pivot.setPosition(pivotpos);
                     }
 
@@ -249,7 +335,7 @@ public class dqp2425 extends LinearOpMode{
             if(a1==2){
                 if( (rotation.getPosition()-rotpos)<= 0.00001 ){
                     a1=3;
-                    slides2pos=0.70;
+                    slides2pos=slides2in;
                     slides2.setPosition(slides2pos);
                 }
             }
@@ -258,8 +344,8 @@ public class dqp2425 extends LinearOpMode{
                 if ((slides2.getPosition() - slides2pos) <= 0.00001) {
                     a2 += 0.015;
                     if (a2 >= 3) {
-
-                        claw2.setPosition(0.38);
+                        claw2pos = 0.34;
+                        claw2.setPosition(claw2pos);
                         a1 = 4;
                         a2 = 0;
 
@@ -283,7 +369,7 @@ public class dqp2425 extends LinearOpMode{
                 a2+=0.015;
                 if(a2>=1) {
 
-                    slides2pos=0.64;
+                    slides2pos=0.5;
                     slides2.setPosition(slides2pos);
                     a1 = 0;
                     a2=0;
@@ -294,20 +380,20 @@ public class dqp2425 extends LinearOpMode{
 
 
             if (gamepad2.dpad_up) {
-                slides.setTargetPosition(-2300);
+                slides.setTargetPosition(-2000);
                 slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 slides.setPower(1);
                 c1=1;
 
             }
-            if (c1==1 && Math.abs(slides.getCurrentPosition()+2300)<=100) {
+            if (c1==1 && Math.abs(slides.getCurrentPosition()+2000)<=100) {
                 c1=0;
-                rot2pos=0.2513;
-                rotation2.setPosition(rot2pos);
+                rot2pos=rot2out;
+                rotation2.setPosition(rot2out);
                 slides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             }
             if (gamepad2.dpad_down) {
-                double rn=this.getRuntime();
+
                 claw2pos=0;
                 claw2.setPosition(claw2pos);
                 //if (this.getRuntime()>rn+1.0) c2=1;
@@ -323,19 +409,26 @@ public class dqp2425 extends LinearOpMode{
             if (c2==2 && Math.abs(claw2.getPosition()-claw2pos)<=0.000001) {
                 c2=0;
                 f=0;
-                rot2pos=0.989;
+                rot2pos=rot2down;
                 rotation2.setPosition(rot2pos);
                 c3=1;
 
             }
-            if (c3==1 && Math.abs(claw2.getPosition()-claw2pos)<0.05 && Math.abs(rotation2.getPosition()-rot2pos)<0.05) {
+            if(c3==1){
+                f+=0.025;
+                if(f>=1){
+                    c3=2;
+                }
+            }
+            if (c3==2 && Math.abs(claw2.getPosition()-claw2pos)<0.05 && Math.abs(rotation2.getPosition()-rot2pos)<0.05) {
+                f=0;
                 c3=0;
-                slides.setTargetPosition(-10);
+                slides.setTargetPosition(slidesnuetral);
                 slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 slides.setPower(1);
-                claw2pos=0.38;
+                claw2pos=claw2close;
                 claw2.setPosition(claw2pos);
-
+//
             }
 
         }
