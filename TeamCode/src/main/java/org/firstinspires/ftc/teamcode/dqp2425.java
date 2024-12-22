@@ -62,6 +62,9 @@ private DcMotor slides;
     double slides2out = 0.73;
     double slides2in= 0.486;
 
+    // winch down position line 249 may have to reverse motor
+    int winchDown = -1000;
+
 
     double f = 0;
     int c1=0;
@@ -244,15 +247,11 @@ private DcMotor slides;
 
 
             if (gamepad1.dpad_down){
-                hang2.setTargetPosition(hang2.getCurrentPosition()- 100);
+                hang2.setTargetPosition(winchDown);
                 hang2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 hang2.setPower(0.6);
             }
-            else if(gamepad1.dpad_up){
-                hang2.setTargetPosition(hang2.getCurrentPosition()+ 100);
-                hang2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                hang2.setPower(0.6);
-            }
+
             telemetry.addData("winch position", hang2.getCurrentPosition());
 //
             if (gamepad2.a) {
