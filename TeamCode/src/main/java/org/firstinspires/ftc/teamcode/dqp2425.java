@@ -11,11 +11,16 @@ import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
+import org.firstinspires.ftc.teamcode.subsystems.OuttakeSlide;
+
 @Config
 @TeleOp(name = "dqp2425", group = "TeleOp")
 
 public class dqp2425 extends LinearOpMode{
-    private DcMotor slides;
+//    private Drivetrain drivetrain;
+//    private OuttakeSlide outtakeSlide;
+private DcMotor slides;
     private Servo slides2;
     private Servo rotation;
     private Servo pivot;
@@ -23,6 +28,7 @@ public class dqp2425 extends LinearOpMode{
     private Servo claw2;
     private Servo rotation2;
     private DcMotor hang;
+    private DcMotor hang2;
 
     double pivotpos=0.41;
     double pivotnuetral = 0.41;
@@ -71,6 +77,7 @@ public class dqp2425 extends LinearOpMode{
 
     @Override
     public void runOpMode() {
+
         double dampS = 0.85;
         double dampSpeedRatio = 0.8;
         double dampTurnRatio  = -0.6;
@@ -80,6 +87,9 @@ public class dqp2425 extends LinearOpMode{
         DcMotor motorBackRight = hardwareMap.dcMotor.get("BR"); //3
         motorFrontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         motorBackLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+
+//        drivetrain = new Drivetrain(hardwareMap);
+//        outtakeSlide = new OuttakeSlide(hardwareMap);
         IMU imu = hardwareMap.get(IMU.class, "imu");
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
                 RevHubOrientationOnRobot.LogoFacingDirection.UP,
@@ -95,8 +105,15 @@ public class dqp2425 extends LinearOpMode{
         claw2=hardwareMap.get(Servo.class, "claw2"); // EPS 4
         rotation2=hardwareMap.get(Servo.class, "rotation2"); // EPS 5
         hang=hardwareMap.get(DcMotor.class, "hang"); // EPM 1
+        hang2=hardwareMap.get(DcMotor.class, "hang2");
 
         hang.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        hang.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        hang.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        hang2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        hang2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        hang2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         slides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         slides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -112,6 +129,8 @@ public class dqp2425 extends LinearOpMode{
 
         waitForStart();
         while (opModeIsActive()) {
+//            drivetrain.Teleop(gamepad1,telemetry);
+//            outtakeSlide.Teleop(gamepad1,telemetry);
             tgtPower=this.gamepad2.left_stick_y;
             telemetry.addData("slides2", slides2pos);
             telemetry.addData("claw", clawpos);
@@ -128,8 +147,6 @@ public class dqp2425 extends LinearOpMode{
             if(start){
                 slides.setTargetPosition(slidesnuetral);
                 slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-
                 start=false;
             }
 
@@ -169,6 +186,7 @@ public class dqp2425 extends LinearOpMode{
             motorBackLeft.setPower(blPower);
             motorFrontRight.setPower(frPower);
             motorBackRight.setPower(brPower);
+
             double idkman= this.gamepad2.left_stick_y;
             slides2pos -= idkman/800;
             if(slides2pos >0.8){
@@ -184,7 +202,6 @@ public class dqp2425 extends LinearOpMode{
 
 
             slides2.setPosition(slides2pos);
-
 
             slides.setPower(1);
             if (gamepad2.right_stick_y > 0) {
@@ -206,12 +223,37 @@ public class dqp2425 extends LinearOpMode{
 
 
 
-            if (this.gamepad1.right_trigger>0) {
-                hang.setPower(this.gamepad1.right_trigger/2.0);
+
+            if (gamepad1.right_trigger>0) {
+                hang.setPower(this.gamepad1.right_trigger);
             }
-            if (this.gamepad1.left_trigger>0) {
-                hang.setPower(-this.gamepad1.left_trigger/3.0);
+            if (gamepad1.left_trigger>0) {
+                hang.setPower(-this.gamepad1.left_trigger);
             }
+
+            // will have to comment out b/c running to position
+            if (gamepad1.a) {
+                hang2.setPower(0.6);
+            }
+            else if (gamepad1.b) {
+                hang2.setPower(-0.6);
+            }
+            else {
+                hang2.setPower(0);
+            }
+
+
+            if (gamepad1.dpad_down){
+                hang2.setTargetPosition(hang2.getCurrentPosition()- 100);
+                hang2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                hang2.setPower(0.6);
+            }
+            else if(gamepad1.dpad_up){
+                hang2.setTargetPosition(hang2.getCurrentPosition()+ 100);
+                hang2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                hang2.setPower(0.6);
+            }
+            telemetry.addData("winch position", hang2.getCurrentPosition());
 //
             if (gamepad2.a) {
                 rotpos=rotout;
