@@ -129,7 +129,7 @@ private DcMotor slides;
         slides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         //*********INIT POSITIONS**********
-        claw.setPosition(0.47);
+        claw.setPosition(clawopen);
         rotation.setPosition(0.28);
         rotation2.setPosition(0.7);
 
@@ -413,7 +413,7 @@ private DcMotor slides;
                 rot2pos=rot2down;
                 rotation2.setPosition(rot2pos);
                 claw2.setPosition(claw2pos);
-                clawpos=0.08;
+                clawpos=clawclose;
                 claw.setPosition(clawpos);
                 a1=1;
             }
@@ -458,8 +458,8 @@ private DcMotor slides;
             if(a1==4){
                 a2+=0.015;
                 if(a2>=0.25) {
-
-                    claw.setPosition(0.47);
+                    clawpos = clawclose;
+                    claw.setPosition(clawpos);
                     a1 = 5;
                     a2=0;
 
