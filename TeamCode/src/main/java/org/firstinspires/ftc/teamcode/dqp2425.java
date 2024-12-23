@@ -72,7 +72,7 @@ private DcMotor slides;
     int actuatorHang = 465;
 
     // swing up is dpad left, down is dpad right
-    double swingup = 0.075;
+    double swingup = 0.08;
     double swingdown = 0.0;
 
 
@@ -412,9 +412,7 @@ private DcMotor slides;
 
             rotation2.setPosition(rot2pos);
 
-            if(gamepad2.left_stick_button){
 
-            }
 //
             // AUTOMATION STUFF
             if (gamepad2.right_stick_button) {
