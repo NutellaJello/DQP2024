@@ -11,8 +11,8 @@ import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
-import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
-import org.firstinspires.ftc.teamcode.subsystems.OuttakeSlide;
+//import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
+//import org.firstinspires.ftc.teamcode.subsystems.OuttakeSlide;
 
 @Config
 @TeleOp(name = "dqp2425", group = "TeleOp")
@@ -27,23 +27,25 @@ private DcMotor slides;
     private Servo claw;
     private Servo claw2;
     private Servo rotation2;
-    private DcMotor hang;
-    private DcMotor hang2;
+    private DcMotor hang; // linear actuator
+    private DcMotor winch; //winch
 
-    double pivotpos=0.41;
-    double pivotnuetral = 0.41;
+    double pivotpos=0.53;
+    double pivotnuetral = 0.53;
 
 
     //intake claw
     double clawpos=0.47;
-    double clawin = 0;
-    double clawout = 0;
+    double clawclose = 0.095;
+    double clawopen = 0.45;
 
     //intake rotation
     double rotpos= 1;
     double rotin = 0.28;
     double rotout = 0.95;
-    int slidesnuetral = -283;
+    int slidesnuetral = -291;
+    int slidesSpeci = -100;
+    int slidesLatchOff = -400;
 
     //outtake claw
     double claw2pos=0.33;
@@ -56,14 +58,17 @@ private DcMotor slides;
     double rot2down = 0.776;
     double rot2out = 0.12;
     double rot2wall = 0.98;
+    double rot2speci = 0.371;
 
     //intake axon
     double slides2pos=0.486;
-    double slides2out = 0.73;
-    double slides2in= 0.486;
+    double slides2out = 0.63;
+    double slides2in= 0.44;
 
     // winch down position line 249 may have to reverse motor
     int winchDown = -1000;
+    int actuatorUp = 1664;
+    int actuatorHang = 465;
 
 
     double f = 0;
@@ -108,15 +113,16 @@ private DcMotor slides;
         claw2=hardwareMap.get(Servo.class, "claw2"); // EPS 4
         rotation2=hardwareMap.get(Servo.class, "rotation2"); // EPS 5
         hang=hardwareMap.get(DcMotor.class, "hang"); // EPM 1
-        hang2=hardwareMap.get(DcMotor.class, "hang2");
+        winch=hardwareMap.get(DcMotor.class, "hang2");
 
         hang.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         hang.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         hang.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        hang2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        hang2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        hang2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        winch.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        winch.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        winch.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         slides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         slides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -165,7 +171,7 @@ private DcMotor slides;
                 dampSpeedRatio = 0.2;
                 dampTurnRatio = -0.16;
             }else{
-                dampSpeedRatio = 0.8;
+                dampSpeedRatio = 1;
                 dampTurnRatio = -0.6;
             }
 
@@ -223,36 +229,43 @@ private DcMotor slides;
                 slides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             }
             telemetry.addData("slides", slides.getCurrentPosition());
-
+            telemetry.addData("hang", hang.getCurrentPosition());
 
 
 
             if (gamepad1.right_trigger>0) {
-                hang.setPower(this.gamepad1.right_trigger);
+                hang.setTargetPosition(actuatorUp);
+                hang.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                hang.setPower(1);
+            }else if (gamepad1.left_trigger>0) {
+                hang.setTargetPosition(actuatorHang);
+                hang.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                hang.setPower(1);
+            }else{
+                hang.setPower(0);
+                hang.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             }
-            if (gamepad1.left_trigger>0) {
-                hang.setPower(-this.gamepad1.left_trigger);
-            }
+
 
             // will have to comment out b/c running to position
             if (gamepad1.a) {
-                hang2.setPower(0.6);
+                winch.setPower(0.6);
             }
             else if (gamepad1.b) {
-                hang2.setPower(-0.6);
+                winch.setPower(-0.6);
             }
             else {
-                hang2.setPower(0);
+                winch.setPower(0);
             }
 
 
             if (gamepad1.dpad_down){
-                hang2.setTargetPosition(winchDown);
-                hang2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                hang2.setPower(0.6);
+                winch.setTargetPosition(winchDown);
+                winch.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                winch.setPower(0.6);
             }
 
-            telemetry.addData("winch position", hang2.getCurrentPosition());
+            telemetry.addData("winch position", winch.getCurrentPosition());
 //
             if (gamepad2.a) {
                 rotpos=rotout;
@@ -273,14 +286,14 @@ private DcMotor slides;
                 claw2.setPosition(claw2pos);
             }
             if (gamepad2.x) {
-                clawpos=0.08;
+                clawpos=clawclose;//0.08 close
                 claw.setPosition(clawpos);
             }
             if (gamepad2.y) {
-                clawpos=0.47;
+                clawpos=clawopen;//-0.47
                 claw.setPosition(clawpos);
             }
-            pivotpos-=gamepad2.left_stick_x*0.01;
+            pivotpos-=gamepad2.left_stick_x*0.017;
 
             if (pivotpos>1) {
                 pivotpos=1;
@@ -312,15 +325,13 @@ private DcMotor slides;
 
             }
 
-            if(gamepad2.dpad_right){
+            if(gamepad2.dpad_right && b1==0){
                 rot2pos= rot2wall;
                 b1 = 1;
-
-
             }
             if(b1==1){
                 f+=0.025;
-                if(f>=1){
+                if(f>=0.5){
                     b1=2;
                 }
             }
@@ -330,17 +341,66 @@ private DcMotor slides;
                 slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 claw2pos = claw2open;
                 claw2.setPosition(claw2pos);
+                b1=3;
+            }
+            if(b1==3){
+                if(gamepad2.dpad_right){
+                    claw2pos = claw2open;
+                    claw2.setPosition(claw2pos);
+                }else{
+                    claw2pos = claw2close;
+                    claw2.setPosition(claw2pos);
+                    //slides.setTargetPosition(slidesLatchOff);
+                    //slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    b1=4;
+                }
+            }
+            if(b1==4){
+                f+=0.025;
+                if(f>=0.2){
+                    b1=5;
+                    f=0;
+                }
+            }
+            if(b1==5){
+                slides.setTargetPosition(slidesLatchOff);
+                slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+                if(Math.abs(slides.getCurrentPosition()-slidesLatchOff)<=10 ){
+                    b1=6;
+                }
+
+            }
+            if(b1==6){
+                //if(Math.abs(slides.getCurrentPosition()-slidesLatchOff)<=10 ){
+                    rot2pos= rot2speci;
+                    rotation2.setPosition(rot2pos);
+                //}
+                b1=7;
+            }
+            if(b1==7){
+                f+=0.025;
+                if(f>=0.5){
+                    b1=8;
+                    f=0;
+                }
+            }
+            if(b1==8){
+                slides.setTargetPosition(slidesSpeci);
+                slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 b1=0;
             }
+
+            telemetry.addData("b1", b1);
+
+
+
 
 
             rotation2.setPosition(rot2pos);
 
             if(gamepad2.left_stick_button){
-                slides.setPower(0.9);
-                slides.setTargetPosition(-1108);
-                rot2pos=0.1285;
-                rotation2.setPosition(rot2pos);
+
             }
 //
             // AUTOMATION STUFF
@@ -359,7 +419,7 @@ private DcMotor slides;
             }
             if(a1==1){
                 a2+=0.015;
-                if(a2>=0.3) {
+                if(a2>=0.2) {
 
                     if( (claw.getPosition()-clawpos)<= 0.0001 ){
                         a1=2;
@@ -384,7 +444,7 @@ private DcMotor slides;
             if(a1==3){
                 if ((slides2.getPosition() - slides2pos) <= 0.00001) {
                     a2 += 0.015;
-                    if (a2 >= 3) {
+                    if (a2 >= 0.8) {
                         claw2pos = 0.34;
                         claw2.setPosition(claw2pos);
                         a1 = 4;
@@ -397,7 +457,7 @@ private DcMotor slides;
 
             if(a1==4){
                 a2+=0.015;
-                if(a2>=1) {
+                if(a2>=0.25) {
 
                     claw.setPosition(0.47);
                     a1 = 5;
@@ -408,7 +468,7 @@ private DcMotor slides;
 
             if(a1==5){
                 a2+=0.015;
-                if(a2>=1) {
+                if(a2>=0.3) {
 
                     slides2pos=0.5;
                     slides2.setPosition(slides2pos);
@@ -443,7 +503,7 @@ private DcMotor slides;
             }
             if(c2==1){
                 f+=0.025;
-                if(f>=1){
+                if(f>=0.6){
                     c2=2;
                 }
             }
@@ -473,6 +533,8 @@ private DcMotor slides;
             }
 
         }
+
+
 
     }
 
