@@ -29,6 +29,7 @@ private DcMotor slides;
     private Servo rotation2;
     private DcMotor hang; // linear actuator
     private DcMotor winch; //winch
+    private Servo swing;
 
     double pivotpos=0.53;
     double pivotnuetral = 0.53;
@@ -69,6 +70,10 @@ private DcMotor slides;
     int winchDown = -1000;
     int actuatorUp = 1664;
     int actuatorHang = 465;
+
+    // swing up is dpad left, down is dpad right
+    double swingup = 0.075;
+    double swingdown = 0.0;
 
 
     double f = 0;
@@ -114,6 +119,7 @@ private DcMotor slides;
         rotation2=hardwareMap.get(Servo.class, "rotation2"); // EPS 5
         hang=hardwareMap.get(DcMotor.class, "hang"); // EPM 1
         winch=hardwareMap.get(DcMotor.class, "hang2");
+        swing = hardwareMap.get(Servo.class, "swing"); // control hub port 5
 
         hang.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         hang.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -208,6 +214,13 @@ private DcMotor slides;
                 slides2pos=slides2out;
             }
 
+            if(gamepad1.dpad_right){
+                swing.setPosition(swingdown);
+            }
+            else if (gamepad1.dpad_left){
+                swing.setPosition(swingup);
+            }
+            telemetry.addData("swing position", swing.getPosition());
 
 
             slides2.setPosition(slides2pos);
