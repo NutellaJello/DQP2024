@@ -46,7 +46,7 @@ private DcMotor slides;
     double rotout = 0.95;
     int slidesnuetral = -291;
     int slidesSpeci = -100;
-    int slidesLatchOff = -400;
+    int slidesLatchOff = -460;
 
     //outtake claw
     double claw2pos=0.33;
