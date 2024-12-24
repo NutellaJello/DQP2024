@@ -91,9 +91,8 @@ private DcMotor slides;
     @Override
     public void runOpMode() {
 
-        double dampS = 0.85;
-        double dampSpeedRatio = 0.8;
-        double dampTurnRatio  = -0.6;
+        double dampSpeedRatio ;
+        double dampTurnRatio ;
         DcMotor motorFrontLeft = hardwareMap.dcMotor.get("FL"); //0
         DcMotor motorFrontRight = hardwareMap.dcMotor.get("FR"); //1
         DcMotor motorBackLeft = hardwareMap.dcMotor.get("BL"); //2
@@ -178,7 +177,7 @@ private DcMotor slides;
                 dampTurnRatio = -0.16;
             }else{
                 dampSpeedRatio = 1;
-                dampTurnRatio = -0.6;
+                dampTurnRatio = -0.8;
             }
 
             double flPower = (y - x) * dampSpeedRatio + dampTurnRatio * rx;
