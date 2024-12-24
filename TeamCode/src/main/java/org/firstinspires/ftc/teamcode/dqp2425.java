@@ -426,6 +426,7 @@ private DcMotor slides;
                 claw2.setPosition(claw2pos);
                 clawpos=clawclose;
                 claw.setPosition(clawpos);
+                //picked up sample on floor
                 a1=1;
             }
             if(a1==1){
@@ -434,14 +435,25 @@ private DcMotor slides;
 
                     if( (claw.getPosition()-clawpos)<= 0.0001 ){
                         a1=2;
-                        rotpos=0.28;
+                        rotpos=rotin;
                         rotation.setPosition(rotpos);
                         pivotpos=pivotnuetral;
                         pivot.setPosition(pivotpos);
+                        a2=0;
+                        //rotating up and pivot nuetral
                     }
 
                 }
 
+            }
+
+
+            //waiting for the rotation to finish
+            if(a1==2){
+                a2+=0.015;
+                if(a2>=0.2) {
+                    a1=3;
+                }
             }
 
             if(a1==2){
@@ -449,6 +461,7 @@ private DcMotor slides;
                     a1=3;
                     slides2pos=slides2in;
                     slides2.setPosition(slides2pos);
+                    //sending slides in
                 }
             }
 
@@ -456,11 +469,12 @@ private DcMotor slides;
                 if ((slides2.getPosition() - slides2pos) <= 0.00001) {
                     a2 += 0.015;
                     if (a2 >= 0.8) {
-                        claw2pos = 0.34;
+                        //waiting for slides to arrive
+                        claw2pos = claw2close;
                         claw2.setPosition(claw2pos);
                         a1 = 4;
                         a2 = 0;
-
+                        //outtake claw closing up
                     }
                 }
 
@@ -468,19 +482,19 @@ private DcMotor slides;
 
             if(a1==4){
                 a2+=0.015;
-                if(a2>=0.25) {
+                if(a2>=0.13) {
                     clawpos = clawopen;
                     claw.setPosition(clawpos);
                     a1 = 5;
                     a2=0;
-
+                    //intake claw opening
                 }
             }
 
             if(a1==5){
                 a2+=0.015;
                 if(a2>=0.3) {
-
+                    //waiting for intake claw to open to slide away
                     slides2pos=0.5;
                     slides2.setPosition(slides2pos);
                     a1 = 0;
@@ -488,6 +502,8 @@ private DcMotor slides;
 
                 }
             }
+
+
 
 
 
@@ -504,44 +520,31 @@ private DcMotor slides;
                 rotation2.setPosition(rot2out);
                 slides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             }
+
+
+
             if (gamepad2.dpad_down) {
-
-                claw2pos=0;
-                claw2.setPosition(claw2pos);
-                //if (this.getRuntime()>rn+1.0) c2=1;
                 c2=1;
-
             }
-            if(c2==1){
-                f+=0.025;
-                if(f>=0.6){
+            if(c2 ==1){
+                if(gamepad2.dpad_down){
+                    claw2pos=claw2open;
+                    claw2.setPosition(claw2pos);
+                }else{
                     c2=2;
                 }
             }
-            if (c2==2 && Math.abs(claw2.getPosition()-claw2pos)<=0.000001) {
-                c2=0;
-                f=0;
+            if (c2==2){
                 rot2pos=rot2down;
                 rotation2.setPosition(rot2pos);
-                c3=1;
-
-            }
-            if(c3==1){
-                f+=0.025;
-                if(f>=1){
-                    c3=2;
-                }
-            }
-            if (c3==2 && Math.abs(claw2.getPosition()-claw2pos)<0.05 && Math.abs(rotation2.getPosition()-rot2pos)<0.05) {
-                f=0;
-                c3=0;
                 slides.setTargetPosition(slidesnuetral);
                 slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 slides.setPower(1);
                 claw2pos=claw2close;
                 claw2.setPosition(claw2pos);
-//
+                c2=0;
             }
+
 
         }
 
