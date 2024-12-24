@@ -72,7 +72,7 @@ private DcMotor slides;
     int actuatorHang = 465;
 
     // swing up is dpad left, down is dpad right
-    double swingup = 0.08;
+    double swingup = 0.1;
     double swingdown = 0.0;
 
 
@@ -256,7 +256,7 @@ private DcMotor slides;
                 hang.setPower(1);
             }else{
                 hang.setPower(0);
-                hang.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                //hang.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             }
 
 
@@ -469,7 +469,7 @@ private DcMotor slides;
             if(a1==4){
                 a2+=0.015;
                 if(a2>=0.25) {
-                    clawpos = clawclose;
+                    clawpos = clawopen;
                     claw.setPosition(clawpos);
                     a1 = 5;
                     a2=0;
