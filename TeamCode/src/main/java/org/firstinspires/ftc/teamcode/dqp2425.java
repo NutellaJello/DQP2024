@@ -37,16 +37,17 @@ private DcMotor slides;
 
     //intake claw
     double clawpos=0.47;
-    double clawclose = 0.095;
+    double clawclose = 0.06;
     double clawopen = 0.45;
 
     //intake rotation
     double rotpos= 1;
     double rotin = 0.28;
     double rotout = 0.95;
-    int slidesnuetral = -291;
-    int slidesSpeci = -100;
-    int slidesLatchOff = -460;
+    int slidesnuetral = -110;
+    int slidesSpeci = -38;
+    int slidesLatchOff = -174;
+    int slidesup = -757;
 
     //outtake claw
     double claw2pos=0.33;
@@ -56,15 +57,15 @@ private DcMotor slides;
 
     //outtake arm rotation
     double rot2pos=0.7;
-    double rot2down = 0.776;
+    double rot2down = 0.7821;
     double rot2out = 0.12;
     double rot2wall = 0.98;
     double rot2speci = 0.371;
 
     //intake axon
-    double slides2pos=0.486;
-    double slides2out = 0.63;
-    double slides2in= 0.44;
+    double slides2pos=0.4968;
+    double slides2out = 0.77;
+    double slides2in= 0.4968;
 
     // winch down position line 249 may have to reverse motor
     int winchDown = -1000;
@@ -72,8 +73,8 @@ private DcMotor slides;
     int actuatorHang = 465;
 
     // swing up is dpad left, down is dpad right
-    double swingup = 0.1;
-    double swingdown = 0.0;
+    double swingup = 0.105;
+    double swingdown = 0.003;
 
 
     double f = 0;
@@ -137,6 +138,7 @@ private DcMotor slides;
         claw.setPosition(clawopen);
         rotation.setPosition(0.28);
         rotation2.setPosition(0.7);
+        swing.setPosition(swingdown);
 
 
 
@@ -173,11 +175,11 @@ private DcMotor slides;
             //    double arct = 0;
 
             if(gamepad1.right_bumper){
-                dampSpeedRatio = 0.2;
-                dampTurnRatio = -0.16;
+                dampSpeedRatio = 0.33;
+                dampTurnRatio = -0.22;
             }else{
                 dampSpeedRatio = 1;
-                dampTurnRatio = -0.8;
+                dampTurnRatio = -0.75;
             }
 
             double flPower = (y - x) * dampSpeedRatio + dampTurnRatio * rx;
@@ -211,13 +213,23 @@ private DcMotor slides;
             }
             if(gamepad2.b){
                 slides2pos=slides2out;
+                rotpos=rotout-0.1;
+                rotation.setPosition(rotpos);
             }
 
-            if(gamepad1.dpad_right){
-                swing.setPosition(swingdown);
+            if(gamepad1.dpad_left){
+                c3=1;
+                rot2pos = 0.85;
+                rotation2.setPosition(rot2pos);
+
             }
-            else if (gamepad1.dpad_left){
-                swing.setPosition(swingup);
+            if(gamepad1.y){
+                c3=2;
+            }
+            if(c3==1 && swing.getPosition()<swingup){
+                swing.setPosition(swing.getPosition()+0.0015);
+            }else if(c3==2){
+                swing.setPosition(swingup+0.01);
             }
             telemetry.addData("swing position", swing.getPosition());
 
@@ -226,12 +238,12 @@ private DcMotor slides;
 
             slides.setPower(1);
             if (gamepad2.right_stick_y > 0) {
-                slides.setTargetPosition(slides.getCurrentPosition() +100);
+                slides.setTargetPosition(slides.getCurrentPosition() +50);
                 slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 //slides.setPower(gamepad2.right_stick_y );
             }
             if (gamepad2.right_stick_y < 0) {
-                slides.setTargetPosition(slides.getCurrentPosition() -100);
+                slides.setTargetPosition(slides.getCurrentPosition() -50);
                 slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 //slides.setPower(gamepad2.right_stick_y);
             }
@@ -260,6 +272,8 @@ private DcMotor slides;
 
 
             // will have to comment out b/c running to position
+
+            /*
             if (gamepad1.a) {
                 winch.setPower(0.6);
             }
@@ -268,11 +282,17 @@ private DcMotor slides;
             }
             else {
                 winch.setPower(0);
+            }*/
+
+
+            if (gamepad1.a){//going up
+                winch.setTargetPosition(winch.getCurrentPosition()+150);
+                winch.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                winch.setPower(0.6);
             }
 
-
-            if (gamepad1.dpad_down){
-                winch.setTargetPosition(winchDown);
+            if (gamepad1.b){//going down
+                winch.setTargetPosition(winch.getCurrentPosition()-150);
                 winch.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 winch.setPower(0.6);
             }
@@ -349,7 +369,7 @@ private DcMotor slides;
             }
             if(b1==2){
                 f=0;
-                slides.setTargetPosition(-10);
+                slides.setTargetPosition(-3);
                 slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 claw2pos = claw2open;
                 claw2.setPosition(claw2pos);
@@ -412,10 +432,9 @@ private DcMotor slides;
             rotation2.setPosition(rot2pos);
 
 
-//
             // AUTOMATION STUFF
             if (gamepad2.right_stick_button) {
-                //transfer();
+                //transfer()
                 slides.setTargetPosition(slidesnuetral);
                 slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 slides.setPower(0.8);
@@ -507,13 +526,13 @@ private DcMotor slides;
 
 
             if (gamepad2.dpad_up) {
-                slides.setTargetPosition(-2000);
+                slides.setTargetPosition(slidesup);
                 slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 slides.setPower(1);
                 c1=1;
 
             }
-            if (c1==1 && Math.abs(slides.getCurrentPosition()+2000)<=100) {
+            if (c1==1 && Math.abs(slides.getCurrentPosition()+slidesup)<=100) {
                 c1=0;
                 rot2pos=rot2out;
                 rotation2.setPosition(rot2out);
