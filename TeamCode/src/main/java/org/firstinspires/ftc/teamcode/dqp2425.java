@@ -54,7 +54,7 @@ private DcMotor slides;
     double rotin = 0.28;
     double rotout = 0.95;
     int slidesnuetral = -110;
-    int slidesSpeci = -38;
+    int slidesSpeci = -5;
     int slidesLatchOff = -174;
     int slidesup = -850;
 
@@ -154,6 +154,7 @@ private DcMotor slides;
         rotation.setPosition(0.28);
         rotation2.setPosition(0.7);
         swing.setPosition(swingdown);
+        imu.resetYaw();
 
 
 
@@ -322,12 +323,12 @@ private DcMotor slides;
 
             slides.setPower(1);
             if (gamepad2.right_stick_y > 0) {
-                slides.setTargetPosition(slides.getCurrentPosition() +100);
+                slides.setTargetPosition((int) (slides.getCurrentPosition() + (100 * gamepad2.right_stick_y)));
                 slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 //slides.setPower(gamepad2.right_stick_y );
             }
             if (gamepad2.right_stick_y < 0) {
-                slides.setTargetPosition(slides.getCurrentPosition() -100);
+                slides.setTargetPosition((int) (slides.getCurrentPosition() - (100 * gamepad2.right_stick_y)));
                 slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 //slides.setPower(gamepad2.right_stick_y);
             }
@@ -587,7 +588,7 @@ private DcMotor slides;
             if(a1==3){
                 if ((slides2.getPosition() - slides2pos) <= 0.00001) {
                     a2 += 0.015;
-                    if (a2 >= 0.8) {
+                    if (a2 >= 0.3) {
                         //waiting for slides to arrive
                         claw2pos = claw2close;
                         claw2.setPosition(claw2pos);
