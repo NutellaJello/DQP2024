@@ -1,31 +1,21 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.roadrunner.ftc.Encoder;
-import com.acmerobotics.roadrunner.ftc.OverflowEncoder;
-import com.acmerobotics.roadrunner.ftc.RawEncoder;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.Range;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
-
-//import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
+import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 //import org.firstinspires.ftc.teamcode.subsystems.OuttakeSlide;
 
 @Config
 @TeleOp(name = "dqp2425", group = "TeleOp")
 
 public class dqp2425 extends LinearOpMode{
-    //    private Drivetrain drivetrain;
+    private Drivetrain drivetrain;
 //    private OuttakeSlide outtakeSlide;
     private DcMotor slides;
     private Servo slides2;
@@ -38,7 +28,7 @@ public class dqp2425 extends LinearOpMode{
     private DcMotor winch; //winch
     private Servo swing;
 
-
+    boolean fieldCentric = false;
 
     double pivotpos=0.53;
     double pivotnuetral = 0.53;
@@ -102,21 +92,8 @@ public class dqp2425 extends LinearOpMode{
 
     @Override
     public void runOpMode() {
-
-        double dampSpeedRatio ;
-        double dampTurnRatio ;
-        DcMotor motorFrontLeft = hardwareMap.dcMotor.get("FL"); //0
-        DcMotor motorFrontRight = hardwareMap.dcMotor.get("FR"); //1
-        DcMotor motorBackLeft = hardwareMap.dcMotor.get("BL"); //2
-        DcMotor motorBackRight = hardwareMap.dcMotor.get("BR"); //3
-
-        Encoder par0 = new OverflowEncoder(new RawEncoder(hardwareMap.get(DcMotorEx.class, "FL")));;
-        Encoder perp = new OverflowEncoder(new RawEncoder(hardwareMap.get(DcMotorEx.class, "BL")));
-
-        motorFrontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-        motorBackLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-
-//        drivetrain = new Drivetrain(hardwareMap);
+        // initializes movement motors
+        drivetrain = new Drivetrain(hardwareMap);
 //        outtakeSlide = new OuttakeSlide(hardwareMap);
         IMU imu = hardwareMap.get(IMU.class, "imu");
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
@@ -124,7 +101,6 @@ public class dqp2425 extends LinearOpMode{
                 RevHubOrientationOnRobot.UsbFacingDirection.FORWARD));
         imu.initialize(parameters);
 
-        double tgtPower = 0;
         slides=hardwareMap.get(DcMotor.class, "slides");// outtake, EPM 0
         slides2=hardwareMap.get(Servo.class, "slides2");// intake, EPS 0 "AXONMAX"
         rotation=hardwareMap.get(Servo.class, "rotation"); // EPS 3
@@ -161,10 +137,8 @@ public class dqp2425 extends LinearOpMode{
 
         waitForStart();
         while (opModeIsActive()) {
-//            drivetrain.Teleop(gamepad1,telemetry);
-//            outtakeSlide.Teleop(gamepad1,telemetry);
-
-            tgtPower=this.gamepad2.left_stick_y;
+            // all the movement controls.
+            drivetrain.Teleop(gamepad1,telemetry, fieldCentric);
             telemetry.addData("slides2", slides2pos);
             telemetry.addData("claw", clawpos);
             telemetry.addData("pivot", pivotpos);
@@ -173,8 +147,6 @@ public class dqp2425 extends LinearOpMode{
             telemetry.addData("rotation2", rot2pos);
             telemetry.addData("outtake",slides.getCurrentPosition());
             telemetry.addData("a1", a1);
-            //telemetry.addData("encoderbrok", par0.getPositionAndVelocity().position );
-            //telemetry.addData("encoder", perp.getPositionAndVelocity().position);
             telemetry.update();
 
 
@@ -183,98 +155,7 @@ public class dqp2425 extends LinearOpMode{
                 slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 start=false;
             }
-/*
-            double y = Range.clip(-gamepad1.left_stick_y, -1, 1);
-            //left stick x value
-            double x = Range.clip(-gamepad1.left_stick_x, -1, 1);
-            //right stick x value
-            double rx = Range.clip(-gamepad1.right_stick_x, -1, 1);
 
-            //    double arct = 0;
-
-            if(gamepad1.right_bumper){
-                dampSpeedRatio = 0.33;
-                dampTurnRatio = -0.22;
-            }else{
-                dampSpeedRatio = 1;
-                dampTurnRatio = -0.75;
-            }
-
-
-
-            double flPower = (y - x) * dampSpeedRatio + dampTurnRatio * rx;
-            double frPower = (y + x) * dampSpeedRatio - dampTurnRatio * rx;
-            double blPower = (y + x) * dampSpeedRatio + dampTurnRatio * rx;
-            double brPower = (y - x) * dampSpeedRatio - dampTurnRatio * rx;
-
-            double maxFront = Math.max(flPower, frPower);
-            double maxBack = Math.max(blPower, brPower);
-            double maxPower = Math.max(maxFront, maxBack);
-
-            if (maxPower > 1.0) {
-                flPower /= maxPower;
-                frPower /= maxPower;
-                blPower /= maxPower;
-                brPower /= maxPower;
-            }
-            //finally moving the motors
-            motorFrontLeft.setPower(flPower);
-            motorBackLeft.setPower(blPower);
-            motorFrontRight.setPower(frPower);
-            motorBackRight.setPower(brPower);
-*/
-            // START FC STUFF
-
-            // reset heading
-            if (gamepad1.dpad_up){
-                imu.resetYaw();
-            }
-
-            // get heading
-            YawPitchRollAngles robotOrientation;
-            robotOrientation = imu.getRobotYawPitchRollAngles();
-            double heading   = robotOrientation.getYaw(AngleUnit.RADIANS);
-
-            double y = Range.clip(-gamepad1.left_stick_y * Math.cos(heading) + -gamepad1.left_stick_x * Math.sin(heading), -1, 1);
-            //left stick x value
-
-            double x = Range.clip( -gamepad1.left_stick_y * Math.sin(heading) + gamepad1.left_stick_x * Math.cos(heading), -1, 1);
-            //right stick x value
-
-            double rx = Range.clip(gamepad1.right_stick_x, -1, 1);
-
-
-            if(gamepad1.right_bumper){
-                dampSpeedRatio = 0.33;
-                dampTurnRatio = 0.22;
-            }else{
-                dampSpeedRatio = 1;
-                dampTurnRatio = 0.75;
-            }
-
-            double flPower = (y + x) * dampSpeedRatio + dampTurnRatio * rx;
-            double frPower = (y - x) * dampSpeedRatio - dampTurnRatio * rx;
-            double blPower = (y - x) * dampSpeedRatio + dampTurnRatio * rx;
-            double brPower = (y + x) * dampSpeedRatio - dampTurnRatio * rx;
-
-            double maxPower;
-            maxPower = Math.max(Math.abs(flPower), Math.abs(frPower));
-            maxPower = Math.max(maxPower, Math.abs(blPower));
-            maxPower = Math.max(maxPower, Math.abs(brPower));
-
-            if (maxPower > 1.0) {
-                flPower /= maxPower;
-                frPower /= maxPower;
-                blPower /= maxPower;
-                brPower /= maxPower;
-            }
-            //finally moving the motors
-            motorFrontLeft.setPower(flPower);
-            motorBackLeft.setPower(blPower);
-            motorFrontRight.setPower(frPower);
-            motorBackRight.setPower(brPower);
-
-            // END FC STUF
             double idkman= this.gamepad2.left_stick_y;
             slides2pos -= idkman/500;
             if(slides2pos >0.8){
@@ -352,7 +233,6 @@ public class dqp2425 extends LinearOpMode{
                 hang.setPower(1);
             }else{
                 hang.setPower(0);
-                //hang.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             }
 
             if(gamepad2.left_stick_button){
@@ -372,20 +252,6 @@ public class dqp2425 extends LinearOpMode{
                 }
 
             }
-
-            // will have to comment out b/c running to position
-
-            /*
-            if (gamepad1.a) {
-                winch.setPower(0.6);
-            }
-            else if (gamepad1.b) {
-                winch.setPower(-0.6);
-            }
-            else {
-                winch.setPower(0);
-            }*/
-
 
             if (gamepad1.a){//going up
                 winch.setTargetPosition(winch.getCurrentPosition()+150);
@@ -455,8 +321,6 @@ public class dqp2425 extends LinearOpMode{
                 else{
                     rot2pos=0.985;
                 }
-//
-
             }
 
             if(gamepad2.dpad_right && b1==0){
@@ -667,7 +531,6 @@ public class dqp2425 extends LinearOpMode{
 
 
         }
-//
 
 
     }
