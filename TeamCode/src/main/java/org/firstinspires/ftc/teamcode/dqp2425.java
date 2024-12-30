@@ -588,7 +588,7 @@ private DcMotor slides;
             if(a1==3){
                 if ((slides2.getPosition() - slides2pos) <= 0.00001) {
                     a2 += 0.015;
-                    if (a2 >= 0.3) {
+                    if (a2 >= 0.7) {
                         //waiting for slides to arrive
                         claw2pos = claw2close;
                         claw2.setPosition(claw2pos);
