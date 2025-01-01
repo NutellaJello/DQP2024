@@ -2,8 +2,8 @@ package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -17,16 +17,19 @@ import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 public class dqp2425 extends LinearOpMode{
     private Drivetrain drivetrain;
 //    private OuttakeSlide outtakeSlide;
-    private DcMotor slides;
-    private Servo slides2;
-    private Servo rotation;
-    private Servo pivot;
-    private Servo claw;
-    private Servo claw2;
-    private Servo rotation2;
-    private DcMotor hang; // linear actuator
-    private DcMotor winch; //winch
-    private Servo swing;
+    /**
+     * outtake slide
+     */
+    private DcMotor slides;     // outtake slide
+    private Servo slides2;      // intake slide
+    private Servo rotation;     // intake claw green pitch
+    private Servo pivot;        // intake claw red rotation
+    private Servo claw;         // intake claw
+    private Servo claw2;        // outtake claw
+    private Servo rotation2;    // outtake arm
+    private DcMotor hang;       // linear actuator, thread bearing
+    private DcMotor winch;      // winch: the pulley roller to wind the hook string
+    private Servo swing;        // the folded bar that the hook is attached to
 
     boolean fieldCentric = false;
 
@@ -149,7 +152,7 @@ public class dqp2425 extends LinearOpMode{
             telemetry.addData("a1", a1);
             telemetry.update();
 
-
+            // just outtake slide initialization, put in initialization code
             if(start){
                 slides.setTargetPosition(slidesnuetral);
                 slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -170,6 +173,7 @@ public class dqp2425 extends LinearOpMode{
                 rotation.setPosition(rotpos);
             }
 
+            // gamepad1 controls the chassis, this rotation2 is the outtakeArm, it prevents from collision
             if(gamepad1.dpad_left){
                 c3=1;
                 rot2pos = 0.85;

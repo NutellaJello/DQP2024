@@ -1,0 +1,13 @@
+package org.firstinspires.ftc.teamcode.subsystems.States;
+
+public enum SampleTransferState {
+
+    SAMPLE_TRANSFER_INIT,   // a1 variable
+    SAMPLE_TRANSFER_FLOOR_CLAMP,
+    SAMPLE_TRANSFER_PICKUP_NEUTRAL_ANGLING,
+    SAMPLE_TRANSFER_PICKUP_NEUTRAL_ANGLE_DONE,
+    SAMPLE_TRANSFER_OUTTAKE_CLOSE,
+    SAMPLE_TRANSFER_INTAKE_OPEN,
+}
+
+
