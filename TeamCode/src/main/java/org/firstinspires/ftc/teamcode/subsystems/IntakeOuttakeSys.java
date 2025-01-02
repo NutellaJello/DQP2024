@@ -129,12 +129,13 @@ public class IntakeOuttakeSys {
         //waiting for the rotation to finish
         if(stateManager.getSampleTransferState()==SampleTransferState.SAMPLE_TRANSFER_PICKUP_NEUTRAL_ANGLING){
             a2+=0.015;
-            if(a2>=0.4) {
+            if(a2>=0.3) {
+                a2=0;
                 //a1=3;
                 stateManager.setSampleTransferState(SampleTransferState.SAMPLE_TRANSFER_PICKUP_NEUTRAL_ANGLE_DONE);
             }
         }
-
+/*
         if(stateManager.getSampleTransferState()==SampleTransferState.SAMPLE_TRANSFER_PICKUP_NEUTRAL_ANGLING){
             //if( (rotation.getPosition()-rotpos)<= 0.00001 ){
             if(intakePitchArm.PositionReachedWithTolerance(0.00001)){
@@ -143,10 +144,10 @@ public class IntakeOuttakeSys {
 //                slides2pos=slides2in;
 //                slides2.setPosition(slides2pos);
                 intakeSlide.SlideIn();
-                //sending slides in
+                //sending slides in`
             }
         }
-
+*/
         if(stateManager.getSampleTransferState()==SampleTransferState.SAMPLE_TRANSFER_PICKUP_NEUTRAL_ANGLE_DONE){
             //if ((slides2.getPosition() - slides2pos) <= 0.00001) {
             if(intakeSlide.PositionReachedWithTolerance(0.00001)){

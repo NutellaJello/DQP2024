@@ -45,7 +45,7 @@ public class dqp2425 extends LinearOpMode{
     //intake rotation
     double rotpos= 1;
     double rotin = 0.28;
-    double rotout = 0.95;
+    double rotout = 0.92;
     int slidesnuetral = -110;
     int slidesSpeci = -5;
     int slidesLatchOff = -174;
@@ -213,7 +213,7 @@ public class dqp2425 extends LinearOpMode{
                 //slides.setPower(gamepad2.right_stick_y );
             }
             if (gamepad2.right_stick_y < 0) {
-                slides.setTargetPosition((int) (slides.getCurrentPosition() - (100 * gamepad2.right_stick_y)));
+                slides.setTargetPosition((int) (slides.getCurrentPosition() + (100 * gamepad2.right_stick_y)));
                 slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 //slides.setPower(gamepad2.right_stick_y);
             }
@@ -281,8 +281,8 @@ public class dqp2425 extends LinearOpMode{
             }
             if (gamepad2.right_bumper) {
 
-                claw2pos = claw2close;
-                claw2.setPosition(claw2pos);
+                //claw2pos = claw2close;
+                //claw2.setPosition(claw2pos);
             }
             if (gamepad2.left_bumper) {
 
@@ -327,7 +327,7 @@ public class dqp2425 extends LinearOpMode{
                 }
             }
 
-            if(gamepad2.dpad_right && b1==0){
+            if(gamepad2.right_bumper && b1==0){
                 rot2pos= rot2wall;
                 b1 = 1;
             }
@@ -346,7 +346,7 @@ public class dqp2425 extends LinearOpMode{
                 b1=3;
             }
             if(b1==3){
-                if(gamepad2.dpad_right){
+                if(gamepad2.right_bumper){
                     claw2pos = claw2open;
                     claw2.setPosition(claw2pos);
                 }else{
@@ -419,7 +419,7 @@ public class dqp2425 extends LinearOpMode{
             }
             if(a1==1){
                 a2+=0.015;
-                if(a2>=0.2) {
+                if(a2>=0.08) {
 
                     if( (claw.getPosition()-clawpos)<= 0.0001 ){
                         a1=2;
@@ -439,28 +439,29 @@ public class dqp2425 extends LinearOpMode{
             //waiting for the rotation to finish
             if(a1==2){
                 a2+=0.015;
-                if(a2>=0.4) {
+                if(a2>=0.3) {
                     a1=3;
+                    a2=0;
                 }
             }
 
-            if(a1==2){
+            if(a1==3){
                 if( (rotation.getPosition()-rotpos)<= 0.00001 ){
-                    a1=3;
+                    a1=4;
                     slides2pos=slides2in;
                     slides2.setPosition(slides2pos);
                     //sending slides in
                 }
             }
 
-            if(a1==3){
+            if(a1==4){
                 if ((slides2.getPosition() - slides2pos) <= 0.00001) {
                     a2 += 0.015;
-                    if (a2 >= 0.7) {
+                    if (a2 >= 0.65) {
                         //waiting for slides to arrive
                         claw2pos = claw2close;
                         claw2.setPosition(claw2pos);
-                        a1 = 4;
+                        a1 = 5;
                         a2 = 0;
                         //outtake claw closing up
                     }
@@ -468,18 +469,18 @@ public class dqp2425 extends LinearOpMode{
 
             }
 
-            if(a1==4){
+            if(a1==5){
                 a2+=0.015;
                 if(a2>=0.13) {
                     clawpos = clawopen;
                     claw.setPosition(clawpos);
-                    a1 = 5;
+                    a1 = 6;
                     a2=0;
                     //intake claw opening
                 }
             }
 
-            if(a1==5){
+            if(a1==6){
                 a2+=0.015;
                 if(a2>=0.3) {
                     //waiting for intake claw to open to slide away
@@ -511,7 +512,7 @@ public class dqp2425 extends LinearOpMode{
 
 
 
-            if (gamepad2.dpad_down) {
+            if (gamepad2.dpad_down ) {
                 c2=1;
             }
             if(c2 ==1){

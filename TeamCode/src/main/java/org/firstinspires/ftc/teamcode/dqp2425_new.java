@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeOuttakeSys;
 
 @Config
-@TeleOp(name = "dqp2425", group = "TeleOp")
+@TeleOp(name = "gorilla", group = "TeleOp")
 
 public class dqp2425_new extends LinearOpMode{
     private Drivetrain drivetrain;
