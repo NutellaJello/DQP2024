@@ -45,7 +45,7 @@ public class dqp2425 extends LinearOpMode{
     //intake rotation
     double rotpos= 1;
     double rotin = 0.28;
-    double rotout = 0.92;
+    double rotout = 0.94;
     int slidesnuetral = -110;
     int slidesSpeci = -5;
     int slidesLatchOff = -174;
@@ -54,7 +54,7 @@ public class dqp2425 extends LinearOpMode{
     //outtake claw
     double claw2pos=0.347;
     double claw2close = 0.347;
-    double claw2open = 0.1;
+    double claw2open = 0.16;
 
 
     //outtake arm rotation
@@ -75,7 +75,7 @@ public class dqp2425 extends LinearOpMode{
     int actuatorHang = 465;
 
     // swing up is dpad left, down is dpad right
-    double swingup = 0.175; // touch bar is 0.23
+    double swingup = 0.20;
     double swingdown = 0.9;
 
 
@@ -171,16 +171,18 @@ public class dqp2425 extends LinearOpMode{
                 slides2pos=slides2out;
                 rotpos=rotout-0.1;
                 rotation.setPosition(rotpos);
+                clawpos = clawopen;
+                claw.setPosition(clawpos);
             }
 
             // gamepad1 controls the chassis, this rotation2 is the outtakeArm, it prevents from collision
-            if(gamepad1.dpad_left){
+            if(gamepad2.y){
                 c3=1;
                 rot2pos = 0.85;
                 rotation2.setPosition(rot2pos);
                 clawpos = clawclose;
                 claw.setPosition(clawpos);
-                slides2pos=slides2in+0.14;
+                slides2pos=slides2in+0.07;
                 slides2.setPosition(slides2pos);
 
             }
@@ -191,7 +193,7 @@ public class dqp2425 extends LinearOpMode{
                 c3=3;
             }
             if(c3==1 && swing.getPosition()> swingup){
-                swing.setPosition(swing.getPosition()-0.0015);
+                swing.setPosition(swing.getPosition()-0.005);
             }else if(c3==2) {
                 swing.setPosition(0.2);
             }else if (c3==3){
@@ -257,16 +259,20 @@ public class dqp2425 extends LinearOpMode{
 
             }
 
-            if (gamepad1.a){//going up
+           /* if (gamepad2.left_trigger>=0.1){//going up
                 winch.setTargetPosition(winch.getCurrentPosition()+150);
                 winch.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                winch.setPower(0.6);
-            }
+                winch.setPower(gamepad2.left_trigger);
+            }*/
 
-            if (gamepad1.b){//going down
+            if (gamepad2.left_trigger>=0.1 && gamepad2.y){//going down
                 winch.setTargetPosition(winch.getCurrentPosition()-150);
                 winch.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 winch.setPower(0.6);
+            }else if(gamepad2.left_trigger>=0.1){
+                winch.setTargetPosition((int) (winch.getCurrentPosition()+200*gamepad2.left_trigger));
+                winch.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                winch.setPower(1);
             }
 
             telemetry.addData("winch position", winch.getCurrentPosition());
@@ -290,12 +296,12 @@ public class dqp2425 extends LinearOpMode{
                 claw2.setPosition(claw2pos);
             }
             if (gamepad2.x) {
-                clawpos=clawclose;//0.08 close
-                claw.setPosition(clawpos);
+               // clawpos=clawclose;//0.08 close
+               // claw.setPosition(clawpos);
             }
             if (gamepad2.y) {
-                clawpos=clawopen;//-0.47
-                claw.setPosition(clawpos);
+                //clawpos=clawopen;//-0.47
+                //claw.setPosition(clawpos);
             }
             pivotpos-=gamepad2.left_stick_x*0.017;
 
@@ -307,7 +313,7 @@ public class dqp2425 extends LinearOpMode{
             }
 
             pivot.setPosition(pivotpos);
-            rot2pos-=gamepad2.left_trigger/100;
+            //rot2pos-=gamepad2.left_trigger/100;
             rot2pos += gamepad2.right_trigger/100;
             if(rot2pos<0){
                 rot2pos=0;
@@ -474,23 +480,13 @@ public class dqp2425 extends LinearOpMode{
                 if(a2>=0.13) {
                     clawpos = clawopen;
                     claw.setPosition(clawpos);
-                    a1 = 6;
+                    a1 = 0;
                     a2=0;
                     //intake claw opening
                 }
             }
 
-            if(a1==6){
-                a2+=0.015;
-                if(a2>=0.3) {
-                    //waiting for intake claw to open to slide away
-                    slides2pos=0.5;
-                    slides2.setPosition(slides2pos);
-                    a1 = 0;
-                    a2=0;
 
-                }
-            }
 
 
 
