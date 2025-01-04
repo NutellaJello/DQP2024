@@ -55,7 +55,7 @@ public class dqp2425 extends LinearOpMode{
     double claw2pos=0.347;
     double claw2close = 0.347;
     double claw2open = 0.16;
-
+//
 
     //outtake arm rotation
     double rot2pos=0.7;
