@@ -125,7 +125,7 @@ public class BlueSideBasket extends LinearOpMode {
                     new Action(){
                         @Override
                         public boolean run(@NonNull TelemetryPacket packet) {
-                            intakeSlides.setPosition(0.4968);
+                            intakeSlides.setPosition(0.5);
                             return false;
                         }}, new SleepAction(0.4)
             );
@@ -318,7 +318,6 @@ public class BlueSideBasket extends LinearOpMode {
         // Execute autonomous sequence
         Actions.runBlocking(
                 new SequentialAction(
-                        new SleepAction(2),
                         new ParallelAction(movement, slidesSpecUp),
                         slidesPartiallyDown,
                         outtakeClaw.openClaw(),
@@ -327,17 +326,15 @@ public class BlueSideBasket extends LinearOpMode {
                                 outtakeRotation.outtakeRotTransfer()),
                         intakeSlides.moveToPosition(),
                         intakeRotation.intakeRotDown(),
-                        new ParallelAction(
-                                intakeClaw.closeClaw(),
-                                intakeRotation.intakeRotUp(),
-                                intakeSlides.retractPosition()
-                        ),
+
+                        intakeClaw.closeClaw(),
+                        intakeRotation.intakeRotUp(),
+                        intakeSlides.retractPosition(),
                         outtakeClaw.closeClaw(),
                         intakeClaw.openClaw(),
-                        new ParallelAction(movement2, new SequentialAction(
-                                slidesUp,
-                                outtakeRotation.outtakeRotBasket()
-                        )),
+                        new ParallelAction(movement2,
+                                slidesUp),
+                        outtakeRotation.outtakeRotBasket(),
                         outtakeClaw.openClaw(),
                         new ParallelAction(movement3, new SequentialAction(
                                 outtakeRotation.outtakeRotTransfer(),

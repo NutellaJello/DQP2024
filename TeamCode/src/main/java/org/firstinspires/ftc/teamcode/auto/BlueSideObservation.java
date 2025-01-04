@@ -317,8 +317,8 @@ public class BlueSideObservation extends LinearOpMode {
                 .splineToConstantHeading(new Vector2d(-15,-31), Math.toRadians(90), new TranslationalVelConstraint(velocity));
         Action moveTo2ndObservation = toObs2nd.build();
 
-        TrajectoryActionBuilder park= drive.actionBuilder(new Pose2d(-15, -31, Math.toRadians(90)))
-                .splineToConstantHeading(new Vector2d(40,-62), Math.toRadians(90), new TranslationalVelConstraint(velocity));
+        TrajectoryActionBuilder park= drive.actionBuilder(new Pose2d(-14, -31, Math.toRadians(90)))
+                .splineToConstantHeading(new Vector2d(50,-60), Math.toRadians(90), new TranslationalVelConstraint(velocity));
         Action goPark = park.build();
 
 
@@ -364,42 +364,38 @@ public class BlueSideObservation extends LinearOpMode {
                         new ParallelAction(firstSample,slidesTransfer, outtakeRotation.outtakeRotTransfer()),
                         intakeSlides.moveToPosition(),
                         intakeRotation.intakeRotDown(),
-                        new ParallelAction(
-                                new SequentialAction(intakeClaw.closeClaw(),new SleepAction(0.1),
-                                intakeRotation.intakeRotUp()),
-                                intakeSlides.retractPosition()
-                        ),
+                        intakeClaw.closeClaw(),
+                        new SleepAction(0.1),
+                        intakeRotation.intakeRotUp(),
+                        intakeSlides.retractPosition(),
                         outtakeClaw.closeClaw(),
                         new SleepAction(0.4),
                         intakeClaw.openClaw(),
                         outtakeRotation.outtakeRotWall(),
                         outtakeClaw.openClaw(),
                         //second sample
-                        new ParallelAction(new SequentialAction( secondSample,outtakeRotation.outtakeRotTransfer(),
-                                intakeSlides.moveToPosition())),
+                        secondSample,
+                        outtakeRotation.outtakeRotTransfer(),
+                        intakeSlides.moveToPosition(),
                         intakeRotation.intakeRotDown(),
                         new SleepAction (0.3),
-                        new ParallelAction(
-                                intakeClaw.closeClaw(),
-                                intakeRotation.intakeRotUp(),
-                                intakeSlides.retractPosition()
-                        ),
+                        intakeClaw.closeClaw(),
+                        intakeRotation.intakeRotUp(),
+                        intakeSlides.retractPosition(),
                         outtakeClaw.closeClaw(),
                         new SleepAction(0.2),
                         intakeClaw.openClaw(),
                         outtakeRotation.outtakeRotWall(),
                         outtakeClaw.openClaw(),
                         //third sample
-                        new ParallelAction(new SequentialAction(outtakeRotation.outtakeRotTransfer()
-                                ,intakeSlides.moveToThirdSample()),
-                                thirdSample),
+                        outtakeRotation.outtakeRotTransfer(),
+                        intakeSlides.moveToThirdSample(),
+                        thirdSample,
                         intakeRotation.intakeRotDown(),
                         new SleepAction(0.3),
-                        new ParallelAction(
-                                intakeClaw.closeClaw(),
-                                intakeSlides.retractPosition(),
-                                intakeRotation.intakeRotUp()
-                        ),
+                        intakeClaw.closeClaw(),
+                        intakeSlides.retractPosition(),
+                        intakeRotation.intakeRotUp(),
                         outtakeClaw.closeClaw(),
                         new SleepAction(0.2),
                         intakeClaw.openClaw(),
@@ -411,9 +407,9 @@ public class BlueSideObservation extends LinearOpMode {
                         outtakeClaw.closeClaw(),
                         new SleepAction(0.2),
                         slidesPickSpec,
-                        new ParallelAction( new SequentialAction(slidesFirstSpec,
-                                outtakeRotation.outtakeRotSpec()),
-                                moveToObservation),
+                        slidesFirstSpec,
+                        outtakeRotation.outtakeRotSpec(),
+                        moveToObservation,
                         slidesHang,
                         outtakeClaw.openClaw(),
                         // pick up second Specimen
