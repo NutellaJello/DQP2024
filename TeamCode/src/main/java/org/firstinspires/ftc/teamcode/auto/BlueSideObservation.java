@@ -41,7 +41,7 @@ import java.util.List;
 public class BlueSideObservation extends LinearOpMode {
     // Declare motors and servos
     private DcMotor slides;
-    private Servo slides2, rotation, pivot, claw, claw2, rotation2;
+    private Servo slides2, rotation, pivot, claw, claw2, rotation2, swing;
 
     public class intakeClaw {
         private Servo intakeClaw;
@@ -94,7 +94,7 @@ public class BlueSideObservation extends LinearOpMode {
                     new Action(){
                         @Override
                         public boolean run(@NonNull TelemetryPacket packet) {
-                            intakeRotation.setPosition(0.85);
+                            intakeRotation.setPosition(0.8);
                             return false;
                         }}, new SleepAction(0.6)
             );
@@ -126,7 +126,7 @@ public class BlueSideObservation extends LinearOpMode {
                     new Action(){
                         @Override
                         public boolean run(@NonNull TelemetryPacket packet) {
-                            intakeSlides.setPosition(0.685);
+                            intakeSlides.setPosition(0.675);
                             return false;
                         }}, new SleepAction(0.2)
             );
@@ -136,7 +136,7 @@ public class BlueSideObservation extends LinearOpMode {
                     new Action(){
                         @Override
                         public boolean run(@NonNull TelemetryPacket packet) {
-                            intakeSlides.setPosition(0.74);
+                            intakeSlides.setPosition(0.73);
                             return false;
                         }}, new SleepAction(0.2)
             );
@@ -256,12 +256,16 @@ public class BlueSideObservation extends LinearOpMode {
         claw = hardwareMap.get(Servo.class, "claw");
         claw2 = hardwareMap.get(Servo.class, "claw2");
         rotation2 = hardwareMap.get(Servo.class, "rotation2");
+        swing = hardwareMap.get(Servo.class, "swing"); // control hub port 5
+
 
         // Configure motor and servo settings
         slides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         slides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         slides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+
+        swing.setPosition(0.9);
         //Ensure intake does not move around
         intakeSlides.setPosition(0.4968);
         claw.setPosition(0.45);
@@ -280,14 +284,14 @@ public class BlueSideObservation extends LinearOpMode {
 // actions for tranfering and strafing
         TrajectoryActionBuilder spec1 = drive.actionBuilder(new Pose2d(-7, -28, Math.toRadians(90)))
                 .lineToY(-30,new TranslationalVelConstraint(velocity))
-                .splineToConstantHeading(new Vector2d(41.75,-47), Math.toRadians(90), new TranslationalVelConstraint(velocity));
+                .splineToConstantHeading(new Vector2d(43,-47), Math.toRadians(90), new TranslationalVelConstraint(velocity));
         Action firstSample = spec1.build();
 
-        TrajectoryActionBuilder spec2 = drive.actionBuilder(new Pose2d(41.75, -47, Math.toRadians(90)))
-                .strafeTo(new Vector2d(55,-47), new TranslationalVelConstraint(velocity));
+        TrajectoryActionBuilder spec2 = drive.actionBuilder(new Pose2d(43, -47, Math.toRadians(90)))
+                .strafeTo(new Vector2d(53,-47), new TranslationalVelConstraint(velocity));
         Action secondSample = spec2.build();
 
-        TrajectoryActionBuilder spec3 = drive.actionBuilder(new Pose2d(55, -47, Math.toRadians(90)))
+        TrajectoryActionBuilder spec3 = drive.actionBuilder(new Pose2d(53, -47, Math.toRadians(90)))
                 .strafeTo(new Vector2d(46,-47), new TranslationalVelConstraint(velocity))
                 .turnTo(Math.toRadians(53));
         Action thirdSample = spec3.build();
@@ -298,12 +302,24 @@ public class BlueSideObservation extends LinearOpMode {
 
         TrajectoryActionBuilder test = drive.actionBuilder(new Pose2d(46, -47, Math.toRadians(90)))
                 .strafeTo(new Vector2d(28.75,-38), new TranslationalVelConstraint(velocity))
-                .strafeTo(new Vector2d(28.75,-63), new TranslationalVelConstraint(velocity));
+                .strafeTo(new Vector2d(28.75,-61), new TranslationalVelConstraint(velocity));
         Action pickSpecimenWall = test.build();
 
-        TrajectoryActionBuilder toObs = drive.actionBuilder(new Pose2d(-28.75, -63, Math.toRadians(90)))
-                .splineToConstantHeading(new Vector2d(-10,-30), Math.toRadians(90), new TranslationalVelConstraint(velocity));
+        TrajectoryActionBuilder toObs = drive.actionBuilder(new Pose2d(28.75, -61, Math.toRadians(90)))
+                .splineToConstantHeading(new Vector2d(-14,-31), Math.toRadians(90), new TranslationalVelConstraint(velocity));
         Action moveToObservation = toObs.build();
+        TrajectoryActionBuilder secondSpec = drive.actionBuilder(new Pose2d(-14, -31, Math.toRadians(90)))
+                .splineToConstantHeading(new Vector2d(31.5,-55),Math.toRadians(90))
+                .strafeTo(new Vector2d(31.5,-62));
+        Action moveTo2ndSpecimen = secondSpec.build();
+
+        TrajectoryActionBuilder toObs2nd = drive.actionBuilder(new Pose2d(31.5, -61, Math.toRadians(90)))
+                .splineToConstantHeading(new Vector2d(-15,-31), Math.toRadians(90), new TranslationalVelConstraint(velocity));
+        Action moveTo2ndObservation = toObs2nd.build();
+
+        TrajectoryActionBuilder park= drive.actionBuilder(new Pose2d(-15, -31, Math.toRadians(90)))
+                .splineToConstantHeading(new Vector2d(40,-62), Math.toRadians(90), new TranslationalVelConstraint(velocity));
+        Action goPark = park.build();
 
 
 
@@ -315,13 +331,18 @@ public class BlueSideObservation extends LinearOpMode {
         Action slidesPickSpec = createMotorAction(slides,-200,1);
         Action slidesFirstSpec =createMotorAction(slides,-400,1);
 
-        Action slidesHang =createMotorAction(slides,-680,1);
+        Action slidesHang =createMotorAction(slides,-530,1, 1.5);
 
-        Action slidesSpecUp2=createMotorAction(slides,-680,0.9);
-        Action slidesPartDown2 = createMotorAction(slides, -290, 0.9);
         Action slidesDown2 = createMotorAction(slides,-5 , 0.9);
 
+        Action slidesPick2ndSpec = createMotorAction(slides,-200,1);
+        Action slidesSecondSpec =createMotorAction(slides,-400,1);
+
+        Action slidesSecondHang =createMotorAction(slides,-530,1, 1.5);
+
         Action slidesTransfer = createMotorAction(slides,-105 , 1);
+
+        Action slidesDown3 = createMotorAction(slides,-5 , 0.9);
 
         ArrayList<Action> pickSampleActions = new ArrayList<>();
         pickSampleActions.add(slidesDown);
@@ -358,6 +379,7 @@ public class BlueSideObservation extends LinearOpMode {
                                 intakeSlides.moveToPosition()),
                                 secondSample),
                         intakeRotation.intakeRotDown(),
+                        new SleepAction (0.3),
                         new ParallelAction(
                                 intakeClaw.closeClaw(),
                                 intakeRotation.intakeRotUp(),
@@ -373,7 +395,7 @@ public class BlueSideObservation extends LinearOpMode {
                                 ,intakeSlides.moveToThirdSample()),
                                 thirdSample),
                         intakeRotation.intakeRotDown(),
-                        new SleepAction(0.2),
+                        new SleepAction(0.3),
                         new ParallelAction(
                                 intakeClaw.closeClaw(),
                                 intakeSlides.retractPosition(),
@@ -385,6 +407,7 @@ public class BlueSideObservation extends LinearOpMode {
                         thirdSampleTransfer,
                         outtakeRotation.outtakeRotWall(),
                         outtakeClaw.openClaw(),
+                        // pick up first Specimen
                         new ParallelAction(pickSpecimenWall, slidesDown),
                         outtakeClaw.closeClaw(),
                         new SleepAction(0.2),
@@ -393,7 +416,20 @@ public class BlueSideObservation extends LinearOpMode {
                                 outtakeRotation.outtakeRotSpec()),
                                 moveToObservation),
                         slidesHang,
-                        outtakeClaw.openClaw()
+                        outtakeClaw.openClaw(),
+                        // pick up second Specimen
+                        new ParallelAction(
+                                new SequentialAction(outtakeRotation.outtakeRotWall(),slidesDown2),moveTo2ndSpecimen
+                        ),
+                        outtakeClaw.closeClaw(),
+                        new SleepAction(0.2),
+                        slidesPick2ndSpec,
+                        new ParallelAction( new SequentialAction(slidesSecondSpec,
+                                outtakeRotation.outtakeRotSpec()),
+                                moveTo2ndObservation),
+                        slidesSecondHang,
+                        outtakeClaw.openClaw(),
+                        new ParallelAction(slidesDown3, goPark)
 
 
 
@@ -435,6 +471,42 @@ public class BlueSideObservation extends LinearOpMode {
             }
         };
     }
+    private Action createMotorAction(DcMotor motor, int targetPosition, double power, double tolerance) {
+        return new Action() {
+            private boolean initialized = false;
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                if (!initialized) {
+                    motor.setTargetPosition(targetPosition);
+                    motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    motor.setPower(power);
+                    initialized = true; // Ensure this setup runs only once
+                }
+
+                // Get the current position
+                int currentPosition = motor.getCurrentPosition();
+
+                // Calculate the absolute error
+                int error = Math.abs(targetPosition - currentPosition);
+
+                // Add telemetry data for debugging
+                packet.put("Motor Position", currentPosition);
+                packet.put("Target Position", targetPosition);
+                packet.put("Position Error", error);
+                packet.put("Tolerance", tolerance);
+
+                // Check if the error is within the specified tolerance
+                if (error > tolerance) {
+                    return true; // Continue running
+                } else {
+                    motor.setPower(0); // Ensure the motor stops
+                    return false; // Action is complete
+                }
+            }
+        };
+    }
+
 
 
 

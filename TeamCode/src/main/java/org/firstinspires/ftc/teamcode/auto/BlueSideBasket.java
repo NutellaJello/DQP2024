@@ -175,12 +175,12 @@ public class BlueSideBasket extends LinearOpMode {
         public outtakeRotation(HardwareMap hardwareMap) {
             outtakeRotation = hardwareMap.get(Servo.class, "rotation2");
         }
-        public Action outtakeRotPreload() {
+        public Action outtakeRotFinal() {
             return new SequentialAction(
                     new Action(){
                         @Override
                         public boolean run(@NonNull TelemetryPacket packet) {
-                            outtakeRotation.setPosition(0.64);
+                            outtakeRotation.setPosition(0.55);
                             return false;
                         }}, new SleepAction(0.6)
             );
@@ -303,7 +303,7 @@ public class BlueSideBasket extends LinearOpMode {
         Action slidesUp2 = createMotorAction(slides, -860, 0.9);
         Action slidesDown3 = createMotorAction(slides,-105 , 0.9);
         Action slidesUp3 = createMotorAction(slides, -850, 0.8);
-        Action slidesDown4 = createMotorAction(slides,-105 , 0.9);
+        Action slidesDown4 = createMotorAction(slides,-5 , 0.9);
 
         ArrayList<Action> pickSampleActions = new ArrayList<>();
         pickSampleActions.add(slidesDown);
@@ -318,6 +318,7 @@ public class BlueSideBasket extends LinearOpMode {
         // Execute autonomous sequence
         Actions.runBlocking(
                 new SequentialAction(
+                        new SleepAction(2),
                         new ParallelAction(movement, slidesSpecUp),
                         slidesPartiallyDown,
                         outtakeClaw.openClaw(),
@@ -373,7 +374,7 @@ public class BlueSideBasket extends LinearOpMode {
                         )),
                         outtakeClaw.openClaw(),
                         new ParallelAction(movement8, new SequentialAction(
-                                outtakeRotation.outtakeRotTransfer(),
+                                outtakeRotation.outtakeRotFinal(),
                                 slidesDown4
                         ))
 
