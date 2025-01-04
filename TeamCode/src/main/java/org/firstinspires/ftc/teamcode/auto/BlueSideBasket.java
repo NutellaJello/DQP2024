@@ -52,9 +52,9 @@ public class BlueSideBasket extends LinearOpMode {
                     new Action(){
                         @Override
                         public boolean run(@NonNull TelemetryPacket packet) {
-                            intakeClaw.setPosition(0.08);
+                            intakeClaw.setPosition(0.06);
                             return false;
-                        }}, new SleepAction(0.2)
+                        }}, new SleepAction(0.1)
             );
         }
         public Action openClaw() {
@@ -64,7 +64,7 @@ public class BlueSideBasket extends LinearOpMode {
                         public boolean run(@NonNull TelemetryPacket packet) {
                             intakeClaw.setPosition(0.45);
                             return false;
-                        }}, new SleepAction(0.2)
+                        }}, new SleepAction(0.1)
             );
         }
 
@@ -81,7 +81,7 @@ public class BlueSideBasket extends LinearOpMode {
                     new Action(){
                         @Override
                         public boolean run(@NonNull TelemetryPacket packet) {
-                            intakeRotation.setPosition(0.97);
+                            intakeRotation.setPosition(0.95);
                             return false;
                         }}, new SleepAction(0.6)
             );
@@ -113,9 +113,9 @@ public class BlueSideBasket extends LinearOpMode {
                     new Action(){
                         @Override
                         public boolean run(@NonNull TelemetryPacket packet) {
-                            intakeSlides.setPosition(0.57);
+                            intakeSlides.setPosition(0.64);
                             return false;
-                        }}, new SleepAction(1.3)
+                        }}, new SleepAction(0.4)
             );
         }
 
@@ -125,9 +125,9 @@ public class BlueSideBasket extends LinearOpMode {
                     new Action(){
                         @Override
                         public boolean run(@NonNull TelemetryPacket packet) {
-                            intakeSlides.setPosition(0.702);
+                            intakeSlides.setPosition(0.4968);
                             return false;
-                        }}, new SleepAction(1.3)
+                        }}, new SleepAction(0.4)
             );
         }
 
@@ -147,7 +147,7 @@ public class BlueSideBasket extends LinearOpMode {
                     new Action(){
                         @Override
                         public boolean run(@NonNull TelemetryPacket packet) {
-                            outtakeClaw.setPosition(0.38);
+                            outtakeClaw.setPosition(0.347);
                             return false;
                         }
                     }, new SleepAction(0.2)
@@ -159,7 +159,7 @@ public class BlueSideBasket extends LinearOpMode {
                     new Action(){
                         @Override
                         public boolean run(@NonNull TelemetryPacket packet) {
-                            outtakeClaw.setPosition(0);
+                            outtakeClaw.setPosition(0.1);
                             return false;
                         }}, new SleepAction(0.2)
             );
@@ -175,23 +175,33 @@ public class BlueSideBasket extends LinearOpMode {
         public outtakeRotation(HardwareMap hardwareMap) {
             outtakeRotation = hardwareMap.get(Servo.class, "rotation2");
         }
-        public Action outtakeRotDown() {
+        public Action outtakeRotPreload() {
             return new SequentialAction(
                     new Action(){
                         @Override
                         public boolean run(@NonNull TelemetryPacket packet) {
-                            outtakeRotation.setPosition(0.97);
+                            outtakeRotation.setPosition(0.64);
+                            return false;
+                        }}, new SleepAction(0.6)
+            );
+        }
+        public Action outtakeRotTransfer() {
+            return new SequentialAction(
+                    new Action(){
+                        @Override
+                        public boolean run(@NonNull TelemetryPacket packet) {
+                            outtakeRotation.setPosition(0.7821);
                             return false;
                         }}, new SleepAction(0.6)
             );
         }
 
-        public Action outtakeRotUp() {
+        public Action outtakeRotBasket() {
             return new SequentialAction(
                     new Action(){
                         @Override
                         public boolean run(@NonNull TelemetryPacket packet) {
-                            outtakeRotation.setPosition(0.25);
+                            outtakeRotation.setPosition(0.06);
                             return false;
                         }}, new SleepAction(0.6)
             );
@@ -219,12 +229,12 @@ public class BlueSideBasket extends LinearOpMode {
 
         slides = hardwareMap.get(DcMotor.class, "slides");
         slides2 = hardwareMap.get(Servo.class, "slides2");
-        //rotation = hardwareMap.get(Servo.class, "rotation");
+        rotation = hardwareMap.get(Servo.class, "rotation");
         pivot = hardwareMap.get(Servo.class, "pivot");
-        //  claw = hardwareMap.get(Servo.class, "claw");
-        //  claw2 = hardwareMap.get(Servo.class, "claw2");
+          claw = hardwareMap.get(Servo.class, "claw");
+          claw2 = hardwareMap.get(Servo.class, "claw2");
         rotation2 = hardwareMap.get(Servo.class, "rotation2");
-        // rotation = hardwareMap.get(Servo.class, "rotation");
+         rotation = hardwareMap.get(Servo.class, "rotation");
         rotation = hardwareMap.get(Servo.class, "rotation");
 
 
@@ -234,51 +244,67 @@ public class BlueSideBasket extends LinearOpMode {
         slides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         //Ensure intake does not move around
-//        intakeSlides.setPosition(0.69);
+        intakeSlides.setPosition(0.4968);
+        claw.setPosition(0.45);
         //Hold Spece
-//        rotation2.setPosition(0.143);
-//        outtakeClaw.setPosition(0.38);
+        rotation2.setPosition(0.64);
+        outtakeClaw.setPosition(0.347);
 
         // Autonomous Actions
 
         TrajectoryActionBuilder tab = drive.actionBuilder(new Pose2d(-16,-60,Math.toRadians(90)))
-                .setReversed(true)
-                .strafeTo(new Vector2d(-10,-59))
-                .waitSeconds(0.2)
-                .lineToY(-29);
+                .splineTo(new Vector2d(-5,-29), Math.toRadians(90));
+
 
         Action movement=tab.build();
-        TrajectoryActionBuilder tab1 = drive.actionBuilder(new Pose2d(-10, -29, Math.toRadians(90)))
-                .lineToY(-42.4)
-                .strafeTo(new Vector2d(-46.5,-42.4))
-                .waitSeconds(0.1)
-                .turn(Math.toRadians(179.5));
+        TrajectoryActionBuilder tab1 = drive.actionBuilder(new Pose2d(-5, -29, Math.toRadians(90)))
+                .lineToY(-44)
+                .strafeTo(new Vector2d(-44,-42.4));
+
         Action movement1 = tab1.build();
 //
-        TrajectoryActionBuilder tab3 = drive.actionBuilder(new Pose2d(-45.5, -42.4, Math.toRadians(90)))
-                .strafeTo(mirrorVector.apply(new Vector2d(-58.5, -55.5))).turnTo(Math.toRadians(45));
-        Action movement3 = tab3.build();
-
-        TrajectoryActionBuilder tab2 = drive.actionBuilder(new Pose2d(-58.5, -55.5, Math.toRadians(45)))
-                .splineTo(new Vector2d(-55.5,-42.4), Math.toRadians(90));
+        TrajectoryActionBuilder tab2 = drive.actionBuilder(new Pose2d(-45.5, -42.4, Math.toRadians(90)))
+                .strafeTo(new Vector2d(-58.5,-55.5))
+                .turnTo(45);
         Action movement2 = tab2.build();
 
+        TrajectoryActionBuilder tab3 = drive.actionBuilder(new Pose2d(-58.5, -55.5, Math.toRadians(45)))
+                .splineTo(new Vector2d(-53,-42.4), Math.toRadians(90));
+        Action movement3 = tab3.build();
+
         TrajectoryActionBuilder tab5 = drive.actionBuilder(new Pose2d(-55.5,-42.4, Math.toRadians(90)))
-                .strafeTo(mirrorVector.apply(new Vector2d(-58.5,-55.5))).turnTo(Math.toRadians(45));
+                .strafeTo(new Vector2d(-58.5,-55.5))
+                .turnTo(45);
         Action movement5 = tab5.build();
+
+        TrajectoryActionBuilder tab6 = drive.actionBuilder(new Pose2d(-58.5,-55.5, Math.toRadians(45)))
+                .turnTo(90)
+                .splineTo(new Vector2d(-62,-42.4), Math.toRadians(90));
+        Action movement6 = tab6.build();
+
+        TrajectoryActionBuilder tab7 = drive.actionBuilder(new Pose2d(-62,-42.4, Math.toRadians(90)))
+                .lineToY(-55);
+        Action movement7 = tab7.build();
+        TrajectoryActionBuilder tab8 = drive.actionBuilder(new Pose2d(-62,-55, Math.toRadians(90)))
+                .splineTo(new Vector2d(-30,0), Math.toRadians(0));
+        Action movement8 = tab8.build();
+
 
 
 
 
 
         // Use utility methods to create actions
-        Action slidesUp = createMotorAction(slides, -2300, 0.8);      // Slides up
-        Action slidesPartUp=createMotorAction(slides,-1100,0.8);
-        Action slidesPartDown = createMotorAction(slides, -400, 0.2); // Slides partially down
-        Action slidesDown = createMotorAction(slides,-5 , 0.8);       // Slides down
-        Action slidesDown2 = createMotorAction(slides, -5, 0.8);
-        Action slidesUp2 = createMotorAction(slides, -2300, 0.8);
-        Action slidesDown3 = createMotorAction(slides, -5, 0.8);
+        Action slidesUp = createMotorAction(slides, -860, 0.9);      // Slides up
+        Action slidesSpecUp = createMotorAction(slides, -640, 0.8);
+        Action slidesDown = createMotorAction(slides,-105 , 0.9);       // Slides down
+        Action slidesPartiallyDown = createMotorAction(slides, -240, 0.8);
+        Action slidesDown2 = createMotorAction(slides,-105 , 0.9);
+        Action slidesUp2 = createMotorAction(slides, -860, 0.9);
+        Action slidesDown3 = createMotorAction(slides,-105 , 0.9);
+        Action slidesUp3 = createMotorAction(slides, -850, 0.8);
+        Action slidesDown4 = createMotorAction(slides,-105 , 0.9);
+
         ArrayList<Action> pickSampleActions = new ArrayList<>();
         pickSampleActions.add(slidesDown);
 
@@ -292,76 +318,67 @@ public class BlueSideBasket extends LinearOpMode {
         // Execute autonomous sequence
         Actions.runBlocking(
                 new SequentialAction(
-//                        outtakeClaw.closeClaw(),
-//                        slidesPartUp,
-                        movement,
-//                        slidesPartDown,
-//                        outtakeClaw.openClaw(),
-//                        slidesDown,
-                        movement1
-//                        intakeClaw.openClaw(),
-//                        outtakeClaw.openClaw(),
-//                        outtakeRotation.outtakeRotDown(),
-//                        intakeSlides.moveToPosition(),
-//                        intakeRotation.intakeRotDown(),
-//                        intakeClaw.closeClaw(),
-//                        intakeRotation.intakeRotUp(),
-//                        intakeSlides.retractPosition(),
-//                        outtakeClaw.closeClaw(),
-//                        intakeClaw.openClaw(),
-//                        new ParallelAction(movement3, new SequentialAction(
-//                                slidesUp,
-//                                outtakeRotation.outtakeRotUp()
-//                        )),
-//                        outtakeClaw.openClaw(),
-//                        new ParallelAction(movement2, new SequentialAction(
-//                                outtakeRotation.outtakeRotDown(),
-//                                slidesDown2
-//                        )),
-//                        intakeSlides.moveToPosition(),
-//                        intakeRotation.intakeRotDown(),
-//                        intakeClaw.closeClaw(),
-//                        intakeRotation.intakeRotUp(),
-//                        intakeSlides.retractPosition(),
-//                        outtakeClaw.closeClaw(),
-//                        intakeClaw.openClaw(),
-//                        new ParallelAction(movement5, new SequentialAction(
-//                                slidesUp2,
-//                                outtakeRotation.outtakeRotUp()
-//                        )),
-//                        outtakeClaw.openClaw(),
-//                        outtakeRotation.outtakeRotDown(),
-//                        slidesDown3
-                        // old code end here
+                        new ParallelAction(movement, slidesSpecUp),
+                        slidesPartiallyDown,
+                        outtakeClaw.openClaw(),
+                        new ParallelAction(movement1,
+                                slidesDown,
+                                outtakeRotation.outtakeRotTransfer()),
+                        intakeSlides.moveToPosition(),
+                        intakeRotation.intakeRotDown(),
+                        new ParallelAction(
+                                intakeClaw.closeClaw(),
+                                intakeRotation.intakeRotUp(),
+                                intakeSlides.retractPosition()
+                        ),
+                        outtakeClaw.closeClaw(),
+                        intakeClaw.openClaw(),
+                        new ParallelAction(movement2, new SequentialAction(
+                                slidesUp,
+                                outtakeRotation.outtakeRotBasket()
+                        )),
+                        outtakeClaw.openClaw(),
+                        new ParallelAction(movement3, new SequentialAction(
+                                outtakeRotation.outtakeRotTransfer(),
+                                slidesDown2
+                        )),
+                        intakeSlides.moveToPosition(),
+                        intakeRotation.intakeRotDown(),
+                        intakeClaw.closeClaw(),
+                        intakeRotation.intakeRotUp(),
+                        intakeSlides.retractPosition(),
+                        outtakeClaw.closeClaw(),
+                        intakeClaw.openClaw(),
+                        new ParallelAction(movement5, new SequentialAction(
+                                slidesUp2,
+                                outtakeRotation.outtakeRotBasket()
+                        )),
+                        outtakeClaw.openClaw(),
+                        new ParallelAction(movement6, new SequentialAction(
+                                outtakeRotation.outtakeRotTransfer(),
+                                slidesDown3
+                        )),
+                        intakeSlides.moveToPosition(),
+                        intakeRotation.intakeRotDown(),
+                        new ParallelAction(
+                                intakeClaw.closeClaw(),
+                                intakeRotation.intakeRotUp(),
+                                intakeSlides.retractPosition()
+                        ),
+                        outtakeClaw.closeClaw(),
+                        intakeClaw.openClaw(),
+                        new ParallelAction(movement7, new SequentialAction(
+                                slidesUp3,
+                                outtakeRotation.outtakeRotBasket()
+                        )),
+                        outtakeClaw.openClaw(),
+                        new ParallelAction(movement8, new SequentialAction(
+                                outtakeRotation.outtakeRotTransfer(),
+                                slidesDown4
+                        ))
 
-//                        movement5,
-//                        intakeSlides.moveToPosition(),
-//                        intakeRotation.intakeRotDown(),
-//                        intakeClaw.closeClaw(),
-//                        intakeRotation.intakeRotUp(),
-//                        intakeSlides.retractPosition(),
-//                        outtakeClaw.closeClaw(),
-//                        intakeClaw.openClaw(),
-//                        slidesUp,
-//                        outtakeRotation.outtakeRotUp(),
-//                        outtakeClaw.openClaw(),
-//                        outtakeRotation.outtakeRotDown(),
-//                        slidesDown
 
-
-//                        intakeSlides.moveToPosition(), new SleepAction(4),
-//                        intakeRotation.intakeRotDown(), new SleepAction(4),
-//                        intakeClaw.closeClaw(), new SleepAction(4),
-//                        intakeRotation.intakeRotUp(), new SleepAction(4),
-//                        intakeSlides.retractPosition()
-                        // transfer to outtake claw
-                        //movement3
-                        // slidesUp
-                        // rotate2 0.173
-                        // open claw
-                        // rotate2Base
-                        // slidesDown
-                        // rotate to heading 90, check MeepMeep
+//
 
 
                 )

@@ -59,30 +59,29 @@ public class MeepMeepTesting {
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
                 .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
-                .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(new Pose2d(8, -60, Math.toRadians(270)))
-                        //.setReversed(true)
+                .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(new Pose2d(6, -60, Math.toRadians(90)))
 
-                        .lineTo(new Vector2d(8,-32))
+                        .lineTo(new Vector2d(6,-29))
 
-                      //  .waitSeconds(1)
 
-                        //.lineTo(new Vector2d(16,-42))
+                        .lineTo(new Vector2d(6,-35))
 
-                        .turn(Math.toRadians(180))
+                        .lineTo(new Vector2d(30,-35))
 
-                        .setReversed(false)
+                        .splineTo(new Vector2d(48,-10), Math.toRadians(0))// keep heading same
 
-                        .lineTo(new Vector2d(45,-42))
+                        .lineTo(new Vector2d(48,-55))
 
-                      //  .waitSeconds(1)
+                        .lineTo(new Vector2d(56,-10))
 
-                      //  .lineTo(new Vector2d(60,-42))
+                        .lineTo(new Vector2d(56,-55))
 
-                       // .lineTo(new Vector2d(46,-46))
+                        .lineTo(new Vector2d(64,-10))
 
-                        .turn(Math.toRadians(180))
+                        .lineTo(new Vector2d(64,-55))
 
-                        .splineTo(new Vector2d(8,-32), Math.toRadians(270))
+
+
                        // .splineToLinearHeading(new Pose2d(8,-32,Math.toRadians(270)))
 
 //                        .splineTo(new Vector2d(48,-10),Math.toRadians(90))

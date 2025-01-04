@@ -403,6 +403,7 @@ public class dqp2425 extends LinearOpMode{
 
 
             // AUTOMATION STUFF
+            // this picks up a sample and transfers it
             if (gamepad2.right_stick_button) {
                 //transfer()
                 slides.setTargetPosition(slidesnuetral);
