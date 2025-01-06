@@ -67,7 +67,7 @@ public class dqp2425 extends LinearOpMode{
     //intake axon
     double slides2pos=0.4968;
     double slides2out = 0.77;
-    double slides2in= 0.4968;
+    double slides2in= 0.4832;
 
     // winch down position line 249 may have to reverse motor
     //int winchDown = -1000;
@@ -75,7 +75,7 @@ public class dqp2425 extends LinearOpMode{
     int actuatorHang = 465;
 
     // swing up is dpad left, down is dpad right
-    double swingup = 0.20;
+    double swingup = 0.178;
     double swingdown = 0.9;
 
 
