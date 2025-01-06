@@ -75,7 +75,7 @@ public class dqp2425 extends LinearOpMode{
     int actuatorHang = 465;
 
     // swing up is dpad left, down is dpad right
-    double swingup = 0.20;
+    double swingup = 0.178;
     double swingdown = 0.9;
 
 
@@ -182,7 +182,7 @@ public class dqp2425 extends LinearOpMode{
                 rotation2.setPosition(rot2pos);
                 clawpos = clawclose;
                 claw.setPosition(clawpos);
-                slides2pos=slides2in+0.07;
+                slides2pos=slides2in+0.02;
                 slides2.setPosition(slides2pos);
 
             }
