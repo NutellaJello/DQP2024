@@ -3,8 +3,11 @@ import androidx.annotation.NonNull;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.AngularVelConstraint;
+import com.acmerobotics.roadrunner.MinVelConstraint;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.ProfileAccelConstraint;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
@@ -21,6 +24,7 @@ import org.firstinspires.ftc.teamcode.MecanumDrive;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Config
@@ -28,7 +32,7 @@ import java.util.List;
 public class BlueSideObservation extends LinearOpMode {
     // Declare motors and servos
     private DcMotor slides;
-    private Servo slides2, rotation, pivot, claw, claw2, rotation2, swing;
+    private Servo slides2, rotation,claw, claw2, rotation2, swing;
 
     public class intakeClaw {
         private Servo intakeClaw;
@@ -81,9 +85,9 @@ public class BlueSideObservation extends LinearOpMode {
                     new Action(){
                         @Override
                         public boolean run(@NonNull TelemetryPacket packet) {
-                            intakeRotation.setPosition(0.8);
+                            intakeRotation.setPosition(0.78);
                             return false;
-                        }}, new SleepAction(0.6)
+                        }}, new SleepAction(0.3)
             );
         }
 
@@ -113,7 +117,7 @@ public class BlueSideObservation extends LinearOpMode {
                     new Action(){
                         @Override
                         public boolean run(@NonNull TelemetryPacket packet) {
-                            intakeSlides.setPosition(0.675);
+                            intakeSlides.setPosition(0.668);
                             return false;
                         }}, new SleepAction(0.5)
             );
@@ -128,7 +132,6 @@ public class BlueSideObservation extends LinearOpMode {
                         }}, new SleepAction(0.2)
             );
         }
-
 
         public Action retractPosition() {
             return new SequentialAction(
@@ -160,7 +163,7 @@ public class BlueSideObservation extends LinearOpMode {
                             outtakeClaw.setPosition(0.347);
                             return false;
                         }
-                    }, new SleepAction(0.1)
+                    }, new SleepAction(0.2)
             );
         }
 
@@ -169,9 +172,9 @@ public class BlueSideObservation extends LinearOpMode {
                     new Action(){
                         @Override
                         public boolean run(@NonNull TelemetryPacket packet) {
-                            outtakeClaw.setPosition(0.13);
+                            outtakeClaw.setPosition(0.1);
                             return false;
-                        }}, new SleepAction(0.1)
+                        }}, new SleepAction(0.2)
             );
         }
         public void setPosition(double value){
@@ -220,6 +223,24 @@ public class BlueSideObservation extends LinearOpMode {
             outtakeRotation.setPosition(value);
         }
     }
+    public class intakePivot{
+        private Servo pivot;
+        public intakePivot(HardwareMap hardwareMap) {
+            pivot = hardwareMap.get(Servo.class, "pivot");
+        }
+        public Action resetPivot(){
+            return new SequentialAction(
+                    new Action(){
+                        @Override
+                        public boolean run(@NonNull TelemetryPacket packet) {
+                            pivot.setPosition(0.53);
+                            return false;
+                        }}, new SleepAction(0.1)
+            );
+        }
+        public void setPosition(double value){pivot.setPosition(value);
+        }
+    }
 
 
 
@@ -235,11 +256,11 @@ public class BlueSideObservation extends LinearOpMode {
 
         outtakeClaw outtakeClaw = new outtakeClaw(hardwareMap);
         outtakeRotation outtakeRotation = new outtakeRotation(hardwareMap);
+        intakePivot pivot = new intakePivot(hardwareMap);
 
         slides = hardwareMap.get(DcMotor.class, "slides");
         slides2 = hardwareMap.get(Servo.class, "slides2");
         rotation = hardwareMap.get(Servo.class, "rotation");
-        pivot = hardwareMap.get(Servo.class, "pivot");
         claw = hardwareMap.get(Servo.class, "claw");
         claw2 = hardwareMap.get(Servo.class, "claw2");
         rotation2 = hardwareMap.get(Servo.class, "rotation2");
@@ -253,6 +274,7 @@ public class BlueSideObservation extends LinearOpMode {
 
 
         swing.setPosition(0.9);
+        pivot.setPosition(0.53);
         //Ensure intake does not move around
         intakeSlides.setPosition(0.51);
         claw.setPosition(0.45);
@@ -263,6 +285,7 @@ public class BlueSideObservation extends LinearOpMode {
 
 
         int velocity = 100;
+        int slowvelocity = 60;
         // Autonomous Actions
         TrajectoryActionBuilder tab1 = drive.actionBuilder(new Pose2d(6,-60,Math.toRadians(90)))
                 .strafeTo(new Vector2d(-5,-28), new TranslationalVelConstraint(velocity));
@@ -271,10 +294,10 @@ public class BlueSideObservation extends LinearOpMode {
 // actions for tranfering and strafing
         TrajectoryActionBuilder spec1 = drive.actionBuilder(new Pose2d(-5, -28, Math.toRadians(90)))
                 .lineToY(-30,new TranslationalVelConstraint(velocity))
-                .splineToConstantHeading(new Vector2d(43.5,-46), Math.toRadians(90), new TranslationalVelConstraint(velocity));
+                .splineToConstantHeading(new Vector2d(42.75,-46), Math.toRadians(90), new TranslationalVelConstraint(velocity));
         Action firstSample = spec1.build();
 
-        TrajectoryActionBuilder spec2 = drive.actionBuilder(new Pose2d(43.5, -46, Math.toRadians(90)))
+        TrajectoryActionBuilder spec2 = drive.actionBuilder(new Pose2d(42.75, -46, Math.toRadians(90)))
                 .strafeTo(new Vector2d(50,-46), new TranslationalVelConstraint(velocity));
         Action secondSample = spec2.build();
 
@@ -293,19 +316,23 @@ public class BlueSideObservation extends LinearOpMode {
         Action pickSpecimenWall = test.build();
 
         TrajectoryActionBuilder toBar = drive.actionBuilder(new Pose2d(30, -61, Math.toRadians(90)))
-                .splineToConstantHeading(new Vector2d(-14,-31), Math.toRadians(90), new TranslationalVelConstraint(velocity));
+                .splineToConstantHeading(new Vector2d(-10,-32.7), Math.toRadians(90))
+                .lineToY(-27.4,
+                        new MinVelConstraint(Arrays.asList(new TranslationalVelConstraint(50), new AngularVelConstraint(Math.toRadians(90)))) ,new ProfileAccelConstraint(-10,10));
         Action moveToBar = toBar.build();
 
-        TrajectoryActionBuilder secondSpec = drive.actionBuilder(new Pose2d(-14, -31, Math.toRadians(90)))
+        TrajectoryActionBuilder secondSpec = drive.actionBuilder(new Pose2d(-10, -27.4, Math.toRadians(90)))
                 .splineToConstantHeading(new Vector2d(31.5,-55),Math.toRadians(90))
                 .strafeTo(new Vector2d(31.5,-62));
         Action moveTo2ndSpecimen = secondSpec.build();
 
-        TrajectoryActionBuilder toObs2nd = drive.actionBuilder(new Pose2d(31.5, -61, Math.toRadians(90)))
-                .splineToConstantHeading(new Vector2d(-15,-32), Math.toRadians(90), new TranslationalVelConstraint(velocity));
+        TrajectoryActionBuilder toObs2nd = drive.actionBuilder(new Pose2d(31.5, -62, Math.toRadians(90)))
+                .splineToConstantHeading(new Vector2d(-8,-32.3), Math.toRadians(90))
+                .lineToY(-27,
+                        new MinVelConstraint(Arrays.asList(new TranslationalVelConstraint(50), new AngularVelConstraint(Math.toRadians(90)))) ,new ProfileAccelConstraint(-10,10));
         Action moveTo2ndObservation = toObs2nd.build();
 
-        TrajectoryActionBuilder park= drive.actionBuilder(new Pose2d(-14, -31, Math.toRadians(90)))
+        TrajectoryActionBuilder park= drive.actionBuilder(new Pose2d(-8, -27, Math.toRadians(90)))
                 .splineToConstantHeading(new Vector2d(50,-60), Math.toRadians(90), new TranslationalVelConstraint(velocity));
         Action goPark = park.build();
 
@@ -316,23 +343,23 @@ public class BlueSideObservation extends LinearOpMode {
         Action slidesPartDown = createMotorAction(slides, -290, 1); // Slides partially down
         Action slidesDown = createMotorAction(slides,-5 , 1);       // Slides down
 
+        Action slidesTransfer = createMotorAction(slides,-105 , 1);
+
         Action slidesPickSpec = createMotorAction(slides,-200,1);
 
-        Action slidesPartUp = createMotorAction(slides,-60,1);
-        Action slidesHang =createMotorAction(slides,-240,1,2);
+        Action slidesPartUp = createMotorAction(slides,-55,1);
+        Action slidesHang =createMotorAction(slides,-628,1,40);
+        //Action slidesHang =createMotorActionUsingEncoder(slides,-288,1,3);
+        //Action slidesHang =createMotorAction(slides,-248,1);
 
         Action slidesDown2 = createMotorAction(slides,-5 , 1);
 
-        Action slidesPick2ndSpec = createMotorAction(slides,-200,1);
-        Action slidesSecondSpec =createMotorAction(slides,-400,1);
+        Action slidesPick2ndSpec = createMotorAction(slides,-240,1, 40);
+        Action slidesPartUp2 =createMotorAction(slides,-55,1);
 
-        Action slidesSecondHang =createMotorAction(slides,-530,1, 1.5);
+        Action slidesSecondHang =createMotorAction(slides,-688,1, 40);
 
-        Action slidesTransfer = createMotorAction(slides,-105 , 1);
-
-        Action slidesDown3 = createMotorAction(slides,-5 , 1);
-
-
+        Action slidesDown3 = createMotorAction(slides,0 , 1);
 
 
         waitForStart();
@@ -353,7 +380,7 @@ public class BlueSideObservation extends LinearOpMode {
                         new SleepAction(0.1),
                         new ParallelAction(intakeRotation.intakeRotUp(), intakeSlides.retractPosition()),
                         outtakeClaw.closeClaw(),
-                        new SleepAction(0.3),
+                        new SleepAction(0.1),
                         intakeClaw.openClaw(),
                         outtakeRotation.outtakeRotWall(),
                         new SleepAction(0.05),
@@ -365,7 +392,7 @@ public class BlueSideObservation extends LinearOpMode {
                         intakeClaw.closeClaw(),
                         new ParallelAction(intakeRotation.intakeRotUp(), intakeSlides.retractPosition()),
                         outtakeClaw.closeClaw(),
-                        new SleepAction(0.3),
+                        new SleepAction(0.1),
                         intakeClaw.openClaw(),
                         outtakeRotation.outtakeRotWall(),
                         new SleepAction(0.05),
@@ -373,14 +400,14 @@ public class BlueSideObservation extends LinearOpMode {
                         //third sample
                         new ParallelAction( outtakeRotation.outtakeRotTransfer(),thirdSample), // sus
                         new ParallelAction(intakeSlides.moveToThirdSample(), intakeRotation.intakeRotDown()),
-                        new SleepAction(0.3),
+                        new SleepAction(0.1),
                         intakeClaw.closeClaw(),
                         new ParallelAction(intakeSlides.retractPosition(), intakeRotation.intakeRotUp()),
                         outtakeClaw.closeClaw(),
-                        new SleepAction(0.3),
+                        new SleepAction(0.1),
                         intakeClaw.openClaw(),
                         new ParallelAction(thirdSampleTransfer, outtakeRotation.outtakeRotWall()),
-                        new SleepAction(0.05),
+                        new SleepAction(0.01),
                         outtakeClaw.openClaw(),
                         // pick up first Specimen
                         new ParallelAction(pickSpecimenWall, slidesDown),
@@ -388,21 +415,22 @@ public class BlueSideObservation extends LinearOpMode {
                         new SleepAction(0.2),
                         slidesPickSpec,
                         new ParallelAction(moveToBar, new SequentialAction(outtakeRotation.outtakeRotSpec(),slidesPartUp)),
+                        new SleepAction(0.2),
                         slidesHang,
+                        new SleepAction(0.2),
                         outtakeClaw.openClaw(),
+
                         // pick up second Specimen
-//                        new ParallelAction(
-//                                new SequentialAction(outtakeRotation.outtakeRotWall(),slidesDown2,moveTo2ndSpecimen)
-//                        ),
-//                        outtakeClaw.closeClaw(),
-//                        new SleepAction(0.2),
-//                        slidesPick2ndSpec,
-//                        new ParallelAction( new SequentialAction(slidesSecondSpec,
-//                                outtakeRotation.outtakeRotSpec()),
-//                                moveTo2ndObservation),
-//                        slidesSecondHang,
-//                        outtakeClaw.openClaw(),
-                        new ParallelAction(goPark,slidesDown3)
+                        new ParallelAction(moveTo2ndSpecimen, new SequentialAction(outtakeRotation.outtakeRotWall(),slidesDown2)),
+                        outtakeClaw.closeClaw(),
+                        new SleepAction(0.2),
+                        slidesPick2ndSpec,
+                        new ParallelAction(moveTo2ndObservation, new SequentialAction(intakeRotation.intakeRotPartialUp(),outtakeRotation.outtakeRotSpec(),slidesPartUp2)),
+                        new SleepAction(0.2),
+                        slidesSecondHang,
+                        new SleepAction(0.2),
+                        outtakeClaw.openClaw(),
+                        new ParallelAction(goPark,new SequentialAction(intakeRotation.intakeRotUp(),slidesDown3))
 
 
 
@@ -444,41 +472,81 @@ public class BlueSideObservation extends LinearOpMode {
             }
         };
     }
-    private Action createMotorAction(DcMotor motor, int targetPosition, double power, double tolerance) {
+    private Action createMotorAction(DcMotor motor, int targetPosition, double power, int tolerance) {
+        return new Action() {
+            private boolean initialized = false;
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                // Initialization: Set motor target and mode
+                if (!initialized) {
+                    motor.setPower(power);
+                    motor.setTargetPosition(targetPosition);
+                    motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+                    initialized = true; // Ensure initialization happens only once
+                }
+
+                // Get the current motor position
+                int currentPosition = motor.getCurrentPosition();
+
+                // Calculate the error (difference between current and target positions)
+                int error = Math.abs(targetPosition - currentPosition);
+
+                // Add telemetry data for debugging
+               telemetry.addData("Current Position", slides.getCurrentPosition());
+                telemetry.addData("Error Position", error);
+                telemetry.update();
+                // Check if the motor has reached the target position within the tolerance
+                if (error > tolerance) {
+                    // Keep running
+                    return true;
+                } else {
+                    // Stop the motor and mark the action as complete
+                    motor.setPower(0); // Ensure motor stops
+                    motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER); // Prevent unintended behavior
+                    return false; // Action is complete
+                }
+            }
+        };
+    }
+
+    private Action createMotorActionUsingEncoder(DcMotor motor, int targetPosition, double power, int tolerance) {
         return new Action() {
             private boolean initialized = false;
 
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
-                    motor.setTargetPosition(targetPosition);
-                    motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    motor.setPower(power);
-                    initialized = true; // Ensure this setup runs only once
+                    motor.setPower(-power);
+                    motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                    initialized = true;
                 }
 
-                // Get the current position
                 int currentPosition = motor.getCurrentPosition();
-
-                // Calculate the absolute error
                 int error = Math.abs(targetPosition - currentPosition);
 
-                // Add telemetry data for debugging
-                packet.put("Motor Position", currentPosition);
-                packet.put("Target Position", targetPosition);
-                packet.put("Position Error", error);
-                packet.put("Tolerance", tolerance);
+                // Add telemetry for debugging
+                telemetry.addData("Current Position", currentPosition);
+                telemetry.addData("Target Position", targetPosition);
+                telemetry.addData("Error Position", error);
+                telemetry.update();
 
-                // Check if the error is within the specified tolerance
-                if (error > tolerance) {
-                    return true; // Continue running
-                } else {
-                    motor.setPower(0); // Ensure the motor stops
+                // Check if within tolerance
+                if (error <= tolerance) {
+                    motor.setPower(0); // Stop motor
                     return false; // Action is complete
+                } else {
+                    // Adjust power dynamically to maintain torque
+                    double adjustedPower = Math.min(Math.abs(power), 1.0); // Clamp power to max 1.0
+                    //motor.setPower(error > 0 ? adjustedPower : -adjustedPower); // Adjust direction
+                    motor.setPower(-power);
+                    return true; // Keep running
                 }
             }
         };
     }
+
 
 
 

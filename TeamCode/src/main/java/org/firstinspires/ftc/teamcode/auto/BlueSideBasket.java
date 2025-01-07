@@ -3,11 +3,15 @@ import androidx.annotation.NonNull;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.AngularVelConstraint;
+import com.acmerobotics.roadrunner.MinVelConstraint;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.ProfileAccelConstraint;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
+import com.acmerobotics.roadrunner.TranslationalVelConstraint;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -20,6 +24,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
@@ -103,7 +108,7 @@ public class BlueSideBasket extends LinearOpMode {
                     new Action(){
                         @Override
                         public boolean run(@NonNull TelemetryPacket packet) {
-                            intakeSlides.setPosition(0.64);
+                            intakeSlides.setPosition(0.61);
                             return false;
                         }}, new SleepAction(0.4)
             );
@@ -115,7 +120,7 @@ public class BlueSideBasket extends LinearOpMode {
                     new Action(){
                         @Override
                         public boolean run(@NonNull TelemetryPacket packet) {
-                            intakeSlides.setPosition(0.5);
+                            intakeSlides.setPosition(0.49);
                             return false;
                         }}, new SleepAction(0.4)
             );
@@ -207,7 +212,7 @@ public class BlueSideBasket extends LinearOpMode {
     @Override
     public void runOpMode() {
         // Initialize drivetrain and mechanisms
-        MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(-16, -60, Math.toRadians(90)));
+        MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(-16, -60, Math.toRadians(270)));
 
 
         intakeClaw intakeClaw = new intakeClaw(hardwareMap);
@@ -234,26 +239,28 @@ public class BlueSideBasket extends LinearOpMode {
         slides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         slides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         slides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        pivot.setPosition(0.53);
 
         //Ensure intake does not move around
         intakeSlides.setPosition(0.4968);
         claw.setPosition(0.45);
-        swing.setPosition(0.9);
+        swing.setPosition(1);
         //Hold Spece
-        rotation2.setPosition(0.64);
+        rotation2.setPosition(0.98);
         outtakeClaw.setPosition(0.347);
 
         // Autonomous Actions
 
-        TrajectoryActionBuilder tab = drive.actionBuilder(new Pose2d(-16,-60,Math.toRadians(90)))
-                .splineTo(new Vector2d(-5,-29), Math.toRadians(90));
-
-
+        TrajectoryActionBuilder tab = drive.actionBuilder(new Pose2d(-16,-60,Math.toRadians(270)))
+                .setReversed(true)
+                .splineToConstantHeading(new Vector2d(-15,-31), Math.toRadians(270), new MinVelConstraint(Arrays.asList(new TranslationalVelConstraint(50), new AngularVelConstraint(Math.toRadians(90)))) ,new ProfileAccelConstraint(-30,30)
+       );
         Action movement=tab.build();
-        TrajectoryActionBuilder tab1 = drive.actionBuilder(new Pose2d(-5, -29, Math.toRadians(90)))
+        TrajectoryActionBuilder tab1 = drive.actionBuilder(new Pose2d(-15, -31, Math.toRadians(270)))
                 .lineToY(-40)
+                .turnTo(Math.toRadians(90))
+                .setReversed(false)
                 .strafeTo(new Vector2d(-43,-42.4));
-
         Action movement1 = tab1.build();
 //
         TrajectoryActionBuilder tab2 = drive.actionBuilder(new Pose2d(-43, -42.4, Math.toRadians(90)))
@@ -262,23 +269,23 @@ public class BlueSideBasket extends LinearOpMode {
         Action movement2 = tab2.build();
 
         TrajectoryActionBuilder tab3 = drive.actionBuilder(new Pose2d(-58.5, -55.5, Math.toRadians(45)))
-                .splineTo(new Vector2d(-53,-42.4), Math.toRadians(90));
+                .splineTo(new Vector2d(-53.5,-42.4), Math.toRadians(90));
         Action movement3 = tab3.build();
 
-        TrajectoryActionBuilder tab5 = drive.actionBuilder(new Pose2d(-55.5,-42.4, Math.toRadians(90)))
+        TrajectoryActionBuilder tab5 = drive.actionBuilder(new Pose2d(-53.5,-42.4, Math.toRadians(90)))
                 .strafeTo(new Vector2d(-58.5,-55.5))
                 .turnTo(45);
         Action movement5 = tab5.build();
 
         TrajectoryActionBuilder tab6 = drive.actionBuilder(new Pose2d(-58.5,-55.5, Math.toRadians(45)))
-                .turnTo(90)
-                .splineTo(new Vector2d(-60,-42.4), Math.toRadians(90));
+                .turnTo(Math.toRadians(90))
+                .splineTo(new Vector2d(-64,-42.4), Math.toRadians(90));
         Action movement6 = tab6.build();
 
-        TrajectoryActionBuilder tab7 = drive.actionBuilder(new Pose2d(-62,-42.4, Math.toRadians(90)))
-                .lineToY(-55);
+        TrajectoryActionBuilder tab7 = drive.actionBuilder(new Pose2d(-64,-42.4, Math.toRadians(90)))
+                .lineToY(-54);
         Action movement7 = tab7.build();
-        TrajectoryActionBuilder tab8 = drive.actionBuilder(new Pose2d(-62,-55, Math.toRadians(90)))
+        TrajectoryActionBuilder tab8 = drive.actionBuilder(new Pose2d(-63,-54, Math.toRadians(90)))
                 .splineTo(new Vector2d(-30,0), Math.toRadians(0));
         Action movement8 = tab8.build();
 
@@ -288,15 +295,15 @@ public class BlueSideBasket extends LinearOpMode {
 
 
         // Use utility methods to create actions
-        Action slidesUp = createMotorAction(slides, -890, 1);      // Slides up
-        Action slidesSpecUp = createMotorAction(slides, -640, 0.8);
-        Action slidesDown = createMotorAction(slides,-105 , 0.9);       // Slides down
+        Action slidesUp = createStayingMotorAction(slides, -890, 1,1);      // Slides up
+        Action slidesSpecUp = createMotorAction(slides, -680, 0.8,1);
+        Action slidesDown = createMotorAction(slides,-105 , 0.9,1);       // Slides down
         Action slidesPartiallyDown = createMotorAction(slides, -240, 0.8);
-        Action slidesDown2 = createMotorAction(slides,-105 , 0.9);
-        Action slidesUp2 = createMotorAction(slides, -890, 1);
-        Action slidesDown3 = createMotorAction(slides,-105 , 0.9);
-        Action slidesUp3 = createMotorAction(slides, -890, 1);
-        Action slidesDown4 = createMotorAction(slides,-5 , 0.9);
+        Action slidesDown2 = createMotorAction(slides,-105 , 0.9,1);
+        Action slidesUp2 = createStayingMotorAction(slides, -890, 1,1);
+        Action slidesDown3 = createMotorAction(slides,-105 , 0.9,1);
+        Action slidesUp3 = createStayingMotorAction(slides, -890, 1,1);
+        Action slidesDown4 = createMotorAction(slides,0 , 1,1);
 
 
 
@@ -310,49 +317,47 @@ public class BlueSideBasket extends LinearOpMode {
                         new ParallelAction(movement, slidesSpecUp),
                         slidesPartiallyDown,
                         outtakeClaw.openClaw(),
-                        new ParallelAction(movement1,
-                                slidesDown),
+                        new ParallelAction(movement1),
                         new ParallelAction(intakeSlides.moveToPosition(), outtakeRotation.outtakeRotTransfer()),
-                        new SleepAction(0.5),
-                        intakeRotation.intakeRotDown(),
+                        new ParallelAction(intakeRotation.intakeRotDown(),slidesDown),
                         intakeClaw.closeClaw(),
-                        intakeRotation.intakeRotUp(),
-                        intakeSlides.retractPosition(),
+                        new SleepAction(0.1),
+                        new ParallelAction(intakeRotation.intakeRotUp(), intakeSlides.retractPosition()),
                         outtakeClaw.closeClaw(),
-                        new SleepAction(0.5),
+                        new SleepAction(0.3),
                         intakeClaw.openClaw(),
                         new ParallelAction(movement2,
                                 slidesUp),
                         outtakeRotation.outtakeRotBasket(),
                         outtakeClaw.openClaw(),
+                        outtakeRotation.outtakeRotTransfer(),
                         new ParallelAction(movement3,
                                 slidesDown2
                         ),
-                        new ParallelAction(outtakeRotation.outtakeRotTransfer(),
-                        intakeSlides.moveToPosition()),
-                        new SleepAction(0.5),
+                        intakeSlides.moveToPosition(),
+                        new SleepAction(0.3),
                         intakeRotation.intakeRotDown(),
                         intakeClaw.closeClaw(),
-                        intakeRotation.intakeRotUp(),
-                        intakeSlides.retractPosition(),
+                        new SleepAction(0.1),
+                        new ParallelAction(intakeRotation.intakeRotUp(), intakeSlides.retractPosition()),
                         outtakeClaw.closeClaw(),
-                        new SleepAction(0.5),
+                        new SleepAction(0.3),
                         intakeClaw.openClaw(),
                         new ParallelAction(movement5,
                                 slidesUp2
                         ),
                         outtakeRotation.outtakeRotBasket(),
                         outtakeClaw.openClaw(),
+                        outtakeRotation.outtakeRotTransfer(),
                         new ParallelAction(movement6, slidesDown3),
-                        new ParallelAction(outtakeRotation.outtakeRotTransfer(),
-                        intakeSlides.moveToPosition()),
+                        intakeSlides.moveToPosition(),
                         new SleepAction(0.3),
                         intakeRotation.intakeRotDown(),
                         intakeClaw.closeClaw(),
-                        intakeRotation.intakeRotUp(),
-                        intakeSlides.retractPosition(),
+                        new SleepAction(0.1),
+                        new ParallelAction(intakeRotation.intakeRotUp(), intakeSlides.retractPosition()),
                         outtakeClaw.closeClaw(),
-                        new SleepAction(0.5),
+                        new SleepAction(0.3),
                         intakeClaw.openClaw(),
                         new ParallelAction(movement7,
                                 slidesUp3
@@ -385,6 +390,7 @@ public class BlueSideBasket extends LinearOpMode {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
+                    motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE); // Use brake mode
                     motor.setTargetPosition(targetPosition);
                     motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                     motor.setPower(power);
@@ -406,6 +412,78 @@ public class BlueSideBasket extends LinearOpMode {
             }
         };
     }
+    private Action createMotorAction(DcMotor motor, int targetPosition, double power, int tolerance) {
+        return new Action() {
+            private boolean initialized = false;
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                // Initialization: Set motor target and mode
+                if (!initialized) {
+                    motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE); // Use brake mode
+                    motor.setTargetPosition(targetPosition);
+                    motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    motor.setPower(power);
+                    initialized = true; // Ensure initialization happens only once
+                }
+
+                // Get the current motor position
+                int currentPosition = motor.getCurrentPosition();
+
+                // Calculate the error (difference between current and target positions)
+                int error = Math.abs(targetPosition - currentPosition);
+
+                // Add telemetry data for debugging
+                telemetry.addData("Current Position", slides.getCurrentPosition());
+                telemetry.addData("Error Position", error);
+                telemetry.update();
+                // Check if the motor has reached the target position within the tolerance
+                if (error > tolerance) {
+                    // Keep running
+                    return true;
+                } else {
+                    // Stop the motor and mark the action as complete
+                    motor.setPower(0); // Ensure motor stops
+                    motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER); // Prevent unintended behavior
+                    return false; // Action is complete
+                }
+            }
+        };
+    }
+    private Action createStayingMotorAction(DcMotor motor, int targetPosition, double power, int tolerance) {
+        return new Action() {
+            private boolean initialized = false;
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                if (!initialized) {
+                    motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE); // Use brake mode
+                    motor.setTargetPosition(targetPosition);
+                    motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    motor.setPower(power);
+                    initialized = true; // Ensure initialization happens only once
+                }
+
+                int currentPosition = motor.getCurrentPosition();
+                int error = Math.abs(targetPosition - currentPosition);
+
+                telemetry.addData("Motor Position", currentPosition);
+                telemetry.addData("Target Position", targetPosition);
+                telemetry.addData("Error", error);
+                telemetry.update();
+
+                if (error > tolerance) {
+                    return true; // Motor still moving
+                } else {
+                    motor.setPower(0.1); // Stop motor once within tolerance
+                    motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER); // Reset to prevent jitter
+                    return false; // Action complete
+                }
+            }
+        };
+    }
+
+
 
     Function<Pose2d,Pose2d> mirrorPose = pose-> new Pose2d( -pose.position.x, -pose.position.y, pose.heading.toDouble()-Math.PI);
     Function<Vector2d,Vector2d> mirrorVector = vector-> new Vector2d( -vector.x, -vector.y);
