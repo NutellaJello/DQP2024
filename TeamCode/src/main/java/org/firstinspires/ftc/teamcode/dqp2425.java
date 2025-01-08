@@ -1,10 +1,14 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.roadrunner.ftc.Encoder;
+import com.acmerobotics.roadrunner.ftc.OverflowEncoder;
+import com.acmerobotics.roadrunner.ftc.RawEncoder;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -93,6 +97,8 @@ public class dqp2425 extends LinearOpMode{
 
     boolean start = true;
 
+
+
     @Override
     public void runOpMode() {
         // initializes movement motors
@@ -114,6 +120,10 @@ public class dqp2425 extends LinearOpMode{
         hang=hardwareMap.get(DcMotor.class, "hang"); // EPM 1
         winch=hardwareMap.get(DcMotor.class, "hang2");
         swing = hardwareMap.get(Servo.class, "swing"); // control hub port 5
+
+        Encoder par0 = new OverflowEncoder(new RawEncoder(hardwareMap.get(DcMotorEx.class, "FL")));// 0
+        Encoder par1 = new OverflowEncoder(new RawEncoder(hardwareMap.get(DcMotorEx.class, "BR"))); // 3
+        Encoder perp = new OverflowEncoder(new RawEncoder(hardwareMap.get(DcMotorEx.class, "BL"))); // 2
 
         hang.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         hang.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -150,7 +160,13 @@ public class dqp2425 extends LinearOpMode{
             telemetry.addData("rotation2", rot2pos);
             telemetry.addData("outtake",slides.getCurrentPosition());
             telemetry.addData("a1", a1);
+            telemetry.addData("coder1", par0.getPositionAndVelocity().rawPosition);
+            telemetry.addData("coder2", par1.getPositionAndVelocity().rawPosition);
+            telemetry.addData("coder3", perp.getPositionAndVelocity().rawPosition);
+
+
             telemetry.update();
+
 
             // just outtake slide initialization, put in initialization code
             if(start){
@@ -295,14 +311,7 @@ public class dqp2425 extends LinearOpMode{
                 claw2pos=claw2open;
                 claw2.setPosition(claw2pos);
             }
-            if (gamepad2.x) {
-               // clawpos=clawclose;//0.08 close
-               // claw.setPosition(clawpos);
-            }
-            if (gamepad2.y) {
-                //clawpos=clawopen;//-0.47
-                //claw.setPosition(clawpos);
-            }
+
             pivotpos-=gamepad2.left_stick_x*0.017;
 
             if (pivotpos>1) {
