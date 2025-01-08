@@ -82,6 +82,8 @@ public class dqp2425 extends LinearOpMode{
     double swingup = 0.178;
     double swingdown = 0.9;
 
+    double transferTime = 0.53;
+
 
     double f = 0;
     int c1=0;
@@ -96,6 +98,7 @@ public class dqp2425 extends LinearOpMode{
     int d1=0;
 
     boolean start = true;
+
 
 
 
@@ -120,11 +123,11 @@ public class dqp2425 extends LinearOpMode{
         hang=hardwareMap.get(DcMotor.class, "hang"); // EPM 1
         winch=hardwareMap.get(DcMotor.class, "hang2");
         swing = hardwareMap.get(Servo.class, "swing"); // control hub port 5
-
+/*
         Encoder par0 = new OverflowEncoder(new RawEncoder(hardwareMap.get(DcMotorEx.class, "FL")));// 0
         Encoder par1 = new OverflowEncoder(new RawEncoder(hardwareMap.get(DcMotorEx.class, "BR"))); // 3
         Encoder perp = new OverflowEncoder(new RawEncoder(hardwareMap.get(DcMotorEx.class, "BL"))); // 2
-
+*/
         hang.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         hang.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         hang.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -145,6 +148,12 @@ public class dqp2425 extends LinearOpMode{
         swing.setPosition(swingdown);
         imu.resetYaw();
 
+        if(fieldCentric){
+            transferTime = 0.56;
+        }else{
+            transferTime = 0.7;
+        }
+
 
 
 
@@ -160,9 +169,9 @@ public class dqp2425 extends LinearOpMode{
             telemetry.addData("rotation2", rot2pos);
             telemetry.addData("outtake",slides.getCurrentPosition());
             telemetry.addData("a1", a1);
-            telemetry.addData("coder1", par0.getPositionAndVelocity().rawPosition);
-            telemetry.addData("coder2", par1.getPositionAndVelocity().rawPosition);
-            telemetry.addData("coder3", perp.getPositionAndVelocity().rawPosition);
+           // telemetry.addData("coder1", par0.getPositionAndVelocity().rawPosition);
+            //telemetry.addData("coder2", par1.getPositionAndVelocity().rawPosition);
+            //telemetry.addData("coder3", perp.getPositionAndVelocity().rawPosition);
 
 
             telemetry.update();
@@ -174,6 +183,8 @@ public class dqp2425 extends LinearOpMode{
                 slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 start=false;
             }
+
+
 
             double idkman= this.gamepad2.left_stick_y;
             slides2pos -= idkman/500;
@@ -435,7 +446,7 @@ public class dqp2425 extends LinearOpMode{
             }
             if(a1==1){
                 a2+=0.015;
-                if(a2>=0.08) {
+                if(a2>=0.05) {
 
                     if( (claw.getPosition()-clawpos)<= 0.0001 ){
                         a1=2;
@@ -455,7 +466,7 @@ public class dqp2425 extends LinearOpMode{
             //waiting for the rotation to finish
             if(a1==2){
                 a2+=0.015;
-                if(a2>=0.3) {
+                if(a2>=0.18) {//0.18
                     a1=3;
                     a2=0;
                 }
@@ -473,7 +484,7 @@ public class dqp2425 extends LinearOpMode{
             if(a1==4){
                 if ((slides2.getPosition() - slides2pos) <= 0.00001) {
                     a2 += 0.015;
-                    if (a2 >= 0.65) {
+                    if (a2 >= transferTime) {
                         //waiting for slides to arrive
                         claw2pos = claw2close;
                         claw2.setPosition(claw2pos);
@@ -487,7 +498,7 @@ public class dqp2425 extends LinearOpMode{
 
             if(a1==5){
                 a2+=0.015;
-                if(a2>=0.13) {
+                if(a2>=0.06) {
                     clawpos = clawopen;
                     claw.setPosition(clawpos);
                     a1 = 0;

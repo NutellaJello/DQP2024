@@ -34,7 +34,7 @@ public class Drivetrain {
         fl.setDirection(DcMotorEx.Direction.REVERSE);
         bl.setDirection(DcMotorEx.Direction.REVERSE);
 
-        IMU imu = hardwareMap.get(IMU.class, "imu");
+        imu = hardwareMap.get(IMU.class, "imu");
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
                 RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
                 RevHubOrientationOnRobot.UsbFacingDirection.FORWARD));
@@ -44,6 +44,8 @@ public class Drivetrain {
     public void Teleop(Gamepad gamepad, Telemetry telemetry, boolean fieldCentric) {
         Teleop(gamepad, telemetry, false, fieldCentric);
     }
+
+
 
     public void Teleop(Gamepad gamepad, Telemetry telemetry, boolean showTelemetry, boolean fieldCentric){ //Code to be run in Teleop Mode void Loop at top level
         // field centric driving
@@ -66,13 +68,24 @@ public class Drivetrain {
             double rx = Range.clip(gamepad.right_stick_x, -1, 1);
 
 
-            if(gamepad.right_bumper){
+            /*if(gamepad.right_bumper){
                 dampSpeedRatio = 0.33;
                 dampTurnRatio = 0.22;
             }else{
                 dampSpeedRatio = 1;
                 dampTurnRatio = 0.75;
+            }*/
+            if (gamepad.right_bumper && gamepad.left_bumper){
+                dampSpeedRatio = 0.2;
+                dampTurnRatio = 0.2;
+            } else if(gamepad.right_bumper || gamepad.left_bumper){
+                dampSpeedRatio = 0.4;
+                dampTurnRatio = 0.4;
+            } else{
+                dampSpeedRatio = 1;
+                dampTurnRatio = 0.75;
             }
+
 
             double flPower = (y + x) * dampSpeedRatio + dampTurnRatio * rx;
             double frPower = (y - x) * dampSpeedRatio - dampTurnRatio * rx;
