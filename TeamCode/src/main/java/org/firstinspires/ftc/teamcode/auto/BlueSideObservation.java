@@ -294,10 +294,10 @@ public class BlueSideObservation extends LinearOpMode {
 // actions for tranfering and strafing
         TrajectoryActionBuilder spec1 = drive.actionBuilder(new Pose2d(-5, -28, Math.toRadians(90)))
                 .lineToY(-30,new TranslationalVelConstraint(velocity))
-                .splineToConstantHeading(new Vector2d(42.75,-46), Math.toRadians(90), new TranslationalVelConstraint(velocity));
+                .splineToConstantHeading(new Vector2d(42.5,-46), Math.toRadians(90), new TranslationalVelConstraint(velocity));
         Action firstSample = spec1.build();
 
-        TrajectoryActionBuilder spec2 = drive.actionBuilder(new Pose2d(42.75, -46, Math.toRadians(90)))
+        TrajectoryActionBuilder spec2 = drive.actionBuilder(new Pose2d(42.5, -46, Math.toRadians(90)))
                 .strafeTo(new Vector2d(50,-46), new TranslationalVelConstraint(velocity));
         Action secondSample = spec2.build();
 
@@ -316,27 +316,28 @@ public class BlueSideObservation extends LinearOpMode {
         Action pickSpecimenWall = test.build();
 
         TrajectoryActionBuilder toBar = drive.actionBuilder(new Pose2d(30, -61, Math.toRadians(90)))
-                .splineToConstantHeading(new Vector2d(-10,-32.7), Math.toRadians(90))
-                .lineToY(-27.4,
+                .splineToConstantHeading(new Vector2d(-10,-33.2), Math.toRadians(90))
+                .lineToY(-29,
                         new MinVelConstraint(Arrays.asList(new TranslationalVelConstraint(50), new AngularVelConstraint(Math.toRadians(90)))) ,new ProfileAccelConstraint(-10,10));
         Action moveToBar = toBar.build();
 
-        TrajectoryActionBuilder secondSpec = drive.actionBuilder(new Pose2d(-10, -27.4, Math.toRadians(90)))
+        TrajectoryActionBuilder secondSpec = drive.actionBuilder(new Pose2d(-10, -29, Math.toRadians(90)))
                 .splineToConstantHeading(new Vector2d(31.5,-55),Math.toRadians(90))
                 .strafeTo(new Vector2d(31.5,-62));
         Action moveTo2ndSpecimen = secondSpec.build();
 
         TrajectoryActionBuilder toObs2nd = drive.actionBuilder(new Pose2d(31.5, -62, Math.toRadians(90)))
-                .splineToConstantHeading(new Vector2d(-8,-32.3), Math.toRadians(90))
-                .lineToY(-27,
+                .splineToConstantHeading(new Vector2d(-8,-33.3), Math.toRadians(90))
+                .lineToY(-29,
                         new MinVelConstraint(Arrays.asList(new TranslationalVelConstraint(50), new AngularVelConstraint(Math.toRadians(90)))) ,new ProfileAccelConstraint(-10,10));
         Action moveTo2ndObservation = toObs2nd.build();
 
-        TrajectoryActionBuilder park= drive.actionBuilder(new Pose2d(-8, -27, Math.toRadians(90)))
+
+        TrajectoryActionBuilder park= drive.actionBuilder(new Pose2d(-8, -29, Math.toRadians(90)))
                 .splineToConstantHeading(new Vector2d(50,-60), Math.toRadians(90), new TranslationalVelConstraint(velocity));
         Action goPark = park.build();
 
-
+//
 
         // Use utility methods to create actions
         Action slidesSpecUp=createMotorAction(slides,-660,1);
@@ -348,13 +349,13 @@ public class BlueSideObservation extends LinearOpMode {
         Action slidesPickSpec = createMotorAction(slides,-200,1);
 
         Action slidesPartUp = createMotorAction(slides,-55,1);
-        Action slidesHang =createMotorAction(slides,-628,1,40);
+        Action slidesHang =createMotorAction(slides,-248,1,5);
         //Action slidesHang =createMotorActionUsingEncoder(slides,-288,1,3);
         //Action slidesHang =createMotorAction(slides,-248,1);
 
         Action slidesDown2 = createMotorAction(slides,-5 , 1);
 
-        Action slidesPick2ndSpec = createMotorAction(slides,-240,1, 40);
+        Action slidesPick2ndSpec = createMotorAction(slides,-248,1, 5);
         Action slidesPartUp2 =createMotorAction(slides,-55,1);
 
         Action slidesSecondHang =createMotorAction(slides,-688,1, 40);
