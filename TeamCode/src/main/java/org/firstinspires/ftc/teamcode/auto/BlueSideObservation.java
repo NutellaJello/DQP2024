@@ -117,7 +117,7 @@ public class BlueSideObservation extends LinearOpMode {
                     new Action(){
                         @Override
                         public boolean run(@NonNull TelemetryPacket packet) {
-                            intakeSlides.setPosition(0.668);
+                            intakeSlides.setPosition(0.66);
                             return false;
                         }}, new SleepAction(0.5)
             );
@@ -127,7 +127,7 @@ public class BlueSideObservation extends LinearOpMode {
                     new Action(){
                         @Override
                         public boolean run(@NonNull TelemetryPacket packet) {
-                            intakeSlides.setPosition(0.71);
+                            intakeSlides.setPosition(0.705);
                             return false;
                         }}, new SleepAction(0.2)
             );
@@ -288,25 +288,25 @@ public class BlueSideObservation extends LinearOpMode {
         int slowvelocity = 60;
         // Autonomous Actions
         TrajectoryActionBuilder tab1 = drive.actionBuilder(new Pose2d(6,-60,Math.toRadians(90)))
-                .strafeTo(new Vector2d(-5,-28), new TranslationalVelConstraint(velocity));
+                .strafeTo(new Vector2d(-5.8,-28), new TranslationalVelConstraint(velocity));
         Action movement1=tab1.build();
 
 // actions for tranfering and strafing
         TrajectoryActionBuilder spec1 = drive.actionBuilder(new Pose2d(-5, -28, Math.toRadians(90)))
                 .lineToY(-30,new TranslationalVelConstraint(velocity))
-                .splineToConstantHeading(new Vector2d(42.5,-46), Math.toRadians(90), new TranslationalVelConstraint(velocity));
+                .splineToConstantHeading(new Vector2d(43,-46), Math.toRadians(90), new TranslationalVelConstraint(velocity));
         Action firstSample = spec1.build();
 
-        TrajectoryActionBuilder spec2 = drive.actionBuilder(new Pose2d(42.5, -46, Math.toRadians(90)))
-                .strafeTo(new Vector2d(50,-46), new TranslationalVelConstraint(velocity));
+        TrajectoryActionBuilder spec2 = drive.actionBuilder(new Pose2d(43, -46, Math.toRadians(90)))
+                .strafeTo(new Vector2d(51,-46), new TranslationalVelConstraint(velocity));
         Action secondSample = spec2.build();
 
-        TrajectoryActionBuilder spec3 = drive.actionBuilder(new Pose2d(50, -46, Math.toRadians(90)))
+        TrajectoryActionBuilder spec3 = drive.actionBuilder(new Pose2d(51, -46, Math.toRadians(90)))
                 .strafeTo(new Vector2d(46,-46), new TranslationalVelConstraint(velocity))
-                .turnTo(Math.toRadians(53));
+                .turnTo(Math.toRadians(50));
         Action thirdSample = spec3.build();
 
-        TrajectoryActionBuilder spec3p2 = drive.actionBuilder(new Pose2d(46, -46, Math.toRadians(57)))
+        TrajectoryActionBuilder spec3p2 = drive.actionBuilder(new Pose2d(46, -46, Math.toRadians(50)))
                 .turnTo(Math.toRadians(90));
         Action thirdSampleTransfer = spec3p2.build();
 
@@ -336,6 +336,17 @@ public class BlueSideObservation extends LinearOpMode {
         TrajectoryActionBuilder park= drive.actionBuilder(new Pose2d(-8, -29, Math.toRadians(90)))
                 .splineToConstantHeading(new Vector2d(50,-60), Math.toRadians(90), new TranslationalVelConstraint(velocity));
         Action goPark = park.build();
+
+        TrajectoryActionBuilder park2= drive.actionBuilder(new Pose2d(46, -46, Math.toRadians(90)))
+                .lineToY(-30);
+
+        Action gotempPark = park2.build();
+
+        TrajectoryActionBuilder park3= drive.actionBuilder(new Pose2d(46, -30, Math.toRadians(90)))
+                .lineToY(-55);
+
+        Action gotempPark2 = park3.build();
+
 
 //
 
@@ -370,6 +381,7 @@ public class BlueSideObservation extends LinearOpMode {
         // Execute autonomous sequence
         Actions.runBlocking(
                 new SequentialAction(
+                        new SleepAction (4),
                         new ParallelAction(movement1,slidesSpecUp),
                         slidesPartDown,
                         outtakeClaw.openClaw(),
@@ -380,6 +392,7 @@ public class BlueSideObservation extends LinearOpMode {
                         intakeClaw.closeClaw(),
                         new SleepAction(0.1),
                         new ParallelAction(intakeRotation.intakeRotUp(), intakeSlides.retractPosition()),
+                        new SleepAction (0.1),
                         outtakeClaw.closeClaw(),
                         new SleepAction(0.1),
                         intakeClaw.openClaw(),
@@ -392,6 +405,7 @@ public class BlueSideObservation extends LinearOpMode {
                         new SleepAction (0.1),
                         intakeClaw.closeClaw(),
                         new ParallelAction(intakeRotation.intakeRotUp(), intakeSlides.retractPosition()),
+                        new SleepAction (0.1),
                         outtakeClaw.closeClaw(),
                         new SleepAction(0.1),
                         intakeClaw.openClaw(),
@@ -404,34 +418,40 @@ public class BlueSideObservation extends LinearOpMode {
                         new SleepAction(0.1),
                         intakeClaw.closeClaw(),
                         new ParallelAction(intakeSlides.retractPosition(), intakeRotation.intakeRotUp()),
+                        new SleepAction (0.1),
                         outtakeClaw.closeClaw(),
                         new SleepAction(0.1),
                         intakeClaw.openClaw(),
                         new ParallelAction(thirdSampleTransfer, outtakeRotation.outtakeRotWall()),
                         new SleepAction(0.01),
                         outtakeClaw.openClaw(),
-                        // pick up first Specimen
-                        new ParallelAction(pickSpecimenWall, slidesDown),
-                        outtakeClaw.closeClaw(),
-                        new SleepAction(0.2),
-                        slidesPickSpec,
-                        new ParallelAction(moveToBar, new SequentialAction(outtakeRotation.outtakeRotSpec(),slidesPartUp)),
-                        new SleepAction(0.2),
-                        slidesHang,
-                        new SleepAction(0.2),
-                        outtakeClaw.openClaw(),
+                        // for second qualifier
+                        new ParallelAction(outtakeRotation.outtakeRotSpec(),gotempPark),
+                        new SleepAction(2),
+                        new ParallelAction(gotempPark2, slidesDown3)
 
-                        // pick up second Specimen
-                        new ParallelAction(moveTo2ndSpecimen, new SequentialAction(outtakeRotation.outtakeRotWall(),slidesDown2)),
-                        outtakeClaw.closeClaw(),
-                        new SleepAction(0.2),
-                        slidesPick2ndSpec,
-                        new ParallelAction(moveTo2ndObservation, new SequentialAction(intakeRotation.intakeRotPartialUp(),outtakeRotation.outtakeRotSpec(),slidesPartUp2)),
-                        new SleepAction(0.2),
-                        slidesSecondHang,
-                        new SleepAction(0.2),
-                        outtakeClaw.openClaw(),
-                        new ParallelAction(goPark,new SequentialAction(intakeRotation.intakeRotUp(),slidesDown3))
+//                        // pick up first Specimen
+//                        new ParallelAction(pickSpecimenWall, slidesDown),
+//                        outtakeClaw.closeClaw(),
+//                        new SleepAction(0.2),
+//                        slidesPickSpec,
+//                        new ParallelAction(moveToBar, new SequentialAction(outtakeRotation.outtakeRotSpec(),slidesPartUp)),
+//                        new SleepAction(0.2),
+//                        slidesHang,
+//                        new SleepAction(0.2),
+//                        outtakeClaw.openClaw(),
+//
+//                        // pick up second Specimen
+//                        new ParallelAction(moveTo2ndSpecimen, new SequentialAction(outtakeRotation.outtakeRotWall(),slidesDown2)),
+//                        outtakeClaw.closeClaw(),
+//                        new SleepAction(0.2),
+//                        slidesPick2ndSpec,
+//                        new ParallelAction(moveTo2ndObservation, new SequentialAction(intakeRotation.intakeRotPartialUp(),outtakeRotation.outtakeRotSpec(),slidesPartUp2)),
+//                        new SleepAction(0.2),
+//                        slidesSecondHang,
+//                        new SleepAction(0.2),
+//                        outtakeClaw.openClaw(),
+//                        new ParallelAction(goPark,new SequentialAction(intakeRotation.intakeRotUp(),slidesDown3))
 
 
 
@@ -495,9 +515,9 @@ public class BlueSideObservation extends LinearOpMode {
                 int error = Math.abs(targetPosition - currentPosition);
 
                 // Add telemetry data for debugging
-               telemetry.addData("Current Position", slides.getCurrentPosition());
-                telemetry.addData("Error Position", error);
-                telemetry.update();
+//               telemetry.addData("Current Position", slides.getCurrentPosition());
+//                telemetry.addData("Error Position", error);
+//                telemetry.update();
                 // Check if the motor has reached the target position within the tolerance
                 if (error > tolerance) {
                     // Keep running
@@ -528,10 +548,10 @@ public class BlueSideObservation extends LinearOpMode {
                 int error = Math.abs(targetPosition - currentPosition);
 
                 // Add telemetry for debugging
-                telemetry.addData("Current Position", currentPosition);
-                telemetry.addData("Target Position", targetPosition);
-                telemetry.addData("Error Position", error);
-                telemetry.update();
+//                telemetry.addData("Current Position", currentPosition);
+//                telemetry.addData("Target Position", targetPosition);
+//                telemetry.addData("Error Position", error);
+//                telemetry.update();
 
                 // Check if within tolerance
                 if (error <= tolerance) {
