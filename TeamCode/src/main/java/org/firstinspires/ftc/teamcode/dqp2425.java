@@ -50,7 +50,7 @@ public class dqp2425 extends LinearOpMode{
     double rotpos= 1;
     double rotin = 0.28;
     double rotout = 0.94;
-    int slidesnuetral = -110;
+    int slidesnuetral = -118;
     int slidesSpeci = -5;
     int slidesLatchOff = -174;
     int slidesup = -850;
@@ -66,7 +66,7 @@ public class dqp2425 extends LinearOpMode{
     double rot2down = 0.7821;
     double rot2out = 0.06;
     double rot2wall = 0.98;
-    double rot2speci = 0.371;
+    double rot2speci = 0.367;//0.371
 
     //intake axon
     double slides2pos=0.4968;
@@ -220,7 +220,8 @@ public class dqp2425 extends LinearOpMode{
                 c3=3;
             }
             if(c3==1 && swing.getPosition()> swingup){
-                swing.setPosition(swing.getPosition()-0.005);
+
+                swing.setPosition(swing.getPosition()-0.008);
             }else if(c3==2) {
                 swing.setPosition(0.2);
             }else if (c3==3){

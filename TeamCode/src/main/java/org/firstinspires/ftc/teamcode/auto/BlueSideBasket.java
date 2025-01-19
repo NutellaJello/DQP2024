@@ -319,11 +319,11 @@ public class BlueSideBasket extends LinearOpMode {
         // Use utility methods to create actions
         Action slidesUp = createStayingMotorAction(slides, -890, 1,1);      // Slides up
         Action slidesSpecUp = createMotorAction(slides, -650, 1);
-        Action slidesDown = createMotorAction(slides,-110 , 0.9,1);       // Slides down
+        Action slidesDown = createMotorAction(slides,-118 , 0.9,1);       // Slides down
         Action slidesPartiallyDown = createMotorAction(slides, -240, 1);
-        Action slidesDown2 = createMotorAction(slides,-110 , 0.9,1);
+        Action slidesDown2 = createMotorAction(slides,-118 , 0.9,1);
         Action slidesUp2 = createStayingMotorAction(slides, -890, 1,1);
-        Action slidesDown3 = createMotorAction(slides,-110 , 0.9,1);
+        Action slidesDown3 = createMotorAction(slides,-118 , 0.9,1);
         Action slidesUp3 = createStayingMotorAction(slides, -890, 1,1);
         Action slidesDown4 = createMotorAction(slides,5 , 1,1);
 
