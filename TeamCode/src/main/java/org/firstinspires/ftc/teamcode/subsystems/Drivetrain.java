@@ -18,8 +18,8 @@ public class Drivetrain {
     private DcMotorEx bl; //Back left motor of drivetrain
     private DcMotorEx br; //Back right motor of drivetrain
     private IMU imu;
-    private double dampSpeedRatio = 0.8;
-    private double dampTurnRatio  = -0.6;
+    private double dampSpeedRatio = 1;
+    private double dampTurnRatio  = -1;
 
     public Drivetrain(HardwareMap hardwareMap){                 // Motor Mapping
         fl = hardwareMap.get(DcMotorEx.class, "FL");
@@ -54,8 +54,8 @@ public class Drivetrain {
                 dampSpeedRatio = 0.2;
                 dampTurnRatio = -0.16;
             }else{
-                dampSpeedRatio = 0.8;
-                dampTurnRatio = -0.6;
+                dampSpeedRatio = 1;
+                dampTurnRatio = -1;
             }
             double heading   = robotOrientation.getYaw(AngleUnit.RADIANS);
 
