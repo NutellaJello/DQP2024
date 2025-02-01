@@ -264,7 +264,7 @@ public class dqp2425 extends LinearOpMode{
             if(gamepad2.x){
                 pivotpos = 0.18;
                 pivot.setPosition(pivotpos);
-            }
+            }//e
 
             if (gamepad1.right_trigger>0) {
                 hang.setTargetPosition(actuatorUp);
