@@ -49,7 +49,7 @@ public class dqp2425 extends LinearOpMode{
     //intake rotation
     double rotpos= 1;
     double rotin = 0.28;
-    double rotout = 0.97;
+    double rotout = 0.95;
     int slidesnuetral = -123;
     int slidesSpeci = -5;
     int slidesLatchOff = -174;
@@ -83,6 +83,8 @@ public class dqp2425 extends LinearOpMode{
     double swingdown = 0.9;
 
     double transferTime = 0.53;
+    boolean usingJst = false;
+    boolean startOuttake = false;
 
 
     double f = 0;
@@ -172,6 +174,7 @@ public class dqp2425 extends LinearOpMode{
             telemetry.addData("rotation2", rot2pos);
             telemetry.addData("outtake",slides.getCurrentPosition());
             telemetry.addData("a1", a1);
+            telemetry.addData("jst", drivetrain.getIntakePosi()); //208 is home base
             // telemetry.addData("coder1", par0.getPositionAndVelocity().rawPosition);
             //telemetry.addData("coder2", par1.getPositionAndVelocity().rawPosition);
             //telemetry.addData("coder3", perp.getPositionAndVelocity().rawPosition);
@@ -258,7 +261,10 @@ public class dqp2425 extends LinearOpMode{
             telemetry.addData("slides", slides.getCurrentPosition());
             telemetry.addData("hang", hang.getCurrentPosition());
 
-
+            if(gamepad2.x){
+                pivotpos = 0.18;
+                pivot.setPosition(pivotpos);
+            }
 
             if (gamepad1.right_trigger>0) {
                 hang.setTargetPosition(actuatorUp);
@@ -483,7 +489,7 @@ public class dqp2425 extends LinearOpMode{
             //waiting for the rotation to finish
             if(a1==2){
                 a2+=0.015;
-                if(a2>=0.18) {//0.18
+                if(a2>=0.30) {//0.18
                     a1=3;
                     a2=0;
                 }
@@ -499,18 +505,35 @@ public class dqp2425 extends LinearOpMode{
             }
 
             if(a1==4){
-                if ((slides2.getPosition() - slides2pos) <= 0.00001) {
-                    a2 += 0.015;
-                    if (a2 >= transferTime) {
-                        //waiting for slides to arrive
-                        claw2pos = claw2close;
-                        claw2.setPosition(claw2pos);
-                        a1 = 5;
-                        a2 = 0;
-                        //outtake claw closing up
+                if(!gamepad2.dpad_right){
+                    usingJst = true;
+                    if(drivetrain.getIntakePosi() >= 210){
+                        a2 += 0.015;
+                        if (a2 >= transferTime/6.5) {
+                            //waiting for slides to arrive
+                            claw2pos = claw2close;
+                            claw2.setPosition(claw2pos);
+                            a1=5;
+                            a2=0;
+                            //outtake claw closing up
+                        }
+
+
+                    }
+                }else {
+                    usingJst = false;
+                    if ((slides2.getPosition() - slides2pos) <= 0.00001) {
+                        a2 += 0.015;
+                        if (a2 >= transferTime) {
+                            //waiting for slides to arrive
+                            claw2pos = claw2close;
+                            claw2.setPosition(claw2pos);
+                            a1 = 5;
+                            a2 = 0;
+                            //outtake claw closing up
+                        }
                     }
                 }
-
             }
 
             if(a1==5){
@@ -518,10 +541,15 @@ public class dqp2425 extends LinearOpMode{
                 if(a2>=0.06) {
                     clawpos = clawopen;
                     claw.setPosition(clawpos);
-                    a1 = 0;
+                    a1=0;
                     a2=0;
                     //intake claw opening
+                    if(usingJst){
+                        startOuttake = true;
+
+                    }
                 }
+
             }
 
 
@@ -530,11 +558,12 @@ public class dqp2425 extends LinearOpMode{
 
 
 
-            if (gamepad2.dpad_up) {
+            if (gamepad2.dpad_up || startOuttake) {
                 slides.setTargetPosition(slidesup);
                 slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 slides.setPower(1);
                 c1=1;
+                startOuttake = false;
 
             }
             if (c1==1 && Math.abs(slides.getCurrentPosition()-slidesup)<=100) {

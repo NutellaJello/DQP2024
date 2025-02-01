@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -20,12 +21,15 @@ public class Drivetrain {
     private IMU imu;
     private double dampSpeedRatio = 1;
     private double dampTurnRatio  = -1;
+    private AnalogInput jst;
+
 
     public Drivetrain(HardwareMap hardwareMap){                 // Motor Mapping
         fl = hardwareMap.get(DcMotorEx.class, "FL");
         fr = hardwareMap.get(DcMotorEx.class, "FR");
         bl = hardwareMap.get(DcMotorEx.class, "BL");
         br = hardwareMap.get(DcMotorEx.class, "BR");
+        jst = hardwareMap.get(AnalogInput.class, "jst");
 
         // Set motor direction based on which side of the robot the motors are on
         fr.setDirection(DcMotorEx.Direction.FORWARD);
@@ -38,6 +42,10 @@ public class Drivetrain {
                 RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
                 RevHubOrientationOnRobot.UsbFacingDirection.FORWARD));
         imu.initialize(parameters);
+    }
+
+    public double getIntakePosi(){
+        return jst.getVoltage()/3.3 *360;
     }
 
     public void Teleop(Gamepad gamepad, Telemetry telemetry, boolean fieldCentric) {
