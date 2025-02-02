@@ -505,7 +505,7 @@ public class dqp2425 extends LinearOpMode{
             }
 
             if(a1==4){
-                if(!gamepad2.dpad_right){
+                if(!gamepad2.back){
                     usingJst = true;
                     if(drivetrain.getIntakePosi() >= 210){
                         a2 += 0.015;
