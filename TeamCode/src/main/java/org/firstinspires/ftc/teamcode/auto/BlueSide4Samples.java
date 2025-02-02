@@ -276,7 +276,7 @@ public class BlueSide4Samples extends LinearOpMode {
         Action outtake1 = tab.build();
 
         TrajectoryActionBuilder tab1 = drive.actionBuilder(new Pose2d(-59, -54, Math.toRadians(90)))
-                .strafeTo(new Vector2d(-41,-42.4));
+                .strafeTo(new Vector2d(-40,-42.4));
         Action intake2 = tab1.build();
 
         TrajectoryActionBuilder tab2 = drive.actionBuilder(new Pose2d(-41, -42.4, Math.toRadians(90)))
@@ -310,16 +310,16 @@ public class BlueSide4Samples extends LinearOpMode {
 ////
 
         // Use utility methods to create actions
-        Action slidesUp = createStayingMotorAction(slides, -890, 1,1);      // Slides up
-        Action slidesSpecUp = createMotorAction(slides, -650, 1);
-        Action slidesDown = createMotorAction(slides,-110 , 0.9,1);       // Slides down
-        Action slidesPartiallyDown = createMotorAction(slides, -240, 1);
-        Action slidesUp2 = createStayingMotorAction(slides, -890, 1,1);
-        Action slidesDown2 = createMotorAction(slides,-110 , 0.9,1);
-        Action slidesUp3 = createStayingMotorAction(slides, -890, 1,1);
-        Action slidesDown3 = createMotorAction(slides,-110 , 0.9,1);
-        Action slidesUp4 = createStayingMotorAction(slides, -890, 1,1);
-        Action slidesDownFinal = createMotorAction(slides,5 , 1,1);
+        Action slidesUp = createStayingMotorAction(slides, -890, 1,2);      // Slides up
+        Action slidesSpecUp = createMotorAction(slides, -650, 2);
+        Action slidesDown = createMotorAction(slides,-125 , 0.9,2);       // Slides down
+        Action slidesPartiallyDown = createMotorAction(slides, -240, 2);
+        Action slidesUp2 = createStayingMotorAction(slides, -890, 1,2);
+        Action slidesDown2 = createMotorAction(slides,-125 , 0.9,2);
+        Action slidesUp3 = createStayingMotorAction(slides, -890, 1,2);
+        Action slidesDown3 = createMotorAction(slides,-130 , 0.9,2);
+        Action slidesUp4 = createStayingMotorAction(slides, -890, 1,2);
+        Action slidesDownFinal = createMotorAction(slides,5 , 1,2);
 
 
 
@@ -331,7 +331,7 @@ public class BlueSide4Samples extends LinearOpMode {
         // Execute autonomous sequence
         Actions.runBlocking(
                 new SequentialAction(
-                        //move to basket
+                        //move to basket\
                         new ParallelAction(outtake1,slidesUp),
 
                         //outtake
