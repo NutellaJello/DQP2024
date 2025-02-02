@@ -173,7 +173,7 @@ public class BlueSideObservation extends LinearOpMode {
                     new Action(){
                         @Override
                         public boolean run(@NonNull TelemetryPacket packet) {
-                            outtakeClaw.setPosition(0.346);
+                            outtakeClaw.setPosition(0.3455);
                             return false;
                         }
                     }, new SleepAction(0.2)
@@ -416,8 +416,8 @@ public class BlueSideObservation extends LinearOpMode {
         Action slidesHang3 =createMotorAction(slides,-330,1,20);
         Action slidesHang4 =createMotorAction(slides,-330,1,20);
 
-        Action slidesDown1 = createMotorAction(slides,-2 , 1,7);
-        Action slidesDown2 = createMotorAction(slides,-2 , 1,7);
+        Action slidesDown1 = createMotorAction(slides,-2 , 1,10);
+        Action slidesDown2 = createMotorAction(slides,-2 , 1,10);
         Action slidesDown3 = createMotorAction(slides,-2 , 1,10);
         Action slidesDown4 = createMotorAction(slides,-2 , 1,7);
 
