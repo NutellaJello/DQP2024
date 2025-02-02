@@ -76,7 +76,7 @@ public class BlueSideObservation extends LinearOpMode {
                         public boolean run(@NonNull TelemetryPacket packet) {
                             intakeRotation.setPosition(0.96);
                             return false;
-                        }}, new SleepAction(0.6)
+                        }}, new SleepAction(0.4)
             );
         }
 
@@ -98,7 +98,7 @@ public class BlueSideObservation extends LinearOpMode {
                         public boolean run(@NonNull TelemetryPacket packet) {
                             intakeRotation.setPosition(0.28);
                             return false;
-                        }}, new SleepAction(0.6)
+                        }}, new SleepAction(0.4)
             );
         }
         public void setPosition(double value){
@@ -195,7 +195,7 @@ public class BlueSideObservation extends LinearOpMode {
                         public boolean run(@NonNull TelemetryPacket packet) {
                             outtakeRotation.setPosition(0.39);
                             return false;
-                        }}, new SleepAction(0.3)
+                        }}, new SleepAction(0.2)
             );
         }
         public Action outtakeRotTransfer() {
@@ -205,7 +205,7 @@ public class BlueSideObservation extends LinearOpMode {
                         public boolean run(@NonNull TelemetryPacket packet) {
                             outtakeRotation.setPosition(0.7821);
                             return false;
-                        }}, new SleepAction(0.3)
+                        }}, new SleepAction(0.2)
             );
         }
         public Action outtakeRotWall() {
@@ -215,7 +215,7 @@ public class BlueSideObservation extends LinearOpMode {
                         public boolean run(@NonNull TelemetryPacket packet) {
                             outtakeRotation.setPosition(0.98);
                             return false;
-                        }}, new SleepAction(0.3)
+                        }}, new SleepAction(0.2)
             );
         }
 
@@ -363,7 +363,7 @@ public class BlueSideObservation extends LinearOpMode {
         Action slidesPartDown = createMotorAction(slides, -290, 1); // Slides partially down
         Action slidesDown = createMotorAction(slides,-5 , 1);       // Slides down
 
-        Action slidesTransfer = createMotorAction(slides,-130 , 1);
+        Action slidesTransfer = createMotorAction(slides,-120 , 1);
 
         Action slidesPickSpec = createMotorAction(slides,-200,1);
 
@@ -403,12 +403,12 @@ public class BlueSideObservation extends LinearOpMode {
                         outtakeClaw.closeClaw(),
                         new SleepAction(0.1),
                         intakeClaw.openClaw(),
-                        outtakeRotation.outtakeRotWall(),
+                        new ParallelAction(outtakeRotation.outtakeRotWall(),intakeSlides.moveToPosition()),
                         new SleepAction(0.05),
                         outtakeClaw.openClaw(),
                         //second sample
                         new ParallelAction(secondSample, outtakeRotation.outtakeRotTransfer()),
-                        new ParallelAction(intakeSlides.moveToPosition(), intakeRotation.intakeRotDown()),
+                        intakeRotation.intakeRotDown(),
                         new SleepAction (0.1),
                         intakeClaw.closeClaw(),
                         new ParallelAction(intakeRotation.intakeRotUp(), intakeSlides.retractPosition()),
@@ -416,12 +416,12 @@ public class BlueSideObservation extends LinearOpMode {
                         outtakeClaw.closeClaw(),
                         new SleepAction(0.1),
                         intakeClaw.openClaw(),
-                        outtakeRotation.outtakeRotWall(),
+                        new ParallelAction(outtakeRotation.outtakeRotWall(),intakeSlides.moveToThirdSample()),
                         new SleepAction(0.05),
                         outtakeClaw.openClaw(),
                         //third sample
                         new ParallelAction( outtakeRotation.outtakeRotTransfer(),thirdSample), // sus
-                        new ParallelAction(intakeSlides.moveToThirdSample(), intakeRotation.intakeRotDown()),
+                        intakeRotation.intakeRotDown(),
                         new SleepAction(0.1),
                         intakeClaw.closeClaw(),
                         new ParallelAction(intakeSlides.retractPosition(), intakeRotation.intakeRotUp()),
@@ -442,8 +442,7 @@ public class BlueSideObservation extends LinearOpMode {
                         new SleepAction(0.2),
                         slidesPickSpec,
                         new ParallelAction(moveToBar, new SequentialAction(outtakeRotation.outtakeRotSpec(),slidesPartUp)),
-                        new SleepAction(0.2),
-                        new ParallelAction(slidesHang, new SequentialAction(new SleepAction(0.5),shiftBack)),
+                        new ParallelAction(slidesHang, new SequentialAction(new SleepAction(0.2),shiftBack)),
                         outtakeClaw.openClaw(),
 
                         // pick up second Specimen

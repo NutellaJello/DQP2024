@@ -43,7 +43,7 @@ public class dqp2425 extends LinearOpMode{
 
     //intake claw
     double clawpos=0.47;
-    double clawclose = 0.06;
+    double clawclose = 0.04; // 0.06
     double clawopen = 0.45;
 
     //intake rotation
