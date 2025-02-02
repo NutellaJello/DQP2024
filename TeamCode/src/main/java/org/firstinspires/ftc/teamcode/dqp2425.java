@@ -50,7 +50,7 @@ public class dqp2425 extends LinearOpMode{
     double rotpos= 1;
     double rotin = 0.28;
     double rotout = 0.95;
-    int slidesnuetral = -123;
+    int slidesnuetral = -115;
     int slidesSpeci = -5;
     int slidesLatchOff = -174;
     int slidesup = -850;
@@ -85,6 +85,7 @@ public class dqp2425 extends LinearOpMode{
     double transferTime = 0.53;
     boolean usingJst = false;
     boolean startOuttake = false;
+    boolean sampleMode = true;
 
 
     double f = 0;
@@ -179,7 +180,12 @@ public class dqp2425 extends LinearOpMode{
             //telemetry.addData("coder2", par1.getPositionAndVelocity().rawPosition);
             //telemetry.addData("coder3", perp.getPositionAndVelocity().rawPosition);
 
-
+            if(gamepad2.back){
+                sampleMode = true;
+            }
+            if(gamepad1.back){
+                sampleMode = false;
+            }
             telemetry.update();
 
 
@@ -505,11 +511,11 @@ public class dqp2425 extends LinearOpMode{
             }
 
             if(a1==4){
-                if(!gamepad2.back){
+                if(sampleMode){
                     usingJst = true;
                     if(drivetrain.getIntakePosi() >= 210){
                         a2 += 0.015;
-                        if (a2 >= transferTime/6.5) {
+                        if (a2 >= transferTime/5) {
                             //waiting for slides to arrive
                             claw2pos = claw2close;
                             claw2.setPosition(claw2pos);
@@ -556,8 +562,6 @@ public class dqp2425 extends LinearOpMode{
 
 
 
-
-
             if (gamepad2.dpad_up || startOuttake) {
                 slides.setTargetPosition(slidesup);
                 slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -591,9 +595,9 @@ public class dqp2425 extends LinearOpMode{
                 rotation2.setPosition(rot2pos);
                 slides.setTargetPosition(slidesnuetral);
                 slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                slides.setPower(1);
+                slides.setPower(1);/*
                 claw2pos=claw2close;
-                claw2.setPosition(claw2pos);
+                claw2.setPosition(claw2pos);*/
                 c2=0;
             }
 
