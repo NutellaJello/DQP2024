@@ -276,7 +276,7 @@ public class BlueSide4Samples extends LinearOpMode {
         slides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         slides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         intakePivot.setPosition(0.53);
-
+//
         //Ensure intake does not move around
         intakeSlides.setPosition(0.4968);
         claw.setPosition(0.45);

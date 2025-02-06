@@ -160,7 +160,7 @@ public class dqp2425 extends LinearOpMode{
             transferTime = 0.9;// 0.7
         }
 
-
+//
 
 
         waitForStart();
