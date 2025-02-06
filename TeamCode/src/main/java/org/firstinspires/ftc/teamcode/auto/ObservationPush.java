@@ -1,4 +1,6 @@
 package org.firstinspires.ftc.teamcode.auto;
+import android.util.Size;
+
 import androidx.annotation.NonNull;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
@@ -9,6 +11,7 @@ import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
+import com.acmerobotics.roadrunner.Trajectory;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.TranslationalVelConstraint;
 import com.acmerobotics.roadrunner.TurnConstraints;
@@ -23,7 +26,13 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.ColorDetectionPipeline;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
+import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.opencv.ColorBlobLocatorProcessor;
+import org.firstinspires.ftc.vision.opencv.ColorRange;
+import org.firstinspires.ftc.vision.opencv.ImageRegion;
+import org.opencv.core.RotatedRect;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
@@ -38,12 +47,14 @@ import java.util.Arrays;
 import java.util.List;
 
 @Config
-@Autonomous
-@Disabled
+@Autonomous(name = "testing")
+
 public class ObservationPush extends LinearOpMode {
     // Declare motors and servos
     private DcMotor slides;
     private Servo slides2, rotation, pivot, claw, claw2, rotation2, swing;
+    private int xPos = -30;
+    private int yPos = -45;
 
     public class intakeClaw {
         private Servo intakeClaw;
@@ -242,7 +253,7 @@ public class ObservationPush extends LinearOpMode {
     @Override
     public void runOpMode() {
         // Initialize drivetrain and mechanisms
-        MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(6, -60, Math.toRadians(90)));
+        MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(-23, 0, Math.toRadians(0)));
 
         intakeClaw intakeClaw = new intakeClaw(hardwareMap);
         intakeRotation intakeRotation = new intakeRotation(hardwareMap);
@@ -259,6 +270,58 @@ public class ObservationPush extends LinearOpMode {
         claw2 = hardwareMap.get(Servo.class, "claw2");
         rotation2 = hardwareMap.get(Servo.class, "rotation2");
         swing = hardwareMap.get(Servo.class, "swing"); // control hub port 5
+
+//        ColorBlobLocatorProcessor colorLocator = new ColorBlobLocatorProcessor.Builder()
+//                .setTargetColorRange(ColorRange.BLUE)         // use a predefined color match
+//                .setContourMode(ColorBlobLocatorProcessor.ContourMode.EXTERNAL_ONLY)    // exclude blobs inside blobs
+//                //    .setRoi(ImageRegion.asUnityCenterCoordinates(-0.5, 0.5, 0.5, -0.5))// search central 1/4 of camera view
+//                .setRoi(ImageRegion.asImageCoordinates(30, 50,  70, 100))
+//                .setDrawContours(true)                        // Show contours on the Stream Preview
+//                .setBlurSize(5)                               // Smooth the transitions between different colors in image
+//                .build();
+//
+//        VisionPortal portal = new VisionPortal.Builder()
+//                .addProcessor(colorLocator)
+//                .setCameraResolution(new Size(320, 240))
+//                .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
+//                .build();
+//
+//        List<ColorBlobLocatorProcessor.Blob> blobs = colorLocator.getBlobs();
+//        ColorBlobLocatorProcessor.Util.filterByArea(50, 20000, blobs);
+
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        OpenCvWebcam webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
+
+        ColorDetectionPipeline pipeline = new ColorDetectionPipeline();
+        webcam.setPipeline(pipeline);
+
+        webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+            @Override
+            public void onOpened() {
+                webcam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
+            }
+
+            @Override
+            public void onError(int errorCode) {
+
+            }
+
+        });
+
+
+
+        // ✅ Keep updating the camera feed while waiting for the match to start
+        while (!isStarted() && !isStopRequested()) {
+            telemetry.addData("Blue detected", pipeline.isBlueDetected());
+            telemetry.addData("yellow detected", pipeline.isYellowDetected());
+            telemetry.addData("Object X", pipeline.getObjectX());
+            telemetry.addData("Object Y", pipeline.getObjectY());
+            telemetry.addLine("Camera Streaming... Waiting for Start");
+            telemetry.update();
+        }
+
+        // ✅ Stop camera streaming after match starts
+        webcam.stopStreaming();
 
 
         // Configure motor and servo settings
@@ -280,47 +343,14 @@ public class ObservationPush extends LinearOpMode {
         ));
 
         int velocity = 100;
-        // Autonomous Actions for pushing
-        TrajectoryActionBuilder tab1 = drive.actionBuilder(new Pose2d(6,-60,Math.toRadians(90)))
-                .strafeTo(new Vector2d(-2,-30), new TranslationalVelConstraint(velocity));
-        Action movement1=tab1.build();
 
-        TrajectoryActionBuilder tab2 = drive.actionBuilder(new Pose2d(-2, -30, Math.toRadians(90)))
-                .strafeTo(new Vector2d(-2,-34))
-                .splineToConstantHeading(new Vector2d(28,-35),Math.toRadians(90), new TranslationalVelConstraint(velocity));
-        Action movement2 = tab2.build();
-        // pushing the first sample
-        TrajectoryActionBuilder tab3 = drive.actionBuilder(new Pose2d(28, -35, Math.toRadians(90)))
-                .splineToConstantHeading(new Vector2d(25,-20),Math.toRadians(90))
-                .splineToConstantHeading(new Vector2d(37,-10),Math.toRadians(90))
-                .strafeTo(new Vector2d(37,-52));
-        Action movement3 = tab3.build();
-        // pushing the second sample
-        TrajectoryActionBuilder tab4 = drive.actionBuilder(new Pose2d(37, -52, Math.toRadians(90)))
-                .splineToConstantHeading(new Vector2d(30,-20),Math.toRadians(90))
-                .splineToConstantHeading(new Vector2d(44,-10),Math.toRadians(90))
-                .strafeTo(new Vector2d(44,-52));
-        Action movement4 = tab4.build();
-        //pushing third sample
-        TrajectoryActionBuilder tab5 = drive.actionBuilder(new Pose2d(43, -52, Math.toRadians(90)))
-                .splineToConstantHeading(new Vector2d(43,-20),Math.toRadians(90))
-                .splineToConstantHeading(new Vector2d(52,-10),Math.toRadians(90))
-                .strafeTo(new Vector2d(52,-52));
-        Action movement5 = tab5.build();
-        //picking up first specimen
-        TrajectoryActionBuilder tab6 = drive.actionBuilder(new Pose2d(52, -52, Math.toRadians(90)))
-                .splineToConstantHeading(new Vector2d(29,-48),Math.toRadians(90))
-                .strafeTo(new Vector2d(29,-63));
-        Action moveToSpecimen = tab6.build();
-        //moving to hang first specimen
-        TrajectoryActionBuilder toObs = drive.actionBuilder(new Pose2d(29, -63, Math.toRadians(90)))
-                .splineToConstantHeading(new Vector2d(-15,-34), Math.toRadians(90), new TranslationalVelConstraint(velocity));
-        Action moveToObservation = toObs.build();
-        // moving back to pick up second specimen
-        TrajectoryActionBuilder secondSpec = drive.actionBuilder(new Pose2d(-15, -34, Math.toRadians(90)))
-                .splineToConstantHeading(new Vector2d(31.5,-55),Math.toRadians(90))
-                .strafeTo(new Vector2d(31.5,-62));
-        Action moveTo2ndSpecimen = secondSpec.build();
+
+        TrajectoryActionBuilder adjustL = drive.actionBuilder(new Pose2d(xPos, yPos, Math.toRadians(0)))
+                .strafeTo(new Vector2d(xPos,yPos+1));
+        Action adjustLeft = adjustL.build();
+
+
+
 
 
 
@@ -353,29 +383,50 @@ public class ObservationPush extends LinearOpMode {
 
         if (isStopRequested()) return;
 
+        int frameCenterX = 40; // Assuming a 320x240 resolution
+        int frameCenterY = 70;
+        int offsetX = pipeline.getObjectX() - frameCenterX;
+        int offsetY = pipeline.getObjectY() - frameCenterY;
+
+
         // Execute autonomous sequence
         Actions.runBlocking(
                 new SequentialAction(
-                        // code for pushing
-                        new ParallelAction(movement1,slidesSpecUp),
-                        slidesPartDown,
-                        outtakeClaw.openClaw(),
-                        new ParallelAction(movement2, outtakeRotation.outtakeRotWall()),
-                        new ParallelAction(movement3,slidesDown),
-                        movement4,
-                        movement5,
-                        moveToSpecimen,
-                        outtakeClaw.closeClaw(),
-                        slidesPickSpec,
-                        new ParallelAction(
-                                new SequentialAction(slidesFirstSpec, outtakeRotation.outtakeRotSpec())
-                                ,moveToObservation),
-                        slidesHang,
-                        outtakeClaw.openClaw(),
-                        new ParallelAction(
-                                new SequentialAction(outtakeRotation.outtakeRotWall(),slidesDown2),moveTo2ndSpecimen
-                        ),
-                        outtakeClaw.closeClaw()
+                        new Action() {
+                            @Override
+                            public boolean run(@NonNull TelemetryPacket packet) {
+
+                                // Stop the robot if the distance is less than 10 cm
+                                if (Math.abs(offsetX) <= 20 && Math.abs(offsetY) <= 20) {
+                                    telemetry.addLine("Object Detected! Stopping...");
+                                    telemetry.update();
+                                    return false; // Stop this action
+                                }
+
+                                // Otherwise, continue moving forward
+                                if (Math.abs(offsetX) > 20) {
+                                    TrajectoryActionBuilder temp = drive.actionBuilder(new Pose2d(xPos, yPos, Math.toRadians(90)))
+                                            .strafeTo(new Vector2d(xPos + 0.5, yPos), new TranslationalVelConstraint(velocity));
+                                    //xPos += 1;
+                                    Action adjust = temp.build();
+                                    Actions.runBlocking(new SequentialAction(adjust, new SleepAction (0.3)));
+                                }
+
+                                if (Math.abs(offsetY) > 20) {
+                                    TrajectoryActionBuilder temp = drive.actionBuilder(new Pose2d(xPos, yPos, Math.toRadians(90)))
+                                            .strafeTo(new Vector2d(xPos , yPos+0.5), new TranslationalVelConstraint(velocity));
+                                    //yPos +=1;
+                                    Action adjust = temp.build();
+                                    Actions.runBlocking(new SequentialAction(adjust, new SleepAction (0.3)));
+                                }
+
+                                return true; // Keep looping
+                            }
+                        },
+                        intakeSlides.moveToPosition()
+
+
+
 
 
 

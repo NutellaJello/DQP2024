@@ -43,14 +43,14 @@ public class dqp2425 extends LinearOpMode{
 
     //intake claw
     double clawpos=0.47;
-    double clawclose = 0.06;
+    double clawclose = 0.0;
     double clawopen = 0.45;
 
     //intake rotation
     double rotpos= 1;
     double rotin = 0.28;
     double rotout = 0.95;
-    int slidesnuetral = -123;
+    int slidesnuetral = -115;
     int slidesSpeci = -5;
     int slidesLatchOff = -174;
     int slidesup = -850;
@@ -85,6 +85,7 @@ public class dqp2425 extends LinearOpMode{
     double transferTime = 0.53;
     boolean usingJst = false;
     boolean startOuttake = false;
+    boolean sampleMode = true;
 
 
     double f = 0;
@@ -125,7 +126,7 @@ public class dqp2425 extends LinearOpMode{
         claw=hardwareMap.get(Servo.class, "claw"); // EPS 1
         claw2=hardwareMap.get(Servo.class, "claw2"); // EPS 4
         rotation2=hardwareMap.get(Servo.class, "rotation2"); // EPS 5
-        hang=hardwareMap.get(DcMotor.class, "hang"); // EPM 1
+        hang=hardwareMap.get(DcMotor.class, "hang"); // EPM 2
         winch=hardwareMap.get(DcMotor.class, "hang2");
         swing = hardwareMap.get(Servo.class, "swing"); // control hub port 5
 /*
@@ -156,7 +157,7 @@ public class dqp2425 extends LinearOpMode{
         if(fieldCentric){
             transferTime = 0.56;
         }else{
-            transferTime = 0.7;
+            transferTime = 0.9;// 0.7
         }
 
 
@@ -174,12 +175,17 @@ public class dqp2425 extends LinearOpMode{
             telemetry.addData("rotation2", rot2pos);
             telemetry.addData("outtake",slides.getCurrentPosition());
             telemetry.addData("a1", a1);
-            telemetry.addData("jst", drivetrain.getIntakePosi()); //208 is home base
+            telemetry.addData("jst", drivetrain.getIntakePosi()); //208 is home base expansion hub analog input, port 2
             // telemetry.addData("coder1", par0.getPositionAndVelocity().rawPosition);
             //telemetry.addData("coder2", par1.getPositionAndVelocity().rawPosition);
             //telemetry.addData("coder3", perp.getPositionAndVelocity().rawPosition);
 
-
+            if(gamepad2.back){
+                sampleMode = true;
+            }
+            if(gamepad1.back){
+                sampleMode = false;
+            }
             telemetry.update();
 
 
@@ -505,11 +511,11 @@ public class dqp2425 extends LinearOpMode{
             }
 
             if(a1==4){
-                if(!gamepad2.back){
+                if(sampleMode){
                     usingJst = true;
                     if(drivetrain.getIntakePosi() >= 210){
                         a2 += 0.015;
-                        if (a2 >= transferTime/6.5) {
+                        if (a2 >= transferTime/5) {
                             //waiting for slides to arrive
                             claw2pos = claw2close;
                             claw2.setPosition(claw2pos);
@@ -538,7 +544,7 @@ public class dqp2425 extends LinearOpMode{
 
             if(a1==5){
                 a2+=0.015;
-                if(a2>=0.06) {
+                if(a2>=0.1) {
                     clawpos = clawopen;
                     claw.setPosition(clawpos);
                     a1=0;
@@ -551,8 +557,6 @@ public class dqp2425 extends LinearOpMode{
                 }
 
             }
-
-
 
 
 
@@ -591,9 +595,9 @@ public class dqp2425 extends LinearOpMode{
                 rotation2.setPosition(rot2pos);
                 slides.setTargetPosition(slidesnuetral);
                 slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                slides.setPower(1);
+                slides.setPower(1);/*
                 claw2pos=claw2close;
-                claw2.setPosition(claw2pos);
+                claw2.setPosition(claw2pos);*/
                 c2=0;
             }
 

@@ -34,7 +34,8 @@ import java.util.List;
 import java.util.function.Function;
 
 @Config
-@Autonomous
+@Autonomous(name= "old basket")
+
 public class BlueSideBasket extends LinearOpMode {
 
     // Declare motors and servos
