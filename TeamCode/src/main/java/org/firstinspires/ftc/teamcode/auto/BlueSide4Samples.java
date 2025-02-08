@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.function.Function;
 
 @Config
-@Autonomous(name = "BlueSide4Samples")
+@Autonomous(name = "Basket 4")
 public class BlueSide4Samples extends LinearOpMode {
 
     // Declare motors and servos
@@ -246,9 +246,6 @@ public class BlueSide4Samples extends LinearOpMode {
         outtakeClaw outtakeClaw = new outtakeClaw(hardwareMap);
         outtakeRotation outtakeRotation = new outtakeRotation(hardwareMap);
 
-        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        OpenCvWebcam webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
-
         //ColorDetectionPipeline pipeline = new ColorDetectionPipeline();
         //webcam.setPipeline(pipeline);
 
@@ -318,7 +315,7 @@ public class BlueSide4Samples extends LinearOpMode {
         Action outtake4 = tab7.build();
 
         TrajectoryActionBuilder tab8 = drive.actionBuilder(new Pose2d(-59,-54, Math.toRadians(90)))
-                .splineTo(new Vector2d(-23,0), Math.toRadians(0));
+                .splineTo(new Vector2d(-23,-8), Math.toRadians(0));
         Action end = tab8.build();
 
 
@@ -467,8 +464,8 @@ public class BlueSide4Samples extends LinearOpMode {
 
                 // Check if motor has reached its target position
                 boolean isBusy = motor.isBusy();
-                packet.put("Motor Busy", isBusy);
-                packet.put("Motor Position", motor.getCurrentPosition());
+/*                packet.put("Motor Busy", isBusy);
+                packet.put("Motor Position", motor.getCurrentPosition());*/
 
                 // Return true while the motor is still busy
                 if (isBusy) {
@@ -503,9 +500,9 @@ public class BlueSide4Samples extends LinearOpMode {
                 int error = Math.abs(targetPosition - currentPosition);
 
                 // Add telemetry data for debugging
-                telemetry.addData("Current Position", slides.getCurrentPosition());
-                telemetry.addData("Error Position", error);
-                telemetry.update();
+//                telemetry.addData("Current Position", slides.getCurrentPosition());
+//                telemetry.addData("Error Position", error);
+//                telemetry.update();
                 // Check if the motor has reached the target position within the tolerance
                 if (error > tolerance) {
                     // Keep running

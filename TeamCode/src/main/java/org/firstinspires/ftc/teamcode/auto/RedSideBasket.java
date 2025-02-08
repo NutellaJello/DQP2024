@@ -15,6 +15,7 @@ import com.acmerobotics.roadrunner.TranslationalVelConstraint;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
@@ -29,8 +30,9 @@ import java.util.List;
 import java.util.function.Function;
 
 @Config
-@Autonomous(name = "1+3 basket auto")
-public class BlueSideBasket extends LinearOpMode {
+@Disabled
+@Autonomous(name = " REd 1+3 basket auto")
+public class RedSideBasket extends LinearOpMode {
 
     // Declare motors and servos
     private DcMotor slides;
@@ -250,10 +252,10 @@ public class BlueSideBasket extends LinearOpMode {
         slides2 = hardwareMap.get(Servo.class, "slides2");
         rotation = hardwareMap.get(Servo.class, "rotation");
 
-          claw = hardwareMap.get(Servo.class, "claw");
-          claw2 = hardwareMap.get(Servo.class, "claw2");
+        claw = hardwareMap.get(Servo.class, "claw");
+        claw2 = hardwareMap.get(Servo.class, "claw2");
         rotation2 = hardwareMap.get(Servo.class, "rotation2");
-         rotation = hardwareMap.get(Servo.class, "rotation");
+        rotation = hardwareMap.get(Servo.class, "rotation");
         rotation = hardwareMap.get(Servo.class, "rotation");
         swing = hardwareMap.get(Servo.class, "swing"); // control hub port 5
 
@@ -274,7 +276,7 @@ public class BlueSideBasket extends LinearOpMode {
         outtakeClaw.setPosition(0.347);
 
         // Autonomous Actions
-       //hang preload
+        //hang preload
         TrajectoryActionBuilder tab = drive.actionBuilder(new Pose2d(-16,-60,Math.toRadians(270)))
                 .setReversed(true)
                 .splineToConstantHeading(new Vector2d(-15,-30), Math.toRadians(270),new MinVelConstraint(Arrays.asList(new TranslationalVelConstraint(35), new AngularVelConstraint(Math.toRadians(90)))) ,new ProfileAccelConstraint(-35,35));

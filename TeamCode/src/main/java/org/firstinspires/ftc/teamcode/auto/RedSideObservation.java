@@ -15,6 +15,7 @@ import com.acmerobotics.roadrunner.TranslationalVelConstraint;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
@@ -29,8 +30,9 @@ import java.util.Collections;
 import java.util.List;
 
 @Config
-@Autonomous(name = "4 spec")
-public class BlueSideObservation extends LinearOpMode {
+@Disabled
+@Autonomous(name = "Red 4 spec")
+public class RedSideObservation extends LinearOpMode {
     // Declare motors and servos
     private DcMotor slides;
     private Servo slides2, rotation,claw, claw2, rotation2, swing;
