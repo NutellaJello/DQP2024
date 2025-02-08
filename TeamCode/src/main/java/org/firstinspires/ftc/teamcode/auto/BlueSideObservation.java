@@ -29,7 +29,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Config
-@Autonomous(name = "Observation Auto")
+@Autonomous(name = "4 spec")
 public class BlueSideObservation extends LinearOpMode {
     // Declare motors and servos
     private DcMotor slides;
@@ -86,7 +86,7 @@ public class BlueSideObservation extends LinearOpMode {
                     new Action(){
                         @Override
                         public boolean run(@NonNull TelemetryPacket packet) {
-                            intakeRotation.setPosition(0.78);
+                            intakeRotation.setPosition(0.75);
                             return false;
                         }}, new SleepAction(0.3)
             );
@@ -173,7 +173,7 @@ public class BlueSideObservation extends LinearOpMode {
                     new Action(){
                         @Override
                         public boolean run(@NonNull TelemetryPacket packet) {
-                            outtakeClaw.setPosition(0.3465);
+                            outtakeClaw.setPosition(0.31);
                             return false;
                         }
                     }, new SleepAction(0.2)
@@ -299,7 +299,7 @@ public class BlueSideObservation extends LinearOpMode {
         pivot.setPosition(0.53);
         //Ensure intake does not move around
         intakeSlides.setPosition(0.51);
-        claw.setPosition(0.45);
+        claw.setPosition(0.4);
         //Hold Spece
         rotation2.setPosition(0.66);
         outtakeClaw.setPosition(0.347);
@@ -315,10 +315,10 @@ public class BlueSideObservation extends LinearOpMode {
         // 1st sample
         TrajectoryActionBuilder spec1 = drive.actionBuilder(new Pose2d(-7, -28, Math.toRadians(90)))
                 .lineToY(-30)
-                .splineToLinearHeading(new Pose2d(28, -44, Math.toRadians(53)), Math.toRadians(90));
+                .splineToLinearHeading(new Pose2d(28, -44, Math.toRadians(54)), Math.toRadians(90));
         Action intake1 = spec1.build();
 
-        TrajectoryActionBuilder spec1d = drive.actionBuilder(new Pose2d(28, -44, Math.toRadians(53)))
+        TrajectoryActionBuilder spec1d = drive.actionBuilder(new Pose2d(28, -44, Math.toRadians(54)))
                 .turnTo(Math.toRadians(-45));
         Action drop1 = spec1d.build();
 
@@ -333,20 +333,20 @@ public class BlueSideObservation extends LinearOpMode {
 
         // 3rd sample
         TrajectoryActionBuilder spec3 = drive.actionBuilder(new Pose2d(28, -44, Math.toRadians(-45)))
-                .splineToLinearHeading(new Pose2d(40, -44, Math.toRadians(41.5)), Math.toRadians(90));
+                .splineToLinearHeading(new Pose2d(40, -44, Math.toRadians(41)), Math.toRadians(90));
         Action intake3 = spec3.build();
 
-        TrajectoryActionBuilder spec3d = drive.actionBuilder(new Pose2d(40, -44, Math.toRadians(41.5)))
+        TrajectoryActionBuilder spec3d = drive.actionBuilder(new Pose2d(40, -44, Math.toRadians(41)))
                 .turnTo(Math.toRadians(-55));
         Action drop3 = spec3d.build();
 
         // 1st spec
         TrajectoryActionBuilder spec1i = drive.actionBuilder(new Pose2d(40, -43, Math.toRadians(-55)))
-                .strafeToLinearHeading(new Vector2d(31,-61.2), Math.toRadians(93));
+                .strafeToLinearHeading(new Vector2d(31,-61.2), Math.toRadians(91));
         Action wall1 = spec1i.build();
 
         TrajectoryActionBuilder toBar1 = drive.actionBuilder(new Pose2d(31, -61.2, Math.toRadians(90)))
-                .splineToConstantHeading(new Vector2d(3,-28), Math.toRadians(92));
+                .splineToConstantHeading(new Vector2d(3,-28), Math.toRadians(91));
         Action bar1 = toBar1.build();
 
         TrajectoryActionBuilder shift1 = drive.actionBuilder(new Pose2d(3, -28, Math.toRadians(90)))
@@ -372,15 +372,15 @@ public class BlueSideObservation extends LinearOpMode {
         Action wall3 = spec3i.build();
 
         TrajectoryActionBuilder toBar3 = drive.actionBuilder(new Pose2d(31, -63.5, Math.toRadians(90)))
-                .strafeToLinearHeading(new Vector2d(-3,-28), Math.toRadians(84));
+                .strafeToLinearHeading(new Vector2d(-3,-28.5), Math.toRadians(84));
         Action bar3 = toBar3.build();
 
-        TrajectoryActionBuilder shift3 = drive.actionBuilder(new Pose2d(-3, -28, Math.toRadians(90)))
+        TrajectoryActionBuilder shift3 = drive.actionBuilder(new Pose2d(-3, -28.5, Math.toRadians(90)))
                 .strafeToLinearHeading(new Vector2d(-3,-32),Math.toRadians(90));
         Action back3 = shift3.build();
 
         // park
-        TrajectoryActionBuilder goPark = drive.actionBuilder(new Pose2d(-3, -27, Math.toRadians(90)))
+        TrajectoryActionBuilder goPark = drive.actionBuilder(new Pose2d(-3, -32, Math.toRadians(90)))
                 .strafeToLinearHeading(new Vector2d(31,-64),Math.toRadians(90));
         Action park = goPark.build();
 
@@ -411,15 +411,15 @@ public class BlueSideObservation extends LinearOpMode {
         Action slidesPartUp3 = createMotorAction(slides,-172,1,2);
         Action slidesPartUp4 = createMotorAction(slides,-172,1,2);
 
-        Action slidesHang1 =createMotorAction(slides,-315,1,3);
-        Action slidesHang2 =createMotorAction(slides,-315,1,3);
-        Action slidesHang3 =createMotorAction(slides,-315,1,3);
-        Action slidesHang4 =createMotorAction(slides,-315,1,3);
+        Action slidesHang1 =createMotorAction(slides,-330,1,20);
+        Action slidesHang2 =createMotorAction(slides,-330,1,20);
+        Action slidesHang3 =createMotorAction(slides,-330,1,20);
+        Action slidesHang4 =createMotorAction(slides,-330,1,20);
 
         Action slidesDown1 = createMotorAction(slides,-2 , 1,10);
         Action slidesDown2 = createMotorAction(slides,-2 , 1,10);
         Action slidesDown3 = createMotorAction(slides,-2 , 1,10);
-        Action slidesDown4 = createMotorAction(slides,-2 , 1,10);
+        Action slidesDown4 = createMotorAction(slides,-2 , 1,7);
 
         Action slidesDownFinal = createMotorAction(slides, 5, 1, 0);
 
@@ -434,74 +434,74 @@ public class BlueSideObservation extends LinearOpMode {
         Actions.runBlocking(
                 new SequentialAction(
 
-                    // preload
-                    new ParallelAction(preload,slidesSpecUp),
-                    slidesPartDown,
+                        // preload
+                        new ParallelAction(preload,slidesSpecUp),
+                        slidesPartDown,
 
-                    // 1st sample
-                    new ParallelAction(outtakeClaw.openClaw(), intake1,slidesDown, new SequentialAction(
-                                    new SleepAction(1),
-                                    new ParallelAction(intakeSlides.moveToPosition2(0.652),pivot.setPosition2(0.72)),
-                                    intakeRotation.intakeRotDown())),
-                    intakeClaw.closeClaw(),
-                    new SleepAction(0.1),
-                    new ParallelAction(intakeRotation.intakeRotPartialUp(),drop1,new SequentialAction(new SleepAction(0.5),intakeClaw.openClaw())),
+                        // 1st sample
+                        new ParallelAction(outtakeClaw.openClaw(), intake1,slidesDown, new SequentialAction(
+                                new SleepAction(1),
+                                new ParallelAction(intakeSlides.moveToPosition2(0.655),pivot.setPosition2(0.72)),
+                                intakeRotation.intakeRotDown())),
+                        intakeClaw.closeClaw(),
+                        new SleepAction(0.1),
+                        new ParallelAction(intakeRotation.intakeRotPartialUp(),drop1,new SequentialAction(new SleepAction(0.5),intakeClaw.openClaw())),
 
-                    // 2nd sample
-                    new ParallelAction(new SequentialAction(new SleepAction(0.32),intakeRotation.intakeRotDown()),intake2, intakeSlides.moveToPosition2(0.773)),
-                    intakeClaw.closeClaw(),
-                    new SleepAction(0.1),
-                    new ParallelAction(intakeRotation.intakeRotPartialUp(),drop2,new SequentialAction(new SleepAction(0.5),intakeClaw.openClaw())),
+                        // 2nd sample
+                        new ParallelAction(new SequentialAction(new SleepAction(0.32),intakeRotation.intakeRotDown()),intake2, intakeSlides.moveToPosition2(0.77)),
+                        intakeClaw.closeClaw(),
+                        new SleepAction(0.1),
+                        new ParallelAction(intakeRotation.intakeRotPartialUp(),drop2,new SequentialAction(new SleepAction(0.5),intakeClaw.openClaw())),
 
-                    // 3rd sample
-                    new ParallelAction(intake3,  intakeSlides.moveToPosition2(0.66),new SequentialAction(new SleepAction(0.6),
-                            new ParallelAction(intakeSlides.moveToPosition2(0.74),intakeRotation.intakeRotDown()))),
+                        // 3rd sample
+                        new ParallelAction(intake3,  intakeSlides.moveToPosition2(0.66),new SequentialAction(new SleepAction(0.6),
+                                new ParallelAction(intakeSlides.moveToPosition2(0.74),intakeRotation.intakeRotDown()))),
 
-                    intakeClaw.closeClaw(),
-                    new SleepAction(0.1),
-                    new ParallelAction(intakeSlides.moveToPosition2(0.55), intakeRotation.intakeRotPartialUp(),
-                            new SequentialAction(
-                                    new SleepAction(0.1),
-                                    new ParallelAction(drop3,
-                                            new SequentialAction(new SleepAction(0.55), intakeClaw.openClaw())))),
+                        intakeClaw.closeClaw(),
+                        new SleepAction(0.1),
+                        new ParallelAction(intakeSlides.moveToPosition2(0.55), intakeRotation.intakeRotPartialUp(),
+                                new SequentialAction(
+                                        new SleepAction(0.1),
+                                        new ParallelAction(drop3,
+                                                new SequentialAction(new SleepAction(0.55), intakeClaw.openClaw())))),
 
-                    // 1st spec
-                    new ParallelAction(wall1, outtakeRotation.outtakeRotWall(), outtakeClaw.openClaw(),intakeRotation.intakeRotUp(),intakeSlides.moveToPosition2(0.55),pivot.resetPivot(),
-                            new SequentialAction(new SleepAction(0.71),
-                                    slidesDown1,
-                                    new SleepAction(0.1),
-                                    outtakeClaw.closeClaw(),
-                                    new SleepAction(0.1))),
+                        // 1st spec had intakeRotation.intakeRotUp() in parallelaction
+                        new ParallelAction(wall1, outtakeRotation.outtakeRotWall(), outtakeClaw.openClaw(),intakeRotation.intakeRotUp(),intakeSlides.moveToPosition2(0.56),pivot.resetPivot(),
+                                new SequentialAction(new SleepAction(0.9),
+                                        slidesDown1,
+                                        new SleepAction(0.1),
+                                        outtakeClaw.closeClaw(),
+                                        new SleepAction(0.1))),
                         slidesPartUp1,
                         new ParallelAction(bar1, outtakeRotation.outtakeRotSpec()),
-                    new ParallelAction(slidesHang1, new SequentialAction(new SleepAction(0.35),back1, new SleepAction(0.1),outtakeClaw.openClaw()
-                    )),
+                        new ParallelAction(slidesHang1, new SequentialAction(new SleepAction(0.35),back1, new SleepAction(0.1),outtakeClaw.openClaw()
+                        )),
 
-                    // 2nd spec
-                    new ParallelAction(wall2, outtakeRotation.outtakeRotWall(),
-                            new SequentialAction(new SleepAction(0.71),
-                                    slidesDown2,
-                                    new SleepAction(0.1),
-                                    outtakeClaw.closeClaw(),
-                                    new SleepAction(0.1))),
-                    slidesPartUp2,
-                    new ParallelAction(bar2, outtakeRotation.outtakeRotSpec()),
-                    new ParallelAction(slidesHang2, new SequentialAction(new SleepAction(0.35),back2, new SleepAction(0.1),outtakeClaw.openClaw())),
+                        // 2nd spec
+                        new ParallelAction(wall2, outtakeRotation.outtakeRotWall(),
+                                new SequentialAction(new SleepAction(0.7),
+                                        slidesDown2,
+                                        new SleepAction(0.1),
+                                        outtakeClaw.closeClaw(),
+                                        new SleepAction(0.1))),
+                        slidesPartUp2,
+                        new ParallelAction(bar2, outtakeRotation.outtakeRotSpec()),
+                        new ParallelAction(slidesHang2, new SequentialAction(new SleepAction(0.35),back2, new SleepAction(0.1),outtakeClaw.openClaw())),
 
-                    // 3rd spec
-                    new ParallelAction(wall3, outtakeRotation.outtakeRotWall(),
-                            new SequentialAction(new SleepAction(0.71),
-                                    slidesDown3,
-                                    new SleepAction(0.1),
-                                    outtakeClaw.closeClaw(),
-                                    new SleepAction(0.1))
-                            ),
-                    slidesPartUp3,
-                    new ParallelAction(bar3, outtakeRotation.outtakeRotSpec()),
-                    new ParallelAction(slidesHang3, new SequentialAction(new SleepAction(0.35),back3, new SleepAction(0.1),outtakeClaw.openClaw())),
+                        // 3rd spec
+                        new ParallelAction(wall3, outtakeRotation.outtakeRotWall(),
+                                new SequentialAction(new SleepAction(0.7),
+                                        slidesDown3,
+                                        new SleepAction(0.1),
+                                        outtakeClaw.closeClaw(),
+                                        new SleepAction(0.1))
+                        ),
+                        slidesPartUp3,
+                        new ParallelAction(bar3, outtakeRotation.outtakeRotSpec()),
+                        new ParallelAction(slidesHang3, new SequentialAction(new SleepAction(0.35),back3, new SleepAction(0.1),outtakeClaw.openClaw(),intakeRotation.intakeRotUp())),
 
-                    // park
-                    new ParallelAction(park, slidesDownFinal, intakeSlides.retractPosition(), pivot.resetPivot())
+                        // park
+                        new ParallelAction(park, slidesDownFinal, intakeSlides.retractPosition(), pivot.resetPivot())
 
 
 

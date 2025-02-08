@@ -143,7 +143,7 @@ public class BlueSide4Samples extends LinearOpMode {
                     new Action(){
                         @Override
                         public boolean run(@NonNull TelemetryPacket packet) {
-                            outtakeClaw.setPosition(0.347);
+                            outtakeClaw.setPosition(0.33);
                             return false;
                         }
                     }, new SleepAction(0.2)

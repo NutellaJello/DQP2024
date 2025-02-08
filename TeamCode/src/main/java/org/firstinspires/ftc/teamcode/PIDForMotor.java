@@ -3,65 +3,80 @@ package org.firstinspires.ftc.teamcode;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
-import com.acmerobotics.roadrunner.Pose2d;
-import com.acmerobotics.roadrunner.ftc.Actions;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.MecanumDrive;
-import org.firstinspires.ftc.teamcode.TankDrive;
-import org.firstinspires.ftc.teamcode.ThreeDeadWheelLocalizer;
-import org.firstinspires.ftc.teamcode.TwoDeadWheelLocalizer;
+import org.firstinspires.ftc.teamcode.auto.BlueSide5Spec;
 
 @Config
-@TeleOp(name = "tunePID", group = "TeleOp")
+@TeleOp(name = "Get & Adjust PIDF", group = "Test")
 public class PIDForMotor extends LinearOpMode {
-    private DcMotorEx motor;
+
+    private DcMotorEx slides;
     private FtcDashboard dashboard;
 
-    public static double p = 10.0;
-    public static double i = 0.05;
-    public static double d = 0.0;
+    // Dashboard adjustable PIDF values
+    public static double P = 12.0;
+    public static double I = 5.0;
+    public static double D = 0.0;
+    public static double F = 0.0;
+
+    public static int targetPosition = -300;  // Adjustable target position
 
     @Override
     public void runOpMode() {
-        motor = hardwareMap.get(DcMotorEx.class, "slides");
+        // Initialize hardware
+        slides = hardwareMap.get(DcMotorEx.class, "slides");
+        slides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        // Get current PIDF from motor controller
+        PIDFCoefficients currentPIDF = slides.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        // Load current PIDF values into dashboard variables
+        P = currentPIDF.p;
+        I = currentPIDF.i;
+        D = currentPIDF.d;
+        F = currentPIDF.f;
+
+        // Initialize FTC Dashboard
         dashboard = FtcDashboard.getInstance();
 
         waitForStart();
-
+        sleep(7000);
+        BlueSide5Spec.SimplePIDF pidController = new BlueSide5Spec.SimplePIDF(P,I, D, F);
+        slides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         while (opModeIsActive()) {
-            // ✅ Dynamically apply updated PID values from FTC Dashboard
-            PIDFCoefficients coefficients = new PIDFCoefficients(p, i, d, 0.0);
-            motor.setPIDFCoefficients(DcMotorEx.RunMode.RUN_TO_POSITION, coefficients);
-
-            double targetPosition = -890; // Target slide position
-            motor.setTargetPosition((int) targetPosition);
-            motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            motor.setPower(1.0);
-
-            double currentPosition = motor.getCurrentPosition();
+            double currentPosition = slides.getCurrentPosition();
             double error = targetPosition - currentPosition;
+            double power = pidController.calculate(currentPosition, targetPosition);
 
-            // 📊 Send data to FTC Dashboard for graphing
+            slides.setPower(power);
+
+            if (Math.abs(targetPosition - currentPosition) < 5) {  // Stop when near target
+                slides.setPower(0);
+                break;
+            }
+
+            // FTC Dashboard telemetry packet
             TelemetryPacket packet = new TelemetryPacket();
-            packet.put("P", p);
-            packet.put("I", i);
-            packet.put("D", d);
-            packet.put("Position", currentPosition);
-            packet.put("Target", targetPosition);
-            packet.put("Error", error);
-            dashboard.sendTelemetryPacket(packet); // Send data for real-time graphing
+            packet.put("Target Position", targetPosition);
+            packet.put("Current Position", currentPosition);
+            packet.put("Error (Target - Current)", error);
+            packet.put("P", P);
+            packet.put("I", I);
+            packet.put("D", D);
+            packet.put("F", F);
+            dashboard.sendTelemetryPacket(packet);
 
-            telemetry.addData("P", p);
-            telemetry.addData("I", i);
-            telemetry.addData("D", d);
+            // Driver Station telemetry
             telemetry.addData("Target", targetPosition);
-            telemetry.addData("Position", currentPosition);
+            telemetry.addData("Current", currentPosition);
             telemetry.addData("Error", error);
+            telemetry.addData("Current PIDF", "P: %.2f I: %.2f D: %.2f F: %.2f", P, I, D, F);
             telemetry.update();
         }
     }

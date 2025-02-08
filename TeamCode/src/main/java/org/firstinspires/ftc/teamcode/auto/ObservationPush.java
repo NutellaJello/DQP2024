@@ -48,13 +48,13 @@ import java.util.List;
 
 @Config
 @Autonomous(name = "testing")
-
+@Disabled
 public class ObservationPush extends LinearOpMode {
     // Declare motors and servos
     private DcMotor slides;
     private Servo slides2, rotation, pivot, claw, claw2, rotation2, swing;
-    private int xPos = -30;
-    private int yPos = -45;
+    private int xPos = -23;
+    private int yPos = 0;
 
     public class intakeClaw {
         private Servo intakeClaw;
@@ -310,18 +310,7 @@ public class ObservationPush extends LinearOpMode {
 
 
 
-        // ✅ Keep updating the camera feed while waiting for the match to start
-        while (!isStarted() && !isStopRequested()) {
-            telemetry.addData("Blue detected", pipeline.isBlueDetected());
-            telemetry.addData("yellow detected", pipeline.isYellowDetected());
-            telemetry.addData("Object X", pipeline.getObjectX());
-            telemetry.addData("Object Y", pipeline.getObjectY());
-            telemetry.addLine("Camera Streaming... Waiting for Start");
-            telemetry.update();
-        }
 
-        // ✅ Stop camera streaming after match starts
-        webcam.stopStreaming();
 
 
         // Configure motor and servo settings
@@ -383,10 +372,10 @@ public class ObservationPush extends LinearOpMode {
 
         if (isStopRequested()) return;
 
-        int frameCenterX = 40; // Assuming a 320x240 resolution
-        int frameCenterY = 70;
-        int offsetX = pipeline.getObjectX() - frameCenterX;
-        int offsetY = pipeline.getObjectY() - frameCenterY;
+//        int frameCenterX = 40; // Assuming a 320x240 resolution
+//        int frameCenterY = 70;
+//        int offsetX = pipeline.getObjectX() - frameCenterX;
+//        int offsetY = pipeline.getObjectY() - frameCenterY;
 
 
         // Execute autonomous sequence
@@ -395,32 +384,35 @@ public class ObservationPush extends LinearOpMode {
                         new Action() {
                             @Override
                             public boolean run(@NonNull TelemetryPacket packet) {
+                                int frameCenterX = 40; // Assuming a 320x240 resolution
+                                int frameCenterY = 70;
 
-                                // Stop the robot if the distance is less than 10 cm
-                                if (Math.abs(offsetX) <= 20 && Math.abs(offsetY) <= 20) {
+                                int offsetX = pipeline.getObjectX() - frameCenterX;
+                                int offsetY = pipeline.getObjectY() - frameCenterY;
+
+                                // Stop if the element is aligned
+                                if (Math.abs(offsetX) <= 10 && Math.abs(offsetY) <= 10) {
                                     telemetry.addLine("Object Detected! Stopping...");
                                     telemetry.update();
                                     return false; // Stop this action
                                 }
 
-                                // Otherwise, continue moving forward
-                                if (Math.abs(offsetX) > 20) {
-                                    TrajectoryActionBuilder temp = drive.actionBuilder(new Pose2d(xPos, yPos, Math.toRadians(90)))
-                                            .strafeTo(new Vector2d(xPos + 0.5, yPos), new TranslationalVelConstraint(velocity));
-                                    //xPos += 1;
+                                // Otherwise, adjust alignment
+                                if (Math.abs(offsetX) > 10) {
+                                    TrajectoryActionBuilder temp = drive.actionBuilder(new Pose2d(xPos, yPos, Math.toRadians(0)))
+                                            .strafeTo(new Vector2d(xPos + (offsetX > 0 ? 1 : -1), yPos), new TranslationalVelConstraint(velocity));
                                     Action adjust = temp.build();
-                                    Actions.runBlocking(new SequentialAction(adjust, new SleepAction (0.3)));
+                                    Actions.runBlocking(adjust);
                                 }
 
-                                if (Math.abs(offsetY) > 20) {
-                                    TrajectoryActionBuilder temp = drive.actionBuilder(new Pose2d(xPos, yPos, Math.toRadians(90)))
-                                            .strafeTo(new Vector2d(xPos , yPos+0.5), new TranslationalVelConstraint(velocity));
-                                    //yPos +=1;
+                                if (Math.abs(offsetY) > 10) {
+                                    TrajectoryActionBuilder temp = drive.actionBuilder(new Pose2d(xPos, yPos, Math.toRadians(0)))
+                                            .strafeTo(new Vector2d(xPos, yPos + (offsetY > 0 ? 1 : -1)), new TranslationalVelConstraint(velocity));
                                     Action adjust = temp.build();
-                                    Actions.runBlocking(new SequentialAction(adjust, new SleepAction (0.3)));
+                                    Actions.runBlocking(adjust);
                                 }
 
-                                return true; // Keep looping
+                                return true; // Continue running until aligned
                             }
                         },
                         intakeSlides.moveToPosition()

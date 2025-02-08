@@ -50,20 +50,20 @@ public class dqp2425 extends LinearOpMode{
     double rotpos= 1;
     double rotin = 0.28;
     double rotout = 0.95;
-    int slidesnuetral = -115;
+    int slidesnuetral = -127;
     int slidesSpeci = -5;
     int slidesLatchOff = -174;
     int slidesup = -850;
 
     //outtake claw
     double claw2pos=0.347;
-    double claw2close = 0.347;
+    double claw2close = 0.334;
     double claw2open = 0.16;
 //
 
     //outtake arm rotation
     double rot2pos=0.7;
-    double rot2down = 0.7821;
+    double rot2down = 0.784;
     double rot2out = 0.06;
     double rot2wall = 0.98;
     double rot2speci = 0.367;//0.371
@@ -167,6 +167,8 @@ public class dqp2425 extends LinearOpMode{
         while (opModeIsActive()) {
             // all the movement controls.
             drivetrain.Teleop(gamepad1,telemetry, fieldCentric);
+
+            telemetry.addData("Samples: ",sampleMode );
             telemetry.addData("slides2", slides2pos);
             telemetry.addData("claw", clawpos);
             telemetry.addData("pivot", pivotpos);
@@ -249,12 +251,12 @@ public class dqp2425 extends LinearOpMode{
             slides2.setPosition(slides2pos);
 
             slides.setPower(1);
-            if (gamepad2.right_stick_y > 0) {
+            if (gamepad2.right_stick_y > 0 && a1==0) {
                 slides.setTargetPosition((int) (slides.getCurrentPosition() + (100 * gamepad2.right_stick_y)));
                 slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 //slides.setPower(gamepad2.right_stick_y );
             }
-            if (gamepad2.right_stick_y < 0) {
+            if (gamepad2.right_stick_y < 0 && a1==0) {
                 slides.setTargetPosition((int) (slides.getCurrentPosition() + (100 * gamepad2.right_stick_y)));
                 slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 //slides.setPower(gamepad2.right_stick_y);
@@ -313,7 +315,7 @@ public class dqp2425 extends LinearOpMode{
                 winch.setTargetPosition(winch.getCurrentPosition()-150);
                 winch.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 winch.setPower(0.6);
-            }else if(gamepad2.left_trigger>=0.1){
+            }else if(gamepad2.left_trigger>=0.1 || gamepad2.right_trigger>=0.1){
                 winch.setTargetPosition((int) (winch.getCurrentPosition()+200*gamepad2.left_trigger));
                 winch.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 winch.setPower(1);
@@ -335,13 +337,17 @@ public class dqp2425 extends LinearOpMode{
                 e1=1;
             }
             if(e1 == 1){
-                e2+= 0.02;
-                if(e2>=1){
-                    e1=2;
-                    e2=0;
+                if(!gamepad2.left_bumper){
+                    clawpos=clawopen;
+                    claw.setPosition(clawpos);
+                    slides2pos=slides2in;
+                    slides2.setPosition(slides2pos);
+                    pivotpos = pivotnuetral;
+                    pivot.setPosition(pivotpos);
+                    e1=0;
                 }
             }
-            if(e1==2){
+            /*if(e1==2){
                 clawpos=clawopen;
                 claw.setPosition(clawpos);
                 slides2pos=slides2in;
@@ -349,7 +355,7 @@ public class dqp2425 extends LinearOpMode{
                 pivotpos = pivotnuetral;
                 pivot.setPosition(pivotpos);
                 e1=0;
-            }
+            }*/
 
 
             pivotpos-=gamepad2.left_stick_x*0.017;
@@ -402,7 +408,7 @@ public class dqp2425 extends LinearOpMode{
             }
             if(b1==3){
                 if(gamepad2.right_bumper){
-                    claw2pos = claw2open;
+                    claw2pos = claw2open-0.15;
                     claw2.setPosition(claw2pos);
                 }else{
                     claw2pos = claw2close;
@@ -515,7 +521,7 @@ public class dqp2425 extends LinearOpMode{
                     usingJst = true;
                     if(drivetrain.getIntakePosi() >= 210){
                         a2 += 0.015;
-                        if (a2 >= transferTime/5) {
+                        if (a2 >= transferTime/2.5) {
                             //waiting for slides to arrive
                             claw2pos = claw2close;
                             claw2.setPosition(claw2pos);
