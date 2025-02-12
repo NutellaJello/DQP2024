@@ -33,8 +33,10 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.opencv.ColorBlobLocatorProcessor;
 import org.firstinspires.ftc.vision.opencv.ColorRange;
+import org.firstinspires.ftc.vision.opencv.ColorSpace;
 import org.firstinspires.ftc.vision.opencv.ImageRegion;
 import org.opencv.core.RotatedRect;
+import org.opencv.core.Scalar;
 
 import java.util.List;
 
@@ -59,7 +61,7 @@ import java.util.List;
  * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
-@Disabled
+//@Disabled
 @TeleOp(name = "Concept: Vision Color-Locator", group = "Concept")
 public class ConceptVisionColorLocator extends LinearOpMode
 {
@@ -107,10 +109,15 @@ public class ConceptVisionColorLocator extends LinearOpMode
          *                                    "pixels" in the range of 2-4 are suitable for low res images.
          */
         ColorBlobLocatorProcessor colorLocator = new ColorBlobLocatorProcessor.Builder()
-                .setTargetColorRange(ColorRange.BLUE)         // use a predefined color match
+                //.setTargetColorRange(ColorRange.YELLOW)         // use a predefined color match
+                .setTargetColorRange(new ColorRange(
+                        ColorSpace.YCrCb,   // Specify YCrCb instead of HSV
+                        new Scalar(0, 140, 80),       // Lower bound (Y, Cr, Cb)
+                        new Scalar(255, 170, 120)     // Upper bound (Y, Cr, Cb)
+                ))
                 .setContourMode(ColorBlobLocatorProcessor.ContourMode.EXTERNAL_ONLY)    // exclude blobs inside blobs
-            //    .setRoi(ImageRegion.asUnityCenterCoordinates(-0.5, 0.5, 0.5, -0.5))// search central 1/4 of camera view
-                .setRoi(ImageRegion.asImageCoordinates(30, 50,  70, 100))
+                .setRoi(ImageRegion.asUnityCenterCoordinates(-0.7, 0.7, 0.3, -0.3))// search central 1/4 of camera view
+                //.setRoi(ImageRegion.asImageCoordinates(30, 50,  70, 100))
                 .setDrawContours(true)                        // Show contours on the Stream Preview
                 .setBlurSize(5)                               // Smooth the transitions between different colors in image
                 .build();
@@ -164,7 +171,7 @@ public class ConceptVisionColorLocator extends LinearOpMode
              *   A blob's Aspect ratio is the ratio of boxFit long side to short side.
              *   A perfect Square has an aspect ratio of 1.  All others are > 1
              */
-            ColorBlobLocatorProcessor.Util.filterByArea(50, 20000, blobs);  // filter out very small blobs.
+            ColorBlobLocatorProcessor.Util.filterByArea(200, 20000, blobs);  // filter out very small blobs.
 
             /*
              * The list of Blobs can be sorted using the same Blob attributes as listed above.
@@ -174,14 +181,21 @@ public class ConceptVisionColorLocator extends LinearOpMode
              *     ColorBlobLocatorProcessor.Util.sortByAspectRatio(SortOrder.DESCENDING, blobs);
              */
 
-            telemetry.addLine(" Area Density Aspect  Center");
+//            telemetry.addLine(" Area Density Aspect  Center");
+//
+//            // Display the size (area) and center location for each Blob.
+//            for(ColorBlobLocatorProcessor.Blob b : blobs)
+//            {
+//                RotatedRect boxFit = b.getBoxFit();
+//                telemetry.addLine(String.format("%5d  %4.2f   %5.2f  (%3d,%3d)",
+//                          b.getContourArea(), b.getDensity(), b.getAspectRatio(), (int) boxFit.center.x, (int) boxFit.center.y));
+//            }
+            if (!blobs.isEmpty()) {
+                ColorBlobLocatorProcessor.Blob bestBlob = blobs.get(0); // Select the largest detected blob
+                RotatedRect boxFit = bestBlob.getBoxFit();
 
-            // Display the size (area) and center location for each Blob.
-            for(ColorBlobLocatorProcessor.Blob b : blobs)
-            {
-                RotatedRect boxFit = b.getBoxFit();
-                telemetry.addLine(String.format("%5d  %4.2f   %5.2f  (%3d,%3d)",
-                          b.getContourArea(), b.getDensity(), b.getAspectRatio(), (int) boxFit.center.x, (int) boxFit.center.y));
+                telemetry.addLine(String.format("Yellow Block at: (%d, %d)",
+                        (int) boxFit.center.x, (int) boxFit.center.y));
             }
 
             telemetry.update();
