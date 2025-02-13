@@ -127,7 +127,7 @@ public class dqp2425 extends LinearOpMode{
         claw2=hardwareMap.get(Servo.class, "claw2"); // EPS 4
         rotation2=hardwareMap.get(Servo.class, "rotation2"); // EPS 5
         hang=hardwareMap.get(DcMotor.class, "hang"); // EPM 2
-        winch=hardwareMap.get(DcMotor.class, "hang2");
+        winch=hardwareMap.get(DcMotor.class, "hang2"); // EPM 3
         swing = hardwareMap.get(Servo.class, "swing"); // control hub port 5
 /*
         Encoder par0 = new OverflowEncoder(new RawEncoder(hardwareMap.get(DcMotorEx.class, "FL")));// 0

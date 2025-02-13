@@ -1,3 +1,5 @@
+package org.firstinspires.ftc.teamcode.tuning;
+
 /*
  * Copyright (c) 2024 Phil Malone
  *
@@ -19,7 +21,6 @@
  * SOFTWARE.
  */
 
-package org.firstinspires.ftc.robotcontroller.external.samples;
 
 import android.util.Size;
 
@@ -35,9 +36,11 @@ import org.firstinspires.ftc.vision.opencv.ColorBlobLocatorProcessor;
 import org.firstinspires.ftc.vision.opencv.ColorRange;
 import org.firstinspires.ftc.vision.opencv.ColorSpace;
 import org.firstinspires.ftc.vision.opencv.ImageRegion;
+import org.opencv.core.Rect;
 import org.opencv.core.RotatedRect;
 import org.opencv.core.Scalar;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /*
@@ -61,9 +64,9 @@ import java.util.List;
  * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
-@Disabled
+
 @TeleOp(name = "Concept: Vision Color-Locator", group = "Concept")
-public class ConceptVisionColorLocator extends LinearOpMode
+public class DetectSample extends LinearOpMode
 {
     @Override
     public void runOpMode()
@@ -108,6 +111,7 @@ public class ConceptVisionColorLocator extends LinearOpMode
          *                                    object, such as when removing noise from an image.
          *                                    "pixels" in the range of 2-4 are suitable for low res images.
          */
+        ImageRegion roi = ImageRegion.asUnityCenterCoordinates(-0.7, 0.7, 0.3, -0.3);
         ColorBlobLocatorProcessor colorLocator = new ColorBlobLocatorProcessor.Builder()
                 //.setTargetColorRange(ColorRange.YELLOW)         // use a predefined color match
                 .setTargetColorRange(new ColorRange(
@@ -116,7 +120,7 @@ public class ConceptVisionColorLocator extends LinearOpMode
                         new Scalar(40, 255, 255)
                 ))
                 .setContourMode(ColorBlobLocatorProcessor.ContourMode.EXTERNAL_ONLY)    // exclude blobs inside blobs
-                .setRoi(ImageRegion.asUnityCenterCoordinates(-0.7, 0.7, 0.3, -0.3))// search central 1/4 of camera view
+                .setRoi(roi)// search central 1/4 of camera view
                 //.setRoi(ImageRegion.asImageCoordinates(30, 50,  70, 100))
                 .setDrawContours(true)                        // Show contours on the Stream Preview
                 .setBlurSize(5)                               // Smooth the transitions between different colors in image
@@ -181,20 +185,63 @@ public class ConceptVisionColorLocator extends LinearOpMode
              *     ColorBlobLocatorProcessor.Util.sortByAspectRatio(SortOrder.DESCENDING, blobs);
              */
 
-//            telemetry.addLine(" Area Density Aspect  Center");
-//
-//            // Display the size (area) and center location for each Blob.
-//            for(ColorBlobLocatorProcessor.Blob b : blobs)
-//            {
-//                RotatedRect boxFit = b.getBoxFit();
-//                telemetry.addLine(String.format("%5d  %4.2f   %5.2f  (%3d,%3d)",
-//                          b.getContourArea(), b.getDensity(), b.getAspectRatio(), (int) boxFit.center.x, (int) boxFit.center.y));
-//            }
-            if (!blobs.isEmpty()) {
-                ColorBlobLocatorProcessor.Blob bestBlob = blobs.get(0); // Select the largest detected blob
-                RotatedRect boxFit = bestBlob.getBoxFit();
+            int imageWidth = 320;
+            int imageHeight = 240;
 
-                telemetry.addLine(String.format("Yellow Block at: (%d, %d)",
+// Define ROI in Unity coordinates (-1 to 1 normalized)
+            double left = -0.7;
+            double top = 0.7;
+            double right = 0.3;
+            double bottom = -0.3;
+
+// Convert Unity coordinates to pixel values
+            int roiX = (int) ((left + 1) * 0.5 * imageWidth);
+            int roiY = (int) ((1 - top) * 0.5 * imageHeight);
+            int roiWidth = (int) ((right - left) * 0.5 * imageWidth);
+            int roiHeight = (int) ((top - bottom) * 0.5 * imageHeight);
+
+// Create an OpenCV Rect for ROI
+            Rect roiRect = new Rect(roiX, roiY, roiWidth, roiHeight);
+            // Remove blobs that intersect with the ROI
+            List<ColorBlobLocatorProcessor.Blob> filteredBlobs = new ArrayList<>();
+
+            for (ColorBlobLocatorProcessor.Blob blob : blobs) {
+                RotatedRect boxFit = blob.getBoxFit();
+                Rect boundingBox = boxFit.boundingRect();
+
+                // Check if boundingBox overlaps with roi manually
+                boolean isOverlapping = boundingBox.x < roiRect.x + roiRect.width &&
+                        boundingBox.x + boundingBox.width > roiRect.x &&
+                        boundingBox.y < roiRect.y + roiRect.height &&
+                        boundingBox.y + boundingBox.height > roiRect.y;
+
+                if (!isOverlapping) {
+                    filteredBlobs.add(blob);  // Keep only non-overlapping blobs
+                }
+            }
+
+            // Find the best non-overlapping yellow block
+            ColorBlobLocatorProcessor.Blob bestBlob = null;
+            double bestScore = Double.MAX_VALUE;
+            for (ColorBlobLocatorProcessor.Blob blob : filteredBlobs) {
+                RotatedRect boxFit = blob.getBoxFit();
+
+                // Calculate distance from the center
+                double distance = Math.sqrt(Math.pow(boxFit.center.x - 160, 2) + Math.pow(boxFit.center.y - 120, 2));
+
+                // Score = Distance + Small Weight for Area
+                double score = distance - (blob.getContourArea() * 0.01);
+
+                if (score < bestScore) {
+                    bestScore = score;
+                    bestBlob = blob;
+                }
+            }
+
+// Display the selected yellow block
+            if (bestBlob != null) {
+                RotatedRect boxFit = bestBlob.getBoxFit();
+                telemetry.addLine(String.format("Final Yellow Block at: (%d, %d)",
                         (int) boxFit.center.x, (int) boxFit.center.y));
             }
 
@@ -204,3 +251,4 @@ public class ConceptVisionColorLocator extends LinearOpMode
     }
 
 }
+
