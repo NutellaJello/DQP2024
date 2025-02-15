@@ -24,21 +24,16 @@ package org.firstinspires.ftc.teamcode.tuning;
 
 import android.util.Size;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.util.SortOrder;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.opencv.ColorBlobLocatorProcessor;
 import org.firstinspires.ftc.vision.opencv.ColorRange;
-import org.firstinspires.ftc.vision.opencv.ColorSpace;
 import org.firstinspires.ftc.vision.opencv.ImageRegion;
-import org.opencv.core.Rect;
 import org.opencv.core.RotatedRect;
-import org.opencv.core.Scalar;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -113,43 +108,43 @@ public class DetectSample extends LinearOpMode
          */
         ImageRegion roi = ImageRegion.asUnityCenterCoordinates(-0.7, 0.7, 0.3, -0.3);
         ColorBlobLocatorProcessor colorLocator = new ColorBlobLocatorProcessor.Builder()
-                //.setTargetColorRange(ColorRange.YELLOW)         // use a predefined color match
-                .setTargetColorRange(new ColorRange(
-                        ColorSpace.HSV,
-                        new Scalar(14, 50, 50),
-                        new Scalar(40, 255, 255)
-                ))
+                //.setTargetColorRange(ColorRange.BLUE)         // use a predefined color match
+                .setTargetColorRange(ColorRange.RED)
+//                .setTargetColorRange(new ColorRange(
+//                        ColorSpace.HSV,
+//                        new Scalar(14, 50, 50),
+//                        new Scalar(40, 255, 255)
+//                ))
                 .setContourMode(ColorBlobLocatorProcessor.ContourMode.EXTERNAL_ONLY)    // exclude blobs inside blobs
                 .setRoi(roi)// search central 1/4 of camera view
                 //.setRoi(ImageRegion.asImageCoordinates(30, 50,  70, 100))
                 .setDrawContours(true)                        // Show contours on the Stream Preview
                 .setBlurSize(5)                               // Smooth the transitions between different colors in image
+//                .setErodeSize(3)   // Helps remove small noise & separates touching blobs
+//                .setDilateSize(2)  // Fills in the individual yellow block to prevent gaps
                 .build();
 
-        /*
-         * Build a vision portal to run the Color Locator process.
-         *
-         *  - Add the colorLocator process created above.
-         *  - Set the desired video resolution.
-         *      Since a high resolution will not improve this process, choose a lower resolution that is
-         *      supported by your camera.  This will improve overall performance and reduce latency.
-         *  - Choose your video source.  This may be
-         *      .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))  .....   for a webcam
-         *  or
-         *      .setCamera(BuiltinCameraDirection.BACK)    ... for a Phone Camera
-         */
+
         VisionPortal portal = new VisionPortal.Builder()
                 .addProcessor(colorLocator)
                 .setCameraResolution(new Size(320, 240))
                 .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
                 .build();
 
+        if (!opModeInInit()) {
+            portal.close();  // Close previous instance
+            portal = new VisionPortal.Builder()
+                    .addProcessor(colorLocator)
+                    .setCameraResolution(new Size(320, 240))
+                    .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
+                    .build();
+        }
+
         telemetry.setMsTransmissionInterval(50);   // Speed up telemetry updates, Just use for debugging.
         telemetry.setDisplayFormat(Telemetry.DisplayFormat.MONOSPACE);
 
         // WARNING:  To be able to view the stream preview on the Driver Station, this code runs in INIT mode.
-        while (opModeIsActive() || opModeInInit())
-        {
+        while (opModeIsActive() || opModeInInit()) {
             telemetry.addData("preview on/off", "... Camera Stream\n");
 
             // Read the current list
@@ -175,78 +170,72 @@ public class DetectSample extends LinearOpMode
              *   A blob's Aspect ratio is the ratio of boxFit long side to short side.
              *   A perfect Square has an aspect ratio of 1.  All others are > 1
              */
-            ColorBlobLocatorProcessor.Util.filterByArea(200, 20000, blobs);  // filter out very small blobs.
+            //ColorBlobLocatorProcessor.Util.filterByArea(1200, 5000, blobs);  // filter out very small blobs.
+            ColorBlobLocatorProcessor.Util.filterByArea(600, 1000, blobs);
+            ColorBlobLocatorProcessor.Util.filterByAspectRatio(1.5, 3.0, blobs);
 
-            /*
-             * The list of Blobs can be sorted using the same Blob attributes as listed above.
-             * No more than one sort call should be made.  Sorting can use ascending or descending order.
-             *     ColorBlobLocatorProcessor.Util.sortByArea(SortOrder.DESCENDING, blobs);      // Default
-             *     ColorBlobLocatorProcessor.Util.sortByDensity(SortOrder.DESCENDING, blobs);
-             *     ColorBlobLocatorProcessor.Util.sortByAspectRatio(SortOrder.DESCENDING, blobs);
-             */
-
-            int imageWidth = 320;
-            int imageHeight = 240;
-
-// Define ROI in Unity coordinates (-1 to 1 normalized)
-            double left = -0.7;
-            double top = 0.7;
-            double right = 0.3;
-            double bottom = -0.3;
-
-// Convert Unity coordinates to pixel values
-            int roiX = (int) ((left + 1) * 0.5 * imageWidth);
-            int roiY = (int) ((1 - top) * 0.5 * imageHeight);
-            int roiWidth = (int) ((right - left) * 0.5 * imageWidth);
-            int roiHeight = (int) ((top - bottom) * 0.5 * imageHeight);
-
-// Create an OpenCV Rect for ROI
-            Rect roiRect = new Rect(roiX, roiY, roiWidth, roiHeight);
-            // Remove blobs that intersect with the ROI
-            List<ColorBlobLocatorProcessor.Blob> filteredBlobs = new ArrayList<>();
+            // Remove blobs that are too close together
+            List<ColorBlobLocatorProcessor.Blob> finalBlobs = new ArrayList<>();
 
             for (ColorBlobLocatorProcessor.Blob blob : blobs) {
+                boolean tooClose = false;
                 RotatedRect boxFit = blob.getBoxFit();
-                Rect boundingBox = boxFit.boundingRect();
 
-                // Check if boundingBox overlaps with roi manually
-                boolean isOverlapping = boundingBox.x < roiRect.x + roiRect.width &&
-                        boundingBox.x + boundingBox.width > roiRect.x &&
-                        boundingBox.y < roiRect.y + roiRect.height &&
-                        boundingBox.y + boundingBox.height > roiRect.y;
+                for (ColorBlobLocatorProcessor.Blob otherBlob : blobs) {
+                    if (blob == otherBlob) continue; // Skip self-comparison
 
-                if (!isOverlapping) {
-                    filteredBlobs.add(blob);  // Keep only non-overlapping blobs
+                    RotatedRect otherBox = otherBlob.getBoxFit();
+                    double distance = Math.sqrt(Math.pow(boxFit.center.x - otherBox.center.x, 2) +
+                            Math.pow(boxFit.center.y - otherBox.center.y, 2));
+
+                    if (distance < 20) { // If two blobs are too close, mark as merged
+                        tooClose = true;
+                        break;
+                    }
+                }
+
+                if (!tooClose) {
+                    finalBlobs.add(blob);
                 }
             }
 
-            // Find the best non-overlapping yellow block
-            ColorBlobLocatorProcessor.Blob bestBlob = null;
-            double bestScore = Double.MAX_VALUE;
-            for (ColorBlobLocatorProcessor.Blob blob : filteredBlobs) {
+            // Telemetry for all candidate blobs
+            telemetry.addLine("Potential Candidates:");
+            for (ColorBlobLocatorProcessor.Blob blob : finalBlobs) {
                 RotatedRect boxFit = blob.getBoxFit();
-
-                // Calculate distance from the center
-                double distance = Math.sqrt(Math.pow(boxFit.center.x - 160, 2) + Math.pow(boxFit.center.y - 120, 2));
-
-                // Score = Distance + Small Weight for Area
-                double score = distance - (blob.getContourArea() * 0.01);
-
-                if (score < bestScore) {
-                    bestScore = score;
-                    bestBlob = blob;
-                }
+                double boxFitSize = boxFit.size.width * boxFit.size.height; // Calculate box area
+                telemetry.addLine(String.format("Blob at (%d, %d), BoxFit Size: %.2f, Aspect Ratio: %.2f",
+                        (int) boxFit.center.x, (int) boxFit.center.y, boxFitSize, blob.getAspectRatio()));
             }
 
-// Display the selected yellow block
-            if (bestBlob != null) {
-                RotatedRect boxFit = bestBlob.getBoxFit();
-                telemetry.addLine(String.format("Final Yellow Block at: (%d, %d)",
-                        (int) boxFit.center.x, (int) boxFit.center.y));
+// Sort blobs by contour area (largest first)
+            //if (finalBlobs != null && finalBlobs.size() > 1) {
+                finalBlobs.sort((b1, b2) -> Double.compare(b2.getContourArea(), b1.getContourArea()));
+            //}
+
+// Defensive check: Ensure at least one valid detection
+            ColorBlobLocatorProcessor.Blob selectedBlob = null;
+            if (!finalBlobs.isEmpty()) {
+                if (finalBlobs.size() >= 2) {
+                    selectedBlob = finalBlobs.get(1); // Use second largest if available
+                } else {
+                    selectedBlob = finalBlobs.get(0); // Use the only detected block
+                }
+
+                RotatedRect boxFit = selectedBlob.getBoxFit();
+
+                // Display blob details on telemetry
+                telemetry.addLine(String.format("Selected Block at: (%d, %d), Area: %.2f",
+                        (int) boxFit.center.x, (int) boxFit.center.y, (double) selectedBlob.getContourArea()));
+
+
+            } else {
+                telemetry.addLine("No valid block detected.");
             }
 
             telemetry.update();
             sleep(50);
+
         }
     }
 
