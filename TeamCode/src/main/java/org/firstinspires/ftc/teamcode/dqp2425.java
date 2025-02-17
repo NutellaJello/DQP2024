@@ -63,7 +63,7 @@ public class dqp2425 extends LinearOpMode{
 
     //outtake arm rotation
     double rot2pos=0.7;
-    double rot2down = 0.784;
+    double rot2down = 0.778;
     double rot2out = 0.06;
     double rot2wall = 0.98;
     double rot2speci = 0.367;//0.371
