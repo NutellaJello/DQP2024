@@ -1,494 +1,673 @@
-package org.firstinspires.ftc.teamcode;
-
+package org.firstinspires.ftc.teamcode.auto;
 import androidx.annotation.NonNull;
-
-import com.acmerobotics.dashboard.canvas.Canvas;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
-import com.acmerobotics.roadrunner.*;
+import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.AngularVelConstraint;
-import com.acmerobotics.roadrunner.DualNum;
-import com.acmerobotics.roadrunner.HolonomicController;
-import com.acmerobotics.roadrunner.MecanumKinematics;
 import com.acmerobotics.roadrunner.MinVelConstraint;
-import com.acmerobotics.roadrunner.MotorFeedforward;
+import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
-import com.acmerobotics.roadrunner.Pose2dDual;
 import com.acmerobotics.roadrunner.ProfileAccelConstraint;
-import com.acmerobotics.roadrunner.Time;
-import com.acmerobotics.roadrunner.TimeTrajectory;
-import com.acmerobotics.roadrunner.TimeTurn;
+import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
-import com.acmerobotics.roadrunner.TurnConstraints;
-import com.acmerobotics.roadrunner.Twist2dDual;
-import com.acmerobotics.roadrunner.VelConstraint;
-import com.acmerobotics.roadrunner.ftc.DownsampledWriter;
-import com.acmerobotics.roadrunner.ftc.Encoder;
-import com.acmerobotics.roadrunner.ftc.FlightRecorder;
-import com.acmerobotics.roadrunner.ftc.LazyImu;
-import com.acmerobotics.roadrunner.ftc.LynxFirmware;
-import com.acmerobotics.roadrunner.ftc.OverflowEncoder;
-import com.acmerobotics.roadrunner.ftc.PositionVelocityPair;
-import com.acmerobotics.roadrunner.ftc.RawEncoder;
-import com.qualcomm.hardware.lynx.LynxModule;
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.acmerobotics.roadrunner.TranslationalVelConstraint;
+import com.acmerobotics.roadrunner.Vector2d;
+import com.acmerobotics.roadrunner.ftc.Actions;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
+
+
+import org.firstinspires.ftc.teamcode.MecanumDrive;
+
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.IMU;
-import com.qualcomm.robotcore.hardware.VoltageSensor;
+import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
-import org.firstinspires.ftc.teamcode.messages.DriveCommandMessage;
-import org.firstinspires.ftc.teamcode.messages.MecanumCommandMessage;
-import org.firstinspires.ftc.teamcode.messages.MecanumLocalizerInputsMessage;
-import org.firstinspires.ftc.teamcode.messages.PoseMessage;
-
-import java.lang.Math;
 import java.util.Arrays;
-import java.util.LinkedList;
+import java.util.Collections;
 import java.util.List;
 
 @Config
-public final class MecanumDrive {
-    public static class Params {
-        // IMU orientation
-        // TODO: fill in these values based on
-        //   see https://ftc-docs.firstinspires.org/en/latest/programming_resources/imu/imu.html?highlight=imu#physical-hub-mounting
-        public RevHubOrientationOnRobot.LogoFacingDirection logoFacingDirection =
-                RevHubOrientationOnRobot.LogoFacingDirection.LEFT;
-        public RevHubOrientationOnRobot.UsbFacingDirection usbFacingDirection =
-                RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
+@Autonomous(name = "5 spec")
+public class BlueSide5Spec extends LinearOpMode {
+    // Declare motors and servos
+    private DcMotor slides;
+    private Servo slides2, rotation,claw, claw2, rotation2, swing;
 
-        // drive model parameters
-        public double inPerTick = 0.00294;
-        public double lateralInPerTick = 0.0022586568188953985;
-        public double trackWidthTicks = 4623.400725311116;
+    public class intakeClaw {
+        private Servo intakeClaw;
 
-        // feedforward parameters (in tick units)
-        public double kS = 1.2349567534050885;
-        public double kV = 0.0005179124479241964;
-        public double kA = 0.0001;
-
-        // path profile parameters (in inches)
-        public double maxWheelVel = 300;
-        public double minProfileAccel = -30;
-        public double maxProfileAccel = 300;
-
-        // turn profile parameters (in radians)
-        public double maxAngVel = 3*Math.PI; // shared with path
-        public double maxAngAccel = 3*Math.PI;
-
-        // path controller gains
-        public double axialGain = 5;
-        public double lateralGain = 2;
-        public double headingGain = 10; // shared with turn
-
-//
-        public double axialVelGain = 0;
-        public double lateralVelGain = 0;
-        public double headingVelGain = 0; // shared with turn
-    }
-
-    public static Params PARAMS = new Params();
-
-    public final MecanumKinematics kinematics = new MecanumKinematics(
-            PARAMS.inPerTick * PARAMS.trackWidthTicks, PARAMS.inPerTick / PARAMS.lateralInPerTick);
-
-    public final TurnConstraints defaultTurnConstraints = new TurnConstraints(
-            PARAMS.maxAngVel, -PARAMS.maxAngAccel, PARAMS.maxAngAccel);
-    public final VelConstraint defaultVelConstraint =
-            new MinVelConstraint(Arrays.asList(
-                    kinematics.new WheelVelConstraint(PARAMS.maxWheelVel),
-                    new AngularVelConstraint(PARAMS.maxAngVel)
-            ));
-    public final AccelConstraint defaultAccelConstraint =
-            new ProfileAccelConstraint(PARAMS.minProfileAccel, PARAMS.maxProfileAccel);
-
-    public final DcMotorEx leftFront, leftBack, rightBack, rightFront;
-
-    public final VoltageSensor voltageSensor;
-
-    public final LazyImu lazyImu;
-
-    public final Localizer localizer;
-    public Pose2d pose;
-
-    private final LinkedList<Pose2d> poseHistory = new LinkedList<>();
-
-    private final DownsampledWriter estimatedPoseWriter = new DownsampledWriter("ESTIMATED_POSE", 50_000_000);
-    private final DownsampledWriter targetPoseWriter = new DownsampledWriter("TARGET_POSE", 50_000_000);
-    private final DownsampledWriter driveCommandWriter = new DownsampledWriter("DRIVE_COMMAND", 50_000_000);
-    private final DownsampledWriter mecanumCommandWriter = new DownsampledWriter("MECANUM_COMMAND", 50_000_000);
-
-    public class DriveLocalizer implements Localizer {
-        public final Encoder leftFront, leftBack, rightBack, rightFront;
-        public final IMU imu;
-
-        private int lastLeftFrontPos, lastLeftBackPos, lastRightBackPos, lastRightFrontPos;
-        private Rotation2d lastHeading;
-        private boolean initialized;
-
-        public DriveLocalizer() {
-            leftFront = new OverflowEncoder(new RawEncoder(MecanumDrive.this.leftFront));
-            leftBack = new OverflowEncoder(new RawEncoder(MecanumDrive.this.leftBack));
-            rightBack = new OverflowEncoder(new RawEncoder(MecanumDrive.this.rightBack));
-            rightFront = new OverflowEncoder(new RawEncoder(MecanumDrive.this.rightFront));
-
-            imu = lazyImu.get();
-
-            // TODO: reverse encoders if needed
-            //leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
-
-
+        public intakeClaw(HardwareMap hardwareMap) {
+            intakeClaw = hardwareMap.get(Servo.class, "claw");
         }
-
-        @Override
-        public Twist2dDual<Time> update() {
-            PositionVelocityPair leftFrontPosVel = leftFront.getPositionAndVelocity();
-            PositionVelocityPair leftBackPosVel = leftBack.getPositionAndVelocity();
-            PositionVelocityPair rightBackPosVel = rightBack.getPositionAndVelocity();
-            PositionVelocityPair rightFrontPosVel = rightFront.getPositionAndVelocity();
-
-            YawPitchRollAngles angles = imu.getRobotYawPitchRollAngles();
-
-            FlightRecorder.write("MECANUM_LOCALIZER_INPUTS", new MecanumLocalizerInputsMessage(
-                    leftFrontPosVel, leftBackPosVel, rightBackPosVel, rightFrontPosVel, angles));
-
-            Rotation2d heading = Rotation2d.exp(angles.getYaw(AngleUnit.RADIANS));
-
-            if (!initialized) {
-                initialized = true;
-
-                lastLeftFrontPos = leftFrontPosVel.position;
-                lastLeftBackPos = leftBackPosVel.position;
-                lastRightBackPos = rightBackPosVel.position;
-                lastRightFrontPos = rightFrontPosVel.position;
-
-                lastHeading = heading;
-
-                return new Twist2dDual<>(
-                        Vector2dDual.constant(new Vector2d(0.0, 0.0), 2),
-                        DualNum.constant(0.0, 2)
-                );
-            }
-
-            double headingDelta = heading.minus(lastHeading);
-            Twist2dDual<Time> twist = kinematics.forward(new MecanumKinematics.WheelIncrements<>(
-                    new DualNum<Time>(new double[]{
-                            (leftFrontPosVel.position - lastLeftFrontPos),
-                            leftFrontPosVel.velocity,
-                    }).times(PARAMS.inPerTick),
-                    new DualNum<Time>(new double[]{
-                            (leftBackPosVel.position - lastLeftBackPos),
-                            leftBackPosVel.velocity,
-                    }).times(PARAMS.inPerTick),
-                    new DualNum<Time>(new double[]{
-                            (rightBackPosVel.position - lastRightBackPos),
-                            rightBackPosVel.velocity,
-                    }).times(PARAMS.inPerTick),
-                    new DualNum<Time>(new double[]{
-                            (rightFrontPosVel.position - lastRightFrontPos),
-                            rightFrontPosVel.velocity,
-                    }).times(PARAMS.inPerTick)
-            ));
-
-            lastLeftFrontPos = leftFrontPosVel.position;
-            lastLeftBackPos = leftBackPosVel.position;
-            lastRightBackPos = rightBackPosVel.position;
-            lastRightFrontPos = rightFrontPosVel.position;
-
-            lastHeading = heading;
-
-            return new Twist2dDual<>(
-                    twist.line,
-                    DualNum.cons(headingDelta, twist.angle.drop(1))
+        public Action closeClaw() {
+            return new SequentialAction(
+                    new Action(){
+                        @Override
+                        public boolean run(@NonNull TelemetryPacket packet) {
+                            intakeClaw.setPosition(0.05);
+                            return false;
+                        }}, new SleepAction(0.1)
             );
         }
+        public Action openClaw() {
+            return new SequentialAction(
+                    new Action(){
+                        @Override
+                        public boolean run(@NonNull TelemetryPacket packet) {
+                            intakeClaw.setPosition(0.45);
+                            return false;
+                        }}, new SleepAction(0.1)
+            );
+        }
+
     }
 
-    public MecanumDrive(HardwareMap hardwareMap, Pose2d pose) {
-        this.pose = pose;
+    public class intakeRotation {
+        private Servo intakeRotation;
 
-        LynxFirmware.throwIfModulesAreOutdated(hardwareMap);
-
-        for (LynxModule module : hardwareMap.getAll(LynxModule.class)) {
-            module.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
+        public intakeRotation(HardwareMap hardwareMap) {
+            intakeRotation = hardwareMap.get(Servo.class, "rotation");
+        }
+        public Action intakeRotDown() {
+            return new SequentialAction(
+                    new Action(){
+                        @Override
+                        public boolean run(@NonNull TelemetryPacket packet) {
+                            intakeRotation.setPosition(0.96);
+                            return false;
+                        }}, new SleepAction(0.1)
+            );
         }
 
-        // TODO: make sure your config has motors with these names (or change them)
-        //   see https://ftc-docs.firstinspires.org/en/latest/hardware_and_software_configuration/configuring/index.html
-        leftFront = hardwareMap.get(DcMotorEx.class, "FL");
-        leftBack = hardwareMap.get(DcMotorEx.class, "BL");
-        rightBack = hardwareMap.get(DcMotorEx.class, "BR");
-        rightFront = hardwareMap.get(DcMotorEx.class, "FR");
+        public Action intakeRotPartialUp() {
+            return new SequentialAction(
+                    new Action(){
+                        @Override
+                        public boolean run(@NonNull TelemetryPacket packet) {
+                            intakeRotation.setPosition(0.75);
+                            return false;
+                        }}, new SleepAction(0.1)
+            );
+        }
 
-        leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        // TODO: reverse motor directions if needed
-        leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
-        leftBack.setDirection(DcMotorSimple.Direction.REVERSE);
-
-        // TODO: make sure your config has an IMU with this name (can be BNO or BHI)
-        //   see https://ftc-docs.firstinspires.org/en/latest/hardware_and_software_configuration/configuring/index.html
-        lazyImu = new LazyImu(hardwareMap, "imu", new RevHubOrientationOnRobot(
-                PARAMS.logoFacingDirection, PARAMS.usbFacingDirection));
-
-        voltageSensor = hardwareMap.voltageSensor.iterator().next();
-
-        //localizer = new DriveLocalizer();
-        localizer = new ThreeDeadWheelLocalizer(hardwareMap, PARAMS.inPerTick);
-
-        FlightRecorder.write("MECANUM_PARAMS", PARAMS);
+        public Action intakeRotUp() {
+            return new SequentialAction(
+                    new Action(){
+                        @Override
+                        public boolean run(@NonNull TelemetryPacket packet) {
+                            intakeRotation.setPosition(0.28);
+                            return false;
+                        }}, new SleepAction(0.1)
+            );
+        }
+        public void setPosition(double value){
+            intakeRotation.setPosition(value);
+        }
     }
+    public class intakeSlides {
+        private Servo intakeSlides;
 
-    public void setDrivePowers(PoseVelocity2d powers) {
-        MecanumKinematics.WheelVelocities<Time> wheelVels = new MecanumKinematics(1).inverse(
-                PoseVelocity2dDual.constant(powers, 1));
-
-        double maxPowerMag = 1;
-        for (DualNum<Time> power : wheelVels.all()) {
-            maxPowerMag = Math.max(maxPowerMag, power.value());
+        public intakeSlides(HardwareMap hardwareMap) {
+            intakeSlides = hardwareMap.get(Servo.class, "slides2");
         }
 
-        leftFront.setPower(wheelVels.leftFront.get(0) / maxPowerMag);
-        leftBack.setPower(wheelVels.leftBack.get(0) / maxPowerMag);
-        rightBack.setPower(wheelVels.rightBack.get(0) / maxPowerMag);
-        rightFront.setPower(wheelVels.rightFront.get(0) / maxPowerMag);
-    }
-
-    public final class FollowTrajectoryAction implements Action {
-        public final TimeTrajectory timeTrajectory;
-        private double beginTs = -1;
-
-        private final double[] xPoints, yPoints;
-
-        public FollowTrajectoryAction(TimeTrajectory t) {
-            timeTrajectory = t;
-
-            List<Double> disps = com.acmerobotics.roadrunner.Math.range(
-                    0, t.path.length(),
-                    Math.max(2, (int) Math.ceil(t.path.length() / 2)));
-            xPoints = new double[disps.size()];
-            yPoints = new double[disps.size()];
-            for (int i = 0; i < disps.size(); i++) {
-                Pose2d p = t.path.get(disps.get(i), 1).value();
-                xPoints[i] = p.position.x;
-                yPoints[i] = p.position.y;
-            }
+        public Action moveToPosition() {
+            return new SequentialAction(
+                    new Action(){
+                        @Override
+                        public boolean run(@NonNull TelemetryPacket packet) {
+                            intakeSlides.setPosition(0.66);
+                            return false;
+                        }}, new SleepAction(0.5)
+            );
         }
 
-        @Override
-        public boolean run(@NonNull TelemetryPacket p) {
-            double t;
-            if (beginTs < 0) {
-                beginTs = Actions.now();
-                t = 0;
-            } else {
-                t = Actions.now() - beginTs;
-            }
-
-            if (t >= timeTrajectory.duration) {
-                leftFront.setPower(0);
-                leftBack.setPower(0);
-                rightBack.setPower(0);
-                rightFront.setPower(0);
-
-                return false;
-            }
-
-            Pose2dDual<Time> txWorldTarget = timeTrajectory.get(t);
-            targetPoseWriter.write(new PoseMessage(txWorldTarget.value()));
-
-            PoseVelocity2d robotVelRobot = updatePoseEstimate();
-
-            PoseVelocity2dDual<Time> command = new HolonomicController(
-                    PARAMS.axialGain, PARAMS.lateralGain, PARAMS.headingGain,
-                    PARAMS.axialVelGain, PARAMS.lateralVelGain, PARAMS.headingVelGain
-            )
-                    .compute(txWorldTarget, pose, robotVelRobot);
-            driveCommandWriter.write(new DriveCommandMessage(command));
-
-            MecanumKinematics.WheelVelocities<Time> wheelVels = kinematics.inverse(command);
-            double voltage = voltageSensor.getVoltage();
-
-            final MotorFeedforward feedforward = new MotorFeedforward(PARAMS.kS,
-                    PARAMS.kV / PARAMS.inPerTick, PARAMS.kA / PARAMS.inPerTick);
-            double leftFrontPower = feedforward.compute(wheelVels.leftFront) / voltage;
-            double leftBackPower = feedforward.compute(wheelVels.leftBack) / voltage;
-            double rightBackPower = feedforward.compute(wheelVels.rightBack) / voltage;
-            double rightFrontPower = feedforward.compute(wheelVels.rightFront) / voltage;
-            mecanumCommandWriter.write(new MecanumCommandMessage(
-                    voltage, leftFrontPower, leftBackPower, rightBackPower, rightFrontPower
-            ));
-
-            leftFront.setPower(leftFrontPower);
-            leftBack.setPower(leftBackPower);
-            rightBack.setPower(rightBackPower);
-            rightFront.setPower(rightFrontPower);
-
-            p.put("x", pose.position.x);
-            p.put("y", pose.position.y);
-            p.put("heading (deg)", Math.toDegrees(pose.heading.toDouble()));
-
-            Pose2d error = txWorldTarget.value().minusExp(pose);
-            p.put("xError", error.position.x);
-            p.put("yError", error.position.y);
-            p.put("headingError (deg)", Math.toDegrees(error.heading.toDouble()));
-
-            // only draw when active; only one drive action should be active at a time
-            Canvas c = p.fieldOverlay();
-            drawPoseHistory(c);
-
-            c.setStroke("#4CAF50");
-            Drawing.drawRobot(c, txWorldTarget.value());
-
-            c.setStroke("#3F51B5");
-            Drawing.drawRobot(c, pose);
-
-            c.setStroke("#4CAF50FF");
-            c.setStrokeWidth(1);
-            c.strokePolyline(xPoints, yPoints);
-
-            return true;
+        public Action moveToPosition2(double value) {
+            return new SequentialAction(
+                    new Action(){
+                        @Override
+                        public boolean run(@NonNull TelemetryPacket packet) {
+                            intakeSlides.setPosition(value);
+                            return false;
+                        }}, new SleepAction(0.5)
+            );
         }
 
-        @Override
-        public void preview(Canvas c) {
-            c.setStroke("#4CAF507A");
-            c.setStrokeWidth(1);
-            c.strokePolyline(xPoints, yPoints);
+        public Action moveToThirdSample() {
+            return new SequentialAction(
+                    new Action(){
+                        @Override
+                        public boolean run(@NonNull TelemetryPacket packet) {
+                            intakeSlides.setPosition(0.69);
+                            return false;
+                        }}, new SleepAction(0.2)
+            );
+        }
+
+        public Action retractPosition() {
+            return new SequentialAction(
+                    new Action(){
+                        @Override
+                        public boolean run(@NonNull TelemetryPacket packet) {
+                            intakeSlides.setPosition(0.5);
+                            return false;
+                        }}, new SleepAction(0.2)
+            );
+        }
+
+        public void setPosition(double value){
+            intakeSlides.setPosition(value);
         }
     }
 
-    public final class TurnAction implements Action {
-        private final TimeTurn turn;
+    public class outtakeClaw {
+        private Servo outtakeClaw;
 
-        private double beginTs = -1;
-
-        public TurnAction(TimeTurn turn) {
-            this.turn = turn;
+        public outtakeClaw(HardwareMap hardwareMap) {
+            outtakeClaw = hardwareMap.get(Servo.class, "claw2");
+        }
+        public Action closeClaw() {
+            return new SequentialAction(
+                    new Action(){
+                        @Override
+                        public boolean run(@NonNull TelemetryPacket packet) {
+                            outtakeClaw.setPosition(0.505);
+                            return false;
+                        }
+                    }, new SleepAction(0.1)
+            );
         }
 
-        @Override
-        public boolean run(@NonNull TelemetryPacket p) {
-            double t;
-            if (beginTs < 0) {
-                beginTs = Actions.now();
-                t = 0;
-            } else {
-                t = Actions.now() - beginTs;
-            }
-
-            if (t >= turn.duration) {
-                leftFront.setPower(0);
-                leftBack.setPower(0);
-                rightBack.setPower(0);
-                rightFront.setPower(0);
-
-                return false;
-            }
-
-            Pose2dDual<Time> txWorldTarget = turn.get(t);
-            targetPoseWriter.write(new PoseMessage(txWorldTarget.value()));
-
-            PoseVelocity2d robotVelRobot = updatePoseEstimate();
-
-            PoseVelocity2dDual<Time> command = new HolonomicController(
-                    PARAMS.axialGain, PARAMS.lateralGain, PARAMS.headingGain,
-                    PARAMS.axialVelGain, PARAMS.lateralVelGain, PARAMS.headingVelGain
-            )
-                    .compute(txWorldTarget, pose, robotVelRobot);
-            driveCommandWriter.write(new DriveCommandMessage(command));
-
-            MecanumKinematics.WheelVelocities<Time> wheelVels = kinematics.inverse(command);
-            double voltage = voltageSensor.getVoltage();
-            final MotorFeedforward feedforward = new MotorFeedforward(PARAMS.kS,
-                    PARAMS.kV / PARAMS.inPerTick, PARAMS.kA / PARAMS.inPerTick);
-            double leftFrontPower = feedforward.compute(wheelVels.leftFront) / voltage;
-            double leftBackPower = feedforward.compute(wheelVels.leftBack) / voltage;
-            double rightBackPower = feedforward.compute(wheelVels.rightBack) / voltage;
-            double rightFrontPower = feedforward.compute(wheelVels.rightFront) / voltage;
-            mecanumCommandWriter.write(new MecanumCommandMessage(
-                    voltage, leftFrontPower, leftBackPower, rightBackPower, rightFrontPower
-            ));
-
-            leftFront.setPower(feedforward.compute(wheelVels.leftFront) / voltage);
-            leftBack.setPower(feedforward.compute(wheelVels.leftBack) / voltage);
-            rightBack.setPower(feedforward.compute(wheelVels.rightBack) / voltage);
-            rightFront.setPower(feedforward.compute(wheelVels.rightFront) / voltage);
-
-            Canvas c = p.fieldOverlay();
-            drawPoseHistory(c);
-
-            c.setStroke("#4CAF50");
-            Drawing.drawRobot(c, txWorldTarget.value());
-
-            c.setStroke("#3F51B5");
-            Drawing.drawRobot(c, pose);
-
-            c.setStroke("#7C4DFFFF");
-            c.fillCircle(turn.beginPose.position.x, turn.beginPose.position.y, 2);
-
-            return true;
+        public Action openClaw() {
+            return new SequentialAction(
+                    new Action(){
+                        @Override
+                        public boolean run(@NonNull TelemetryPacket packet) {
+                            outtakeClaw.setPosition(0.256);
+                            return false;
+                        }}, new SleepAction(0.1)
+            );
         }
-
-        @Override
-        public void preview(Canvas c) {
-            c.setStroke("#7C4DFF7A");
-            c.fillCircle(turn.beginPose.position.x, turn.beginPose.position.y, 2);
+        public void setPosition(double value){
+            outtakeClaw.setPosition(value);
         }
     }
 
-    public PoseVelocity2d updatePoseEstimate() {
-        Twist2dDual<Time> twist = localizer.update();
-        pose = pose.plus(twist.value());
+    public class outtakeRotation {
+        private Servo outtakeRotation;
 
-        poseHistory.add(pose);
-        while (poseHistory.size() > 100) {
-            poseHistory.removeFirst();
+        public outtakeRotation(HardwareMap hardwareMap) {
+            outtakeRotation = hardwareMap.get(Servo.class, "rotation2");
+        }
+        public Action outtakeRotSpec() {
+            return new SequentialAction(
+                    new Action(){
+                        @Override
+                        public boolean run(@NonNull TelemetryPacket packet) {
+                            outtakeRotation.setPosition(0.54); //0.383
+                            return false;
+                        }}, new SleepAction(0.1)
+            );
+        }
+        public Action outtakeRotTransfer() {
+            return new SequentialAction(
+                    new Action(){
+                        @Override
+                        public boolean run(@NonNull TelemetryPacket packet) {
+                            outtakeRotation.setPosition(0.7821);
+                            return false;
+                        }}, new SleepAction(0.3)
+            );
+        }
+        public Action outtakeRotWall() {
+            return new SequentialAction(
+                    new Action(){
+                        @Override
+                        public boolean run(@NonNull TelemetryPacket packet) {
+                            outtakeRotation.setPosition(0.91);
+                            return false;
+                        }}, new SleepAction(0.1)
+            );
         }
 
-        estimatedPoseWriter.write(new PoseMessage(pose));
-
-        return twist.velocity().value();
-    }
-
-    private void drawPoseHistory(Canvas c) {
-        double[] xPoints = new double[poseHistory.size()];
-        double[] yPoints = new double[poseHistory.size()];
-
-        int i = 0;
-        for (Pose2d t : poseHistory) {
-            xPoints[i] = t.position.x;
-            yPoints[i] = t.position.y;
-
-            i++;
+        public void setPosition(double value){
+            outtakeRotation.setPosition(value);
         }
-
-        c.setStrokeWidth(1);
-        c.setStroke("#3F51B5");
-        c.strokePolyline(xPoints, yPoints);
+    }
+    public class intakePivot{
+        private Servo pivot;
+        public intakePivot(HardwareMap hardwareMap) {
+            pivot = hardwareMap.get(Servo.class, "pivot");
+        }
+        public Action resetPivot(){
+            return new SequentialAction(
+                    new Action(){
+                        @Override
+                        public boolean run(@NonNull TelemetryPacket packet) {
+                            pivot.setPosition(0.53);
+                            return false;
+                        }}, new SleepAction(0.1)
+            );
+        }public Action setPosition2(double value){
+            return new SequentialAction(
+                    new Action(){
+                        @Override
+                        public boolean run(@NonNull TelemetryPacket packet) {
+                            pivot.setPosition(value);
+                            return false;
+                        }}
+            );
+        }
+        public void setPosition(double value){pivot.setPosition(value);
+        }
     }
 
-    public TrajectoryActionBuilder actionBuilder(Pose2d beginPose) {
-        return new TrajectoryActionBuilder(
-                TurnAction::new,
-                FollowTrajectoryAction::new,
-                new TrajectoryBuilderParams(
-                        1e-6,
-                        new ProfileParams(
-                                0.25, 0.1, 1e-2
-                        )
-                ),
-                beginPose, 0.0,
-                defaultTurnConstraints,
-                defaultVelConstraint, defaultAccelConstraint
+
+
+
+    @Override
+    public void runOpMode() {
+        // Initialize drivetrain and mechanisms
+        MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(6, -60, Math.toRadians(90)));
+
+        intakeClaw intakeClaw = new intakeClaw(hardwareMap);
+        intakeRotation intakeRotation = new intakeRotation(hardwareMap);
+        intakeSlides intakeSlides = new intakeSlides(hardwareMap);
+
+        outtakeClaw outtakeClaw = new outtakeClaw(hardwareMap);
+        outtakeRotation outtakeRotation = new outtakeRotation(hardwareMap);
+        intakePivot pivot = new intakePivot(hardwareMap);
+
+        slides = hardwareMap.get(DcMotor.class, "slides");
+        slides2 = hardwareMap.get(Servo.class, "slides2");
+        rotation = hardwareMap.get(Servo.class, "rotation");
+        claw = hardwareMap.get(Servo.class, "claw");
+        claw2 = hardwareMap.get(Servo.class, "claw2");
+        rotation2 = hardwareMap.get(Servo.class, "rotation2");
+        swing = hardwareMap.get(Servo.class, "swing"); // control hub port 5
+
+
+        // Configure motor and servo settings
+        slides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        slides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+
+        swing.setPosition(0.9);
+        pivot.setPosition(0.53);
+        //Ensure intake does not move around
+        intakeSlides.setPosition(0.51);
+        claw.setPosition(0.45);
+        //Hold Spece
+        rotation2.setPosition(0.6);
+        outtakeClaw.setPosition(0.5);
+        // Define custom velocity and acceleration constraints
+
+
+        int slowVelocity = 60;
+        // preload
+        TrajectoryActionBuilder tab1 = drive.actionBuilder(new Pose2d(6,-60,Math.toRadians(90)))
+                .strafeTo(new Vector2d(-11,-27.5));
+        Action preload=tab1.build();
+
+        // 1st sample
+        TrajectoryActionBuilder spec1 = drive.actionBuilder(new Pose2d(-11, -27.5, Math.toRadians(90)))
+                .lineToY(-30)
+                .splineToLinearHeading(new Pose2d(28, -44, Math.toRadians(55)), Math.toRadians(90));
+        Action intake1 = spec1.build();
+
+        TrajectoryActionBuilder spec1d = drive.actionBuilder(new Pose2d(28, -44, Math.toRadians(55)))
+                .turnTo(Math.toRadians(-40));
+        Action drop1 = spec1d.build();
+
+        // 2nd sample
+        TrajectoryActionBuilder spec2 = drive.actionBuilder(new Pose2d(28, -44, Math.toRadians(-40)))
+                .turnTo(Math.toRadians(44));
+        Action intake2 = spec2.build();
+
+        TrajectoryActionBuilder spec2d = drive.actionBuilder(new Pose2d(28, -44, Math.toRadians(44)))
+                .turnTo(Math.toRadians(-40));
+        Action drop2 = spec2d.build();
+
+        // 3rd sample
+        TrajectoryActionBuilder spec3 = drive.actionBuilder(new Pose2d(28, -44, Math.toRadians(-40)))
+                .splineToLinearHeading(new Pose2d(40, -43, Math.toRadians(40)), Math.toRadians(90));
+        Action intake3 = spec3.build();
+
+        TrajectoryActionBuilder spec3d = drive.actionBuilder(new Pose2d(40, -44, Math.toRadians(42)))
+                .turnTo(Math.toRadians(-55));
+        Action drop3 = spec3d.build();
+
+        // 1st spec
+        TrajectoryActionBuilder spec1i = drive.actionBuilder(new Pose2d(40, -44, Math.toRadians(-55)))
+                .strafeToLinearHeading(new Vector2d(31,-61.5), Math.toRadians(92));
+        Action wall1 = spec1i.build();
+
+        TrajectoryActionBuilder toBar1 = drive.actionBuilder(new Pose2d(31, -61.5, Math.toRadians(90)))
+                .splineToConstantHeading(new Vector2d(-6,-27.2), Math.toRadians(85));
+        Action bar1 = toBar1.build();
+
+
+        // 2nd spec
+        TrajectoryActionBuilder spec2i = drive.actionBuilder(new Pose2d(-6, -27.2, Math.toRadians(90)))
+                .strafeToLinearHeading(new Vector2d(31,-62.8),Math.toRadians(87));
+        Action wall2 = spec2i.build();
+
+        TrajectoryActionBuilder toBar2 = drive.actionBuilder(new Pose2d(31, -62.8, Math.toRadians(90)))
+                .strafeToLinearHeading(new Vector2d(-5,-27.2), Math.toRadians(85));
+        Action bar2 = toBar2.build();
+
+        // 3rd spec
+        TrajectoryActionBuilder spec3i = drive.actionBuilder(new Pose2d(-5, -27.2, Math.toRadians(90)))
+                .strafeToLinearHeading(new Vector2d(31,-62.8),Math.toRadians(84));
+        Action wall3 = spec3i.build();
+
+        TrajectoryActionBuilder toBar3 = drive.actionBuilder(new Pose2d(31, -62.8, Math.toRadians(90)))
+                .strafeToLinearHeading(new Vector2d(-4,-27.5), Math.toRadians(83));
+        Action bar3 = toBar3.build();
+
+        // 4th spec
+        TrajectoryActionBuilder spec4i = drive.actionBuilder(new Pose2d(-4, -28, Math.toRadians(86)))
+                .strafeToLinearHeading(new Vector2d(31,-64),Math.toRadians(81));
+        Action wall4 = spec4i.build();
+
+        TrajectoryActionBuilder toBar4 = drive.actionBuilder(new Pose2d(31, -63, Math.toRadians(90)))
+                .strafeToLinearHeading(new Vector2d(-3,-27.5), Math.toRadians(85));
+        Action bar4 = toBar4.build();
+
+        // park
+        TrajectoryActionBuilder goPark = drive.actionBuilder(new Pose2d(-3, -28, Math.toRadians(90)))
+                .strafeToLinearHeading(new Vector2d(31,-62),Math.toRadians(90));
+        Action park = goPark.build();
+
+
+
+//
+
+        // Use utility methods to create actions
+        Action slidesHang0 = createStayingMotorAction(slides,-460,1,2);
+
+        Action slidesWall1 = createMotorAction(slides,-140,1,2);
+        Action slidesWall2 = createMotorAction(slides,-140,1,2);
+        Action slidesWall3 = createMotorAction(slides,-140,1,2);
+        Action slidesWall4 = createMotorAction(slides,-140,1,2);
+
+        Action slidesHang1 =createStayingMotorAction(slides,-440,1,2);
+        Action slidesHang2 =createStayingMotorAction(slides,-460,1,2);
+        Action slidesHang3 =createStayingMotorAction(slides,-460,1,2);
+        Action slidesHang4 =createStayingMotorAction(slides,-460,1,2);
+
+        Action slidesDownFinal = createMotorAction(slides, 2, 1, 0);
+
+
+
+
+
+        waitForStart();
+
+        if (isStopRequested()) return;
+
+        // Execute autonomous sequence
+        Actions.runBlocking(
+                new SequentialAction(
+
+                        // preload
+                        new ParallelAction(preload,slidesHang0,outtakeRotation.outtakeRotSpec()),
+
+                        // 1st sample
+                        new ParallelAction(outtakeClaw.openClaw(),intake1, new SequentialAction(
+                                new SleepAction(0.65),
+                                new ParallelAction(intakeSlides.moveToPosition2(0.65),pivot.setPosition2(0.72),outtakeRotation.outtakeRotWall()),
+                                intakeRotation.intakeRotDown())),
+                        intakeClaw.closeClaw(),
+                        new SleepAction(0.1),
+                        new ParallelAction(intakeRotation.intakeRotPartialUp(),drop1,new SequentialAction(new SleepAction(0.46),intakeClaw.openClaw())),
+
+                        // 2nd sample
+                        new ParallelAction(new SequentialAction(new SleepAction(0.35),intakeRotation.intakeRotDown()),intake2, intakeSlides.moveToPosition2(0.77)),
+                        intakeClaw.closeClaw(),
+                        new SleepAction(0.1),
+                        new ParallelAction(intakeRotation.intakeRotPartialUp(),drop2,new SequentialAction(new SleepAction(0.448),intakeClaw.openClaw())),
+
+                        // 3rd sample
+                        new ParallelAction(intake3,  intakeSlides.moveToPosition2(0.66),new SequentialAction(new SleepAction(0.6),
+                                new ParallelAction(intakeSlides.moveToPosition2(0.72),intakeRotation.intakeRotDown()))),
+
+                        intakeClaw.closeClaw(),
+                        new SleepAction(0.1),
+                        new ParallelAction(intakeSlides.moveToPosition2(0.55), intakeRotation.intakeRotPartialUp(),
+                                new SequentialAction(
+                                        new SleepAction(0.1),
+                                        new ParallelAction(drop3,
+                                                new SequentialAction(new SleepAction(0.35), intakeClaw.openClaw())))),
+
+                        // 1st spec
+                        new ParallelAction(slidesWall1,wall1,  outtakeClaw.openClaw(),intakeRotation.intakeRotUp(),intakeSlides.moveToPosition2(0.56),pivot.resetPivot(),
+                                new SequentialAction(
+                                        new SleepAction(1),
+                                        outtakeClaw.closeClaw())),
+                        new ParallelAction(slidesHang1,new SequentialAction(new SleepAction(0.2),new ParallelAction(bar1, outtakeRotation.outtakeRotSpec()))),
+
+                        // 2nd spec
+                        new ParallelAction(wall2, outtakeClaw.openClaw(),
+                                new SequentialAction(new SleepAction(0.6),
+                                        outtakeClaw.closeClaw(),
+                                        new SleepAction(0.3),
+                                        outtakeRotation.outtakeRotWall(),
+                                        outtakeClaw.openClaw(),
+                                        new SleepAction(0.4),
+                                        slidesWall2,
+                                        outtakeClaw.closeClaw(),
+                                        new SleepAction(0.1))),
+                        new ParallelAction(slidesHang2,new SequentialAction(new SleepAction(0.2),new ParallelAction(bar2, outtakeRotation.outtakeRotSpec()))),
+
+                        // 3rd spec
+                        new ParallelAction(wall3, outtakeClaw.openClaw(),
+                                new SequentialAction(new SleepAction(0.6),
+                                        outtakeClaw.closeClaw(),
+                                        new SleepAction(0.3),
+                                        outtakeRotation.outtakeRotWall(),
+                                        outtakeClaw.openClaw(),
+                                        new SleepAction(0.4),
+                                        slidesWall3,
+                                        outtakeClaw.closeClaw(),
+                                        new SleepAction(0.1))),
+                        new ParallelAction(slidesHang3,new SequentialAction(new SleepAction(0.2), new ParallelAction(bar3, outtakeRotation.outtakeRotSpec()))),
+
+                        // 4th spec
+                        new ParallelAction(wall4, outtakeClaw.openClaw(),
+                                new SequentialAction(new SleepAction(0.6),
+                                        outtakeClaw.closeClaw(),
+                                        new SleepAction(0.3),
+                                        outtakeRotation.outtakeRotWall(),
+                                        outtakeClaw.openClaw(),
+                                        new SleepAction(0.4),
+                                        slidesWall4,
+                                        outtakeClaw.closeClaw(),
+                                        new SleepAction(0.1))),
+                        new ParallelAction(slidesHang4,new SequentialAction(new SleepAction(0.2),new ParallelAction(bar4, outtakeRotation.outtakeRotSpec()))),
+
+                        // park
+                        new ParallelAction(outtakeClaw.openClaw(), park, intakeSlides.retractPosition(), pivot.resetPivot(),new SequentialAction(new SleepAction(0.8), slidesDownFinal))
+
+
+
+
+
+
+                )
         );
     }
+
+    /**
+     * Utility method to create an action for a motor to move to a target position.
+     */
+    /**
+     * Utility method to create an action for a motor to move to a target position.
+     */
+    private Action createMotorAction(DcMotor motor, int targetPosition, double power) {
+        return new Action() {
+            private boolean initialized = false;
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                if (!initialized) {
+                    motor.setTargetPosition(targetPosition);
+                    motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    motor.setPower(power);
+                    initialized = true; // Ensure this setup runs only once
+                }
+
+                // Check if motor has reached its target position
+                boolean isBusy = motor.isBusy();
+                packet.put("Motor Busy", isBusy);
+                packet.put("Motor Position", motor.getCurrentPosition());
+
+                // Return true while the motor is still busy
+                if (isBusy) {
+                    return true;
+                } else {
+                    motor.setPower(0); // Ensure the motor stops when done
+                    motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                    return false; // Action is complete
+                }
+            }
+        };
+    }
+    private Action createMotorAction(DcMotor motor, int targetPosition, double power, int tolerance) {
+        return new Action() {
+            private boolean initialized = false;
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                // Initialization: Set motor target and mode
+                if (!initialized) {
+                    motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                    motor.setTargetPosition(targetPosition);
+                    motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    motor.setPower(power);
+
+                    initialized = true; // Ensure initialization happens only once
+                }
+
+                // Get the current motor position
+                int currentPosition = motor.getCurrentPosition();
+
+                // Calculate the error (difference between current and target positions)
+                int error = Math.abs(targetPosition - currentPosition);
+
+                // Add telemetry data for debugging
+//               telemetry.addData("Current Position", slides.getCurrentPosition());
+//                telemetry.addData("Error Position", error);
+//                telemetry.update();
+                // Check if the motor has reached the target position within the tolerance
+                if (error > tolerance) {
+                    // Keep running
+                    return true;
+                } else {
+                    // Stop the motor and mark the action as complete
+                    motor.setPower(0); // Ensure motor stops
+                    motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER); // Prevent unintended behavior
+                    return false; // Action is complete
+                }
+            }
+        };
+    }
+
+    private Action createMotorActionUsingEncoder(DcMotor motor, int targetPosition, double power, int tolerance) {
+        return new Action() {
+            private boolean initialized = false;
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                if (!initialized) {
+                    motor.setPower(-power);
+                    motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                    initialized = true;
+                }
+
+                int currentPosition = motor.getCurrentPosition();
+                int error = Math.abs(targetPosition - currentPosition);
+
+                // Add telemetry for debugging
+//                telemetry.addData("Current Position", currentPosition);
+//                telemetry.addData("Target Position", targetPosition);
+//                telemetry.addData("Error Position", error);
+//                telemetry.update();
+
+                // Check if within tolerance
+                if (error <= tolerance) {
+                    motor.setPower(0); // Stop motor
+                    return false; // Action is complete
+                } else {
+                    // Adjust power dynamically to maintain torque
+                    double adjustedPower = Math.min(Math.abs(power), 1.0); // Clamp power to max 1.0
+                    //motor.setPower(error > 0 ? adjustedPower : -adjustedPower); // Adjust direction
+                    motor.setPower(-power);
+                    return true; // Keep running
+                }
+            }
+        };
+    }
+    private Action createStayingMotorAction(DcMotor motor, int targetPosition, double power, int tolerance) {
+        return new Action() {
+            private boolean initialized = false;
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                if (!initialized) {
+                    motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE); // Use brake mode
+                    motor.setTargetPosition(targetPosition);
+                    motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    motor.setPower(power);
+                    initialized = true; // Ensure initialization happens only once
+                }
+
+                int currentPosition = motor.getCurrentPosition();
+                int error = Math.abs(targetPosition - currentPosition);
+
+                telemetry.addData("Motor Position", currentPosition);
+                telemetry.addData("Target Position", targetPosition);
+                telemetry.addData("Error", error);
+                telemetry.update();
+
+                if (error > tolerance) {
+                    return true; // Motor still moving
+                } else {
+                    motor.setPower(0.01); // Stop motor once within tolerance
+                    motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER); // Reset to prevent jitter
+                    return false; // Action complete
+                }
+            }
+        };
+    }
+
+
+
+
+
+    /**
+     * Combining multiple Utility methods into one action.
+     */
+    public class ConcurrentAction implements Action {
+        private final List<Action> actions;
+
+        public ConcurrentAction(List<Action> actions) {
+            this.actions = actions;
+        }
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket packet) {
+            boolean anyRunning = false;
+            for (Action action : actions) {
+                if (action.run(packet)) {
+                    anyRunning = true; // At least one action is still running
+                }
+            }
+            return anyRunning; // Continue running until all actions are complete
+        }
+    }
+
 }
