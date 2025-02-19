@@ -50,23 +50,23 @@ public class dqp2425 extends LinearOpMode{
     double rotpos= 1;
     double rotin = 0.28;
     double rotout = 0.95;
-    int slidesnuetral = -127;
+    int slidesnuetral = -205;
     int slidesSpeci = -5;
-    int slidesLatchOff = -174;
-    int slidesup = -850;
+    int slidesLatchOff = -460;
+    int slidesup = -777;
 
     //outtake claw
     double claw2pos=0.347;
-    double claw2close = 0.334;
-    double claw2open = 0.16;
+    double claw2close = 0.5;
+    double claw2open = 0.4;
 //
 
     //outtake arm rotation
-    double rot2pos=0.7;
-    double rot2down = 0.778;
+    double rot2pos=0.6;
+    double rot2down = 0.7577;
     double rot2out = 0.06;
     double rot2wall = 0.98;
-    double rot2speci = 0.367;//0.371
+    double rot2speci = 0.54;//0.371
 
     //intake axon
     double slides2pos=0.4968;
@@ -196,6 +196,14 @@ public class dqp2425 extends LinearOpMode{
                 slides.setTargetPosition(slidesnuetral);
                 slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 start=false;
+            }
+            if(gamepad2.x){
+                claw2.setPosition(claw2open);
+                claw2pos = claw2open;
+            }
+            if(gamepad2.left_bumper){
+                claw2.setPosition(claw2close);
+                claw2pos = claw2close;
             }
 
 
@@ -400,7 +408,7 @@ public class dqp2425 extends LinearOpMode{
             }
             if(b1==2){
                 f=0;
-                slides.setTargetPosition(-3);
+                slides.setTargetPosition(-4);
                 slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 claw2pos = claw2open;
                 claw2.setPosition(claw2pos);
@@ -439,9 +447,9 @@ public class dqp2425 extends LinearOpMode{
                 rot2pos= rot2speci;
                 rotation2.setPosition(rot2pos);
                 //}
-                b1=7;
+                b1=0;
             }
-            if(b1==7){
+            /* if(b1==7){
                 f+=0.025;
                 if(f>=0.5){
                     b1=8;
@@ -452,7 +460,7 @@ public class dqp2425 extends LinearOpMode{
                 slides.setTargetPosition(slidesSpeci);
                 slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 b1=0;
-            }
+            }*/
 
             telemetry.addData("b1", b1);
 
