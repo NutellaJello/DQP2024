@@ -52,12 +52,12 @@ public class dqp2425 extends LinearOpMode{
     double rotout = 0.95;
     int slidesnuetral = -235;
     int slidesSpeci = -5;
-    int slidesLatchOff = -460;
+    int slidesLatchOff = -433;
     int slidesup = -890;
 
     //outtake claw
     double claw2pos=0.347;
-    double claw2close = 0.505;
+    double claw2close = 0.523;
     double claw2open = 0.35;
 //
 
@@ -65,7 +65,7 @@ public class dqp2425 extends LinearOpMode{
     double rot2pos=0.6;
     double rot2down = 0.7714;
     double rot2out = 0.0;
-    double rot2wall = 0.98;
+    double rot2wall = 1;
     double rot2speci = 0.54;//0.371
 
     //intake axon
@@ -188,7 +188,7 @@ public class dqp2425 extends LinearOpMode{
                 rot2pos=0.4;
                 rotation2.setPosition(rot2pos);
             }
-            telemetry.update();
+
 
             if(gamepad1.b){
                 rot2pos = 0.468;
@@ -275,8 +275,11 @@ public class dqp2425 extends LinearOpMode{
                 //slides.setPower(gamepad2.right_stick_y);
             }
             if(gamepad1.y){
+                slides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                slides.setPower(0);
+                sleep(100);
                 slides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                slides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                //slides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
                 slides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             }
             telemetry.addData("slides", slides.getCurrentPosition());
