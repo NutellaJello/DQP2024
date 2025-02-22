@@ -50,21 +50,21 @@ public class dqp2425 extends LinearOpMode{
     double rotpos= 1;
     double rotin = 0.28;
     double rotout = 0.95;
-    int slidesnuetral = -205;
+    int slidesnuetral = -235;
     int slidesSpeci = -5;
     int slidesLatchOff = -460;
-    int slidesup = -777;
+    int slidesup = -890;
 
     //outtake claw
     double claw2pos=0.347;
-    double claw2close = 0.5;
-    double claw2open = 0.4;
+    double claw2close = 0.505;
+    double claw2open = 0.35;
 //
 
     //outtake arm rotation
     double rot2pos=0.6;
-    double rot2down = 0.7577;
-    double rot2out = 0.06;
+    double rot2down = 0.7714;
+    double rot2out = 0.0;
     double rot2wall = 0.98;
     double rot2speci = 0.54;//0.371
 
@@ -80,7 +80,7 @@ public class dqp2425 extends LinearOpMode{
 
     // swing up is dpad left, down is dpad right
     double swingup = 0.178;
-    double swingdown = 0.9;
+    double swingdown = 0.87;
 
     double transferTime = 0.53;
     boolean usingJst = false;
@@ -129,11 +129,7 @@ public class dqp2425 extends LinearOpMode{
         hang=hardwareMap.get(DcMotor.class, "hang"); // EPM 2
         winch=hardwareMap.get(DcMotor.class, "hang2"); // EPM 3
         swing = hardwareMap.get(Servo.class, "swing"); // control hub port 5
-/*
-        Encoder par0 = new OverflowEncoder(new RawEncoder(hardwareMap.get(DcMotorEx.class, "FL")));// 0
-        Encoder par1 = new OverflowEncoder(new RawEncoder(hardwareMap.get(DcMotorEx.class, "BR"))); // 3
-        Encoder perp = new OverflowEncoder(new RawEncoder(hardwareMap.get(DcMotorEx.class, "BL"))); // 2
-*/
+
         hang.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         hang.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         hang.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -150,7 +146,7 @@ public class dqp2425 extends LinearOpMode{
         //*********INIT POSITIONS**********
         claw.setPosition(clawopen);
         rotation.setPosition(0.28);
-        rotation2.setPosition(0.7);
+        rotation2.setPosition(rot2pos);
         swing.setPosition(swingdown);
         imu.resetYaw();
 
@@ -188,7 +184,16 @@ public class dqp2425 extends LinearOpMode{
             if(gamepad1.back){
                 sampleMode = false;
             }
+            if(gamepad1.a){
+                rot2pos=0.4;
+                rotation2.setPosition(rot2pos);
+            }
             telemetry.update();
+
+            if(gamepad1.b){
+                rot2pos = 0.468;
+                slides.setTargetPosition(-460);
+            }
 
 
             // just outtake slide initialization, put in initialization code
@@ -201,10 +206,10 @@ public class dqp2425 extends LinearOpMode{
                 claw2.setPosition(claw2open);
                 claw2pos = claw2open;
             }
-            if(gamepad2.left_bumper){
+            /*if(gamepad2.left_bumper){
                 claw2.setPosition(claw2close);
                 claw2pos = claw2close;
-            }
+            }*/
 
 
 
@@ -398,11 +403,13 @@ public class dqp2425 extends LinearOpMode{
 
             if(gamepad2.right_bumper && b1==0){
                 rot2pos= rot2wall;
+                rotpos = 0.75;
+                rotation.setPosition(rotpos);
                 b1 = 1;
             }
             if(b1==1){
                 f+=0.025;
-                if(f>=1){
+                if(f>=0.5){
                     b1=2;
                 }
             }
@@ -584,7 +591,7 @@ public class dqp2425 extends LinearOpMode{
                 startOuttake = false;
 
             }
-            if (c1==1 && Math.abs(slides.getCurrentPosition()-slidesup)<=100) {
+            if (c1==1 /*&& Math.abs(slides.getCurrentPosition()-slidesup)<=100*/) {
                 c1=0;
                 rot2pos=rot2out;
                 rotation2.setPosition(rot2out);

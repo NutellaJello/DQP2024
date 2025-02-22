@@ -10,10 +10,9 @@ public class MotorUtils {
         motor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
         while (Math.abs(targetPosition - motor.getCurrentPosition()) > tolerance && opMode.opModeIsActive()) {
-            double power = pidController.calculate(motor.getCurrentPosition(), targetPosition);
+            double power = 5/*pidController.calculate(motor.getCurrentPosition(), targetPosition)*/;
             motor.setPower(power);
         }
         motor.setPower(0); // Stop motor when target is reached
     }
 }
-
