@@ -29,7 +29,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Config
-@Autonomous(name = "5 spec")
+@Autonomous(name = "not 5 spec")
 public class BlueSideObservation extends LinearOpMode {
     // Declare motors and servos
     private DcMotor slides;
