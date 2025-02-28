@@ -108,7 +108,7 @@ public class BlueSideBasket extends LinearOpMode {
                     new Action(){
                         @Override
                         public boolean run(@NonNull TelemetryPacket packet) {
-                            intakeSlides.setPosition(0.602);
+                            intakeSlides.setPosition(0.63);
                             return false;
                         }}, new SleepAction(0.4)
             );
@@ -120,7 +120,7 @@ public class BlueSideBasket extends LinearOpMode {
                     new Action(){
                         @Override
                         public boolean run(@NonNull TelemetryPacket packet) {
-                            intakeSlides.setPosition(0.49);
+                            intakeSlides.setPosition(0.505);
                             return false;
                         }}, new SleepAction(0.4)
             );
@@ -142,7 +142,7 @@ public class BlueSideBasket extends LinearOpMode {
                     new Action(){
                         @Override
                         public boolean run(@NonNull TelemetryPacket packet) {
-                            outtakeClaw.setPosition(0.347);
+                            outtakeClaw.setPosition(0.51);
                             return false;
                         }
                     }, new SleepAction(0.2)
@@ -154,7 +154,7 @@ public class BlueSideBasket extends LinearOpMode {
                     new Action(){
                         @Override
                         public boolean run(@NonNull TelemetryPacket packet) {
-                            outtakeClaw.setPosition(0.1);
+                            outtakeClaw.setPosition(0.35);
                             return false;
                         }}, new SleepAction(0.2)
             );
@@ -185,7 +185,7 @@ public class BlueSideBasket extends LinearOpMode {
                     new Action(){
                         @Override
                         public boolean run(@NonNull TelemetryPacket packet) {
-                            outtakeRotation.setPosition(0.7821);
+                            outtakeRotation.setPosition(0.761);
                             return false;
                         }}, new SleepAction(0.3)
             );
@@ -196,7 +196,7 @@ public class BlueSideBasket extends LinearOpMode {
                     new Action(){
                         @Override
                         public boolean run(@NonNull TelemetryPacket packet) {
-                            outtakeRotation.setPosition(0.06);
+                            outtakeRotation.setPosition(0.0);
                             return false;
                         }}, new SleepAction(0.65)
             );
@@ -270,45 +270,45 @@ public class BlueSideBasket extends LinearOpMode {
         claw.setPosition(0.45);
         swing.setPosition(1);
         //Hold Spece
-        rotation2.setPosition(0.98);
-        outtakeClaw.setPosition(0.347);
+        rotation2.setPosition(1);
+        outtakeClaw.setPosition(0.523);
 
         // Autonomous Actions
        //hang preload
         TrajectoryActionBuilder tab = drive.actionBuilder(new Pose2d(-16,-60,Math.toRadians(270)))
                 .setReversed(true)
-                .splineToConstantHeading(new Vector2d(-15,-30), Math.toRadians(270),new MinVelConstraint(Arrays.asList(new TranslationalVelConstraint(35), new AngularVelConstraint(Math.toRadians(90)))) ,new ProfileAccelConstraint(-35,35));
+                .splineToConstantHeading(new Vector2d(-15,-33.6), Math.toRadians(270),new MinVelConstraint(Arrays.asList(new TranslationalVelConstraint(35), new AngularVelConstraint(Math.toRadians(90)))) ,new ProfileAccelConstraint(-35,35));
         Action movement=tab.build();
         // move to first sample
-        TrajectoryActionBuilder tab1 = drive.actionBuilder(new Pose2d(-15, -30, Math.toRadians(270)))
+        TrajectoryActionBuilder tab1 = drive.actionBuilder(new Pose2d(-15, -33.6, Math.toRadians(270)))
                 .lineToY(-40)
-                .turnTo(Math.toRadians(90))
+                .turnTo(Math.toRadians(87))
                 .setReversed(false)
-                .strafeTo(new Vector2d(-43,-43));
+                .strafeTo(new Vector2d(-42.5,-43));
         Action movement1 = tab1.build();
 //      bucket first sample
-        TrajectoryActionBuilder tab2 = drive.actionBuilder(new Pose2d(-43, -43, Math.toRadians(90)))
-                .strafeTo(new Vector2d(-61,-54));
+        TrajectoryActionBuilder tab2 = drive.actionBuilder(new Pose2d(-42.5, -43, Math.toRadians(90)))
+                .strafeTo(new Vector2d(-61,-47));
         Action movement2 = tab2.build();
         // move to second sample
-        TrajectoryActionBuilder tab3 = drive.actionBuilder(new Pose2d(-61, -54, Math.toRadians(90)))
-                .strafeTo(new Vector2d(-52,-41.5));
+        TrajectoryActionBuilder tab3 = drive.actionBuilder(new Pose2d(-61, -47, Math.toRadians(90)))
+                .strafeTo(new Vector2d(-52.3,-42));
         Action movement3 = tab3.build();
         // move to second bucket
-        TrajectoryActionBuilder tab5 = drive.actionBuilder(new Pose2d(-52,-41.5, Math.toRadians(90)))
-                .strafeTo(new Vector2d(-60,-54));
+        TrajectoryActionBuilder tab5 = drive.actionBuilder(new Pose2d(-52.3,-42, Math.toRadians(90)))
+                .strafeTo(new Vector2d(-60,-47));
         Action movement5 = tab5.build();
         // third sample
-        TrajectoryActionBuilder tab6 = drive.actionBuilder(new Pose2d(-60,-54, Math.toRadians(90)))
-                .strafeTo(new Vector2d(-64.5,-41.5));
+        TrajectoryActionBuilder tab6 = drive.actionBuilder(new Pose2d(-60,-47, Math.toRadians(90)))
+                .strafeTo(new Vector2d(-64.5,-42));
         Action movement6 = tab6.build();
         // third bucket
-        TrajectoryActionBuilder tab7 = drive.actionBuilder(new Pose2d(-64.5,-41.5, Math.toRadians(90)))
-                .strafeTo(new Vector2d(-60,-55));
+        TrajectoryActionBuilder tab7 = drive.actionBuilder(new Pose2d(-64.5,-42, Math.toRadians(90)))
+                .strafeTo(new Vector2d(-60,-47));
         Action movement7 = tab7.build();
         // park!
-        TrajectoryActionBuilder tab8 = drive.actionBuilder(new Pose2d(-60,-55, Math.toRadians(90)))
-                .splineTo(new Vector2d(-30,-7), Math.toRadians(0));
+        TrajectoryActionBuilder tab8 = drive.actionBuilder(new Pose2d(-60,-47, Math.toRadians(90)))
+                .splineTo(new Vector2d(-30,-9), Math.toRadians(0));
         Action movement8 = tab8.build();
 
 
@@ -317,14 +317,21 @@ public class BlueSideBasket extends LinearOpMode {
 ////
 
         // Use utility methods to create actions
-        Action slidesUp = createStayingMotorAction(slides, -890, 1,5);      // Slides up
-        Action slidesSpecUp = createMotorAction(slides, -650, 1);
-        Action slidesDown = createStayingMotorAction(slides,-125 , 0.9,1);       // Slides down
-        Action slidesPartiallyDown = createMotorAction(slides, -240, 1);
-        Action slidesDown2 = createMotorAction(slides,-131 , 0.9,1);
+              // Slides up for specimen
+        Action slidesSpecUp = createMotorAction(slides, -600, 1);
+        Action slidesPartiallyDown = createMotorAction(slides, -200, 1,10);
+
+        // first sample
+        Action slidesDown = createStayingMotorAction(slides,-240 , 0.9,1);
+        Action slidesUp = createStayingMotorAction(slides, -890, 1,5);
+              // Slides down
+        // second sample
+        Action slidesDown2 = createMotorAction(slides,-244 , 0.9,1);
         Action slidesUp2 = createStayingMotorAction(slides, -890, 1,5);
-        Action slidesDown3 = createMotorAction(slides,-131 , 0.9,1);
+        // third sample
+        Action slidesDown3 = createMotorAction(slides,-243 , 0.9,1);
         Action slidesUp3 = createStayingMotorAction(slides, -890, 1,5);
+        // ensure slides are all the way down
         Action slidesDown4 = createMotorAction(slides,5 , 1,1);
 
 
@@ -336,11 +343,13 @@ public class BlueSideBasket extends LinearOpMode {
         // Execute autonomous sequence
         Actions.runBlocking(
                 new SequentialAction(
+                        // go to hang the first specimen
                         new ParallelAction(movement, slidesSpecUp),
                         slidesPartiallyDown,
                         new SleepAction(0.1),
                         outtakeClaw.openClaw(),
-                        new ParallelAction(movement1),
+                        // moving to pick up first sample
+                        movement1,
                         new ParallelAction(intakeSlides.moveToPosition(), outtakeRotation.outtakeRotTransfer()),
                         //new ParallelAction(intakeRotation.intakeRotDown(),slidesDown),
                         intakeRotation.intakeRotDown(),
@@ -352,11 +361,13 @@ public class BlueSideBasket extends LinearOpMode {
                         outtakeClaw.closeClaw(),
                         new SleepAction(0.4),
                         intakeClaw.openClaw(),
+                        //first sample scored
                         new ParallelAction(movement2,
                                 slidesUp),
                         outtakeRotation.outtakeRotBasket(),
                         outtakeClaw.openClaw(),
                         outtakeRotation.outtakeRotTransfer(),
+                        // moving to second sample
                         new ParallelAction(movement3,
                                 slidesDown2
                         ),
@@ -369,12 +380,14 @@ public class BlueSideBasket extends LinearOpMode {
                         outtakeClaw.closeClaw(),
                         new SleepAction(0.3),
                         intakeClaw.openClaw(),
+                        // moving to score 2nd sample
                         new ParallelAction(movement5,
                                 slidesUp2
                         ),
                         outtakeRotation.outtakeRotBasket(),
                         outtakeClaw.openClaw(),
                         outtakeRotation.outtakeRotTransfer(),
+                        // moving to 3rd sample
                         new ParallelAction(movement6, slidesDown3),
                         new ParallelAction(intakeSlides.moveToPosition(), intakePivot.resetPivot()),
                         new SleepAction(0.3),
@@ -385,13 +398,14 @@ public class BlueSideBasket extends LinearOpMode {
                         outtakeClaw.closeClaw(),
                         new SleepAction(0.3),
                         intakeClaw.openClaw(),
+                        //move to score 3rd sample
                         new ParallelAction(movement7,
                                 slidesUp3
                         ),
                         outtakeRotation.outtakeRotBasket(),
                         outtakeClaw.openClaw(),
                         outtakeRotation.outtakeRotFinal(),
-//                        slidesDown4
+//                      go park in the zone for easy teleop
                         new ParallelAction(movement8,
                                 slidesDown4
                         )
