@@ -309,11 +309,11 @@ public class BlueSide5Spec extends LinearOpMode {
         int slowVelocity = 60;
         // preload
         TrajectoryActionBuilder tab1 = drive.actionBuilder(new Pose2d(6,-60,Math.toRadians(90)))
-                .strafeTo(new Vector2d(-13,-27.2));
+                .strafeTo(new Vector2d(-13,-26.9));
         Action preload=tab1.build();
 
         // 1st sample
-        TrajectoryActionBuilder spec1 = drive.actionBuilder(new Pose2d(-13, -27.2, Math.toRadians(90)))
+        TrajectoryActionBuilder spec1 = drive.actionBuilder(new Pose2d(-13, -26.9, Math.toRadians(90)))
                 .lineToY(-30)
                 .splineToLinearHeading(new Pose2d(28, -44, Math.toRadians(51)), Math.toRadians(90));
         Action intake1 = spec1.build();
@@ -324,10 +324,10 @@ public class BlueSide5Spec extends LinearOpMode {
 
         // 2nd sample
         TrajectoryActionBuilder spec2 = drive.actionBuilder(new Pose2d(28, -44, Math.toRadians(-80)))
-                .turnTo(Math.toRadians(42));
+                .turnTo(Math.toRadians(43.5));
         Action intake2 = spec2.build();
 
-        TrajectoryActionBuilder spec2d = drive.actionBuilder(new Pose2d(28, -44, Math.toRadians(42)))
+        TrajectoryActionBuilder spec2d = drive.actionBuilder(new Pose2d(28, -44, Math.toRadians(43.5)))
                 .turnTo(Math.toRadians(-75));
         Action drop2 = spec2d.build();
 
@@ -345,35 +345,35 @@ public class BlueSide5Spec extends LinearOpMode {
                 .strafeToLinearHeading(new Vector2d(31,-56.7), Math.toRadians(92));
         Action wall1 = spec1i.build();
 
-        TrajectoryActionBuilder toBar1 = drive.actionBuilder(new Pose2d(31, -56.5, Math.toRadians(92)))
-                .strafeToLinearHeading(new Vector2d(-12,-27), Math.toRadians(88));
+        TrajectoryActionBuilder toBar1 = drive.actionBuilder(new Pose2d(31, -56.7, Math.toRadians(92)))
+                .strafeToLinearHeading(new Vector2d(-12,-27), Math.toRadians(85));
         Action bar1 = toBar1.build();
 
 
         // 2nd spec
         TrajectoryActionBuilder spec2i = drive.actionBuilder(new Pose2d(-12, -27, Math.toRadians(90)))
-                .strafeToLinearHeading(new Vector2d(31,-59.4),Math.toRadians(86));
+                .strafeToLinearHeading(new Vector2d(31,-59.3),Math.toRadians(86));
         Action wall2 = spec2i.build();
 
-        TrajectoryActionBuilder toBar2 = drive.actionBuilder(new Pose2d(31, -59.4, Math.toRadians(90)))
-                .strafeToLinearHeading(new Vector2d(-12,-27), Math.toRadians(84));
+        TrajectoryActionBuilder toBar2 = drive.actionBuilder(new Pose2d(31, -59.3, Math.toRadians(90)))
+                .strafeToLinearHeading(new Vector2d(-11.5,-27), Math.toRadians(84));
         Action bar2 = toBar2.build();
 
         // 3rd spec
-        TrajectoryActionBuilder spec3i = drive.actionBuilder(new Pose2d(-12, -27.1, Math.toRadians(90)))
-                .strafeToLinearHeading(new Vector2d(31,-60.9),Math.toRadians(85));
+        TrajectoryActionBuilder spec3i = drive.actionBuilder(new Pose2d(-11.5, -27, Math.toRadians(90)))
+                .strafeToLinearHeading(new Vector2d(31,-60.85),Math.toRadians(85));
         Action wall3 = spec3i.build();
 
-        TrajectoryActionBuilder toBar3 = drive.actionBuilder(new Pose2d(31, -60.9, Math.toRadians(90)))
+        TrajectoryActionBuilder toBar3 = drive.actionBuilder(new Pose2d(31, -60.85, Math.toRadians(90)))
                 .strafeToLinearHeading(new Vector2d(-11,-27), Math.toRadians(84));
         Action bar3 = toBar3.build();
 
         // 4th spec
         TrajectoryActionBuilder spec4i = drive.actionBuilder(new Pose2d(-11, -27, Math.toRadians(90)))
-                .strafeToLinearHeading(new Vector2d(31,-62.1),Math.toRadians(84));
+                .strafeToLinearHeading(new Vector2d(31,-62.05),Math.toRadians(83));
         Action wall4 = spec4i.build();
 
-        TrajectoryActionBuilder toBar4 = drive.actionBuilder(new Pose2d(31, -62.1, Math.toRadians(90)))
+        TrajectoryActionBuilder toBar4 = drive.actionBuilder(new Pose2d(31, -62.05, Math.toRadians(90)))
                 .strafeToLinearHeading(new Vector2d(-10.6,-27), Math.toRadians(82));
         Action bar4 = toBar4.build();
 
@@ -419,14 +419,14 @@ public class BlueSide5Spec extends LinearOpMode {
                         // 1st sample
                         new ParallelAction(outtakeClaw.openClaw(),intake1, new SequentialAction(
                                 new SleepAction(0.65),
-                                new ParallelAction(intakeSlides.moveToPosition2(0.64),pivot.setPosition2(0.72),outtakeRotation.outtakeRotWall()),
-                                intakeRotation.intakeRotDown())),
+                                new ParallelAction(intakeSlides.moveToPosition2(0.64),pivot.setPosition2(0.72),outtakeClaw.closeClaw(),outtakeRotation.outtakeRotWall()),
+                                new ParallelAction(outtakeClaw.openClaw(),intakeRotation.intakeRotDown()))),
                         intakeClaw.closeClaw(),
                         new SleepAction(0.05),
-                        new ParallelAction(intakeRotation.intakeRotPartialUp(),drop1,new SequentialAction(new SleepAction(0.54),intakeClaw.openClaw())),
+                        new ParallelAction(intakeRotation.intakeRotPartialUp(),drop1,new SequentialAction(new SleepAction(0.55),intakeClaw.openClaw())),
 
                         // 2nd sample
-                        new ParallelAction(new SequentialAction(new SleepAction(0.5),intakeRotation.intakeRotDown()),intake2, intakeSlides.moveToPosition2(0.77 )),
+                        new ParallelAction(new SequentialAction(new SleepAction(0.6),intakeRotation.intakeRotDown()),intake2, intakeSlides.moveToPosition2(0.77 )),
                         intakeClaw.closeClaw(),
                         new SleepAction(0.05),
                         new ParallelAction(intakeRotation.intakeRotPartialUp(),drop2,new SequentialAction(new SleepAction(0.53),intakeClaw.openClaw())),
@@ -441,7 +441,7 @@ public class BlueSide5Spec extends LinearOpMode {
                                 new SequentialAction(
                                         new SleepAction(0.1),
                                         new ParallelAction(drop3,
-                                                new SequentialAction(new SleepAction(0.42), intakeClaw.openClaw())))),
+                                                new SequentialAction(new SleepAction(0.44), intakeClaw.openClaw())))),
 
                         // 1st spec
                         new ParallelAction(slidesWall1,wall1,  outtakeClaw.openClaw(),intakeRotation.intakeRotUp(),intakeSlides.moveToPosition2(0.56),pivot.resetPivot(),
@@ -627,7 +627,7 @@ public class BlueSide5Spec extends LinearOpMode {
                 if (error > tolerance) {
                     return true; // Motor still moving
                 } else {
-                    motor.setPower(0.0015); // Stop motor once within tolerance
+                    motor.setPower(0.0016); // Stop motor once within tolerance
                     motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER); // Reset to prevent jitter
                     return false; // Action complete
                 }
