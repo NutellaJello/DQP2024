@@ -3,15 +3,11 @@ import androidx.annotation.NonNull;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
-import com.acmerobotics.roadrunner.AngularVelConstraint;
-import com.acmerobotics.roadrunner.MinVelConstraint;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
-import com.acmerobotics.roadrunner.ProfileAccelConstraint;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
-import com.acmerobotics.roadrunner.TranslationalVelConstraint;
 import com.acmerobotics.roadrunner.TurnConstraints;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
@@ -19,13 +15,12 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import org.firstinspires.ftc.teamcode.MecanumDrive2;
-
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 
-import java.util.Arrays;
+import org.firstinspires.ftc.teamcode.MecanumDrive2;
+
 import java.util.List;
 import java.util.function.Function;
 
@@ -109,7 +104,7 @@ public class BlueSideBasket extends LinearOpMode {
                     new Action(){
                         @Override
                         public boolean run(@NonNull TelemetryPacket packet) {
-                            intakeSlides.setPosition(0.636);
+                            intakeSlides.setPosition(0.653);
                             return false;
                         }}, new SleepAction(0.4)
             );
@@ -295,29 +290,30 @@ public class BlueSideBasket extends LinearOpMode {
         // move to first sample
         TrajectoryActionBuilder tab1 = drive.actionBuilder(new Pose2d(-15, -33.6, Math.toRadians(90)))
                 .lineToY(-40)
-                .turnTo(Math.toRadians(87))
+                .turnTo(Math.toRadians(86))
                 .setReversed(false)
-                .strafeTo(new Vector2d(-41,-44));
+                .strafeTo(new Vector2d(-42,-44));
         Action movement1 = tab1.build();
 
 //      bucket first sample
-        TrajectoryActionBuilder tab2 = drive.actionBuilder(new Pose2d(-41, -44, Math.toRadians(90)))
+        TrajectoryActionBuilder tab2 = drive.actionBuilder(new Pose2d(-42, -44, Math.toRadians(90)))
                 .strafeTo(new Vector2d(-61,-47));
         Action movement2 = tab2.build();
         // move to second sample
         TrajectoryActionBuilder tab3 = drive.actionBuilder(new Pose2d(-61, -47, Math.toRadians(90)))
-                .strafeTo(new Vector2d(-51,-44));
+                .strafeTo(new Vector2d(-53,-42))
+                .turnTo(Math.toRadians(90));
         Action movement3 = tab3.build();
         // move to second bucket
-        TrajectoryActionBuilder tab5 = drive.actionBuilder(new Pose2d(-51,-44, Math.toRadians(90)))
+        TrajectoryActionBuilder tab5 = drive.actionBuilder(new Pose2d(-53,-42, Math.toRadians(90)))
                 .strafeTo(new Vector2d(-59.5,-47));
         Action movement5 = tab5.build();
         // third sample
         TrajectoryActionBuilder tab6 = drive.actionBuilder(new Pose2d(-59.5,-47, Math.toRadians(90)))
-                .strafeTo(new Vector2d(-63,-42));
+                .strafeTo(new Vector2d(-63,-40));
         Action movement6 = tab6.build();
         // third bucket
-        TrajectoryActionBuilder tab7 = drive.actionBuilder(new Pose2d(-63,-42, Math.toRadians(90)))
+        TrajectoryActionBuilder tab7 = drive.actionBuilder(new Pose2d(-63,-40, Math.toRadians(90)))
                 .strafeTo(new Vector2d(-60,-47));
         Action movement7 = tab7.build();
         // park!
@@ -336,14 +332,14 @@ public class BlueSideBasket extends LinearOpMode {
         Action slidesPartiallyDown = createMotorAction(slides, -185, 1,10);
 
         // first sample
-        Action slidesDown = createStayingMotorAction(slides,-102 , 0.9,1);
+        Action slidesDown = createStayingMotorAction(slides,-106 , 0.9,1);
         Action slidesUp = createStayingMotorAction(slides, -880, 1,5);
               // Slides down
         // second sample
-        Action slidesDown2 = createMotorAction(slides,-114 , 0.9,1);
+        Action slidesDown2 = createMotorAction(slides,-116 , 0.9,1);
         Action slidesUp2 = createStayingMotorAction(slides, -880, 1,5);
         // third sample
-        Action slidesDown3 = createMotorAction(slides,-114 , 0.9,1);
+        Action slidesDown3 = createMotorAction(slides,-117 , 0.9,1);
         Action slidesUp3 = createStayingMotorAction(slides, -880, 1,5);
         // ensure slides are all the way down
         Action slidesDown4 = createMotorAction(slides,5 , 1,1);
