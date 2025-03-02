@@ -15,6 +15,7 @@ import com.acmerobotics.roadrunner.TranslationalVelConstraint;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
@@ -29,6 +30,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Config
+@Disabled
 @Autonomous(name = "not 5 spec")
 public class BlueSideObservation extends LinearOpMode {
     // Declare motors and servos

@@ -48,7 +48,7 @@ public class BlueSide4Samples extends LinearOpMode {
                     new Action(){
                         @Override
                         public boolean run(@NonNull TelemetryPacket packet) {
-                            intakeClaw.setPosition(0.06);
+                            intakeClaw.setPosition(0.01);
                             return false;
                         }}, new SleepAction(0.1)
             );
@@ -121,7 +121,7 @@ public class BlueSide4Samples extends LinearOpMode {
                     new Action(){
                         @Override
                         public boolean run(@NonNull TelemetryPacket packet) {
-                            intakeSlides.setPosition(0.49);
+                            intakeSlides.setPosition(0.59); // 0.49
                             return false;
                         }}, new SleepAction(0.2)
             );
@@ -155,9 +155,9 @@ public class BlueSide4Samples extends LinearOpMode {
                     new Action(){
                         @Override
                         public boolean run(@NonNull TelemetryPacket packet) {
-                            outtakeClaw.setPosition(0.35);
+                            outtakeClaw.setPosition(0.34);
                             return false;
-                        }}, new SleepAction(0.2)
+                        }}, new SleepAction(0.3)
             );
         }
         public void setPosition(double value){
@@ -186,7 +186,7 @@ public class BlueSide4Samples extends LinearOpMode {
                     new Action(){
                         @Override
                         public boolean run(@NonNull TelemetryPacket packet) {
-                            outtakeRotation.setPosition(0.761);
+                            outtakeRotation.setPosition(0.65); // 0.761 change this so that the transfer happens outside of fully retract
                             return false;
                         }}, new SleepAction(0.3)
             );
@@ -326,14 +326,14 @@ public class BlueSide4Samples extends LinearOpMode {
         // Use utility methods to create actions
         Action slidesUp = createStayingMotorAction(slides, -890, 1,2);      // Slides up
         Action slidesSpecUp = createMotorAction(slides, -650, 2);
-        Action slidesDown = createMotorAction(slides,-240 , 0.9,2);       // Slides down
+        Action slidesDown = createMotorAction(slides,-118 , 0.9,2);       // Slides down
 
         Action slidesUp2 = createStayingMotorAction(slides, -890, 1,2);
-        Action slidesDown2 = createMotorAction(slides,-240 , 0.9,2);
+        Action slidesDown2 = createMotorAction(slides,-114 , 0.9,2);
         Action slidesUp3 = createStayingMotorAction(slides, -890, 1,2);
         // have to add a pause because the transfer on the last one is weird.
         Action slidesPartiallyDown = createMotorAction(slides, -300, 0.9,2);
-        Action slidesDown3 = createMotorAction(slides,-240 , 0.9,2);
+        Action slidesDown3 = createMotorAction(slides,-110 , 0.9,2);
         Action slidesUp4 = createStayingMotorAction(slides, -890, 1,2);
         Action slidesDownFinal = createMotorAction(slides,5 , 1,2);
 
