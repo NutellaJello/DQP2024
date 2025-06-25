@@ -173,7 +173,7 @@ public class BlueSide5Spec extends LinearOpMode {
                     new Action(){
                         @Override
                         public boolean run(@NonNull TelemetryPacket packet) {
-                            outtakeClaw.setPosition(0.513);
+                            outtakeClaw.setPosition(0.514);
                             return false;
                         }
                     }, new SleepAction(0.1)
@@ -324,19 +324,19 @@ public class BlueSide5Spec extends LinearOpMode {
 
         // 2nd sample
         TrajectoryActionBuilder spec2 = drive.actionBuilder(new Pose2d(28, -44, Math.toRadians(-80)))
-                .turnTo(Math.toRadians(43.5));
+                .turnTo(Math.toRadians(45));
         Action intake2 = spec2.build();
 
-        TrajectoryActionBuilder spec2d = drive.actionBuilder(new Pose2d(28, -44, Math.toRadians(43.5)))
+        TrajectoryActionBuilder spec2d = drive.actionBuilder(new Pose2d(28, -44, Math.toRadians(45)))
                 .turnTo(Math.toRadians(-75));
         Action drop2 = spec2d.build();
 
         // 3rd sample
         TrajectoryActionBuilder spec3 = drive.actionBuilder(new Pose2d(28, -44, Math.toRadians(-75)))
-                .strafeToLinearHeading(new Vector2d(40, -43), Math.toRadians(32));
+                .strafeToLinearHeading(new Vector2d(40, -43), Math.toRadians(34));
         Action intake3 = spec3.build();
 
-        TrajectoryActionBuilder spec3d = drive.actionBuilder(new Pose2d(40, -43, Math.toRadians(32)))
+        TrajectoryActionBuilder spec3d = drive.actionBuilder(new Pose2d(40, -43, Math.toRadians(34)))
                 .turnTo(Math.toRadians(-75));
         Action drop3 = spec3d.build();
 
@@ -352,28 +352,28 @@ public class BlueSide5Spec extends LinearOpMode {
 
         // 2nd spec
         TrajectoryActionBuilder spec2i = drive.actionBuilder(new Pose2d(-12, -27, Math.toRadians(90)))
-                .strafeToLinearHeading(new Vector2d(31,-59.3),Math.toRadians(86));
+                .strafeToLinearHeading(new Vector2d(31,-59),Math.toRadians(86));
         Action wall2 = spec2i.build();
 
-        TrajectoryActionBuilder toBar2 = drive.actionBuilder(new Pose2d(31, -59.3, Math.toRadians(90)))
+        TrajectoryActionBuilder toBar2 = drive.actionBuilder(new Pose2d(31, -59, Math.toRadians(90)))
                 .strafeToLinearHeading(new Vector2d(-11.5,-27), Math.toRadians(84));
         Action bar2 = toBar2.build();
 
         // 3rd spec
         TrajectoryActionBuilder spec3i = drive.actionBuilder(new Pose2d(-11.5, -27, Math.toRadians(90)))
-                .strafeToLinearHeading(new Vector2d(31,-60.85),Math.toRadians(85));
+                .strafeToLinearHeading(new Vector2d(31,-60.4),Math.toRadians(85));
         Action wall3 = spec3i.build();
 
-        TrajectoryActionBuilder toBar3 = drive.actionBuilder(new Pose2d(31, -60.85, Math.toRadians(90)))
-                .strafeToLinearHeading(new Vector2d(-11,-27), Math.toRadians(84));
+        TrajectoryActionBuilder toBar3 = drive.actionBuilder(new Pose2d(31, -60.4, Math.toRadians(90)))
+                .strafeToLinearHeading(new Vector2d(-11,-26.8), Math.toRadians(84));
         Action bar3 = toBar3.build();
 
         // 4th spec
-        TrajectoryActionBuilder spec4i = drive.actionBuilder(new Pose2d(-11, -27, Math.toRadians(90)))
-                .strafeToLinearHeading(new Vector2d(31,-62.05),Math.toRadians(83));
+        TrajectoryActionBuilder spec4i = drive.actionBuilder(new Pose2d(-11, -26.8, Math.toRadians(90)))
+                .strafeToLinearHeading(new Vector2d(31,-61.6),Math.toRadians(83));
         Action wall4 = spec4i.build();
 
-        TrajectoryActionBuilder toBar4 = drive.actionBuilder(new Pose2d(31, -62.05, Math.toRadians(90)))
+        TrajectoryActionBuilder toBar4 = drive.actionBuilder(new Pose2d(31, -61.6, Math.toRadians(90)))
                 .strafeToLinearHeading(new Vector2d(-10.6,-27), Math.toRadians(82));
         Action bar4 = toBar4.build();
 
@@ -390,9 +390,9 @@ public class BlueSide5Spec extends LinearOpMode {
         Action slidesHang0 = createStayingMotorAction(slides,-520,1,2);
 
         Action slidesWall1 = createMotorAction(slides,-25,1,3);
-        Action slidesWall2 = createMotorAction(slides,-25,1,3);
-        Action slidesWall3 = createMotorAction(slides,-25,1,3);
-        Action slidesWall4 = createMotorAction(slides,-25,1,3);
+        Action slidesWall2 = createMotorAction(slides,-23,1,3);
+        Action slidesWall3 = createMotorAction(slides,-23,1,3);
+        Action slidesWall4 = createMotorAction(slides,-23,1,3);
 
         Action slidesHang1 =createStayingMotorAction(slides,-535,1,2);
         Action slidesHang2 =createStayingMotorAction(slides,-535,1,2);
@@ -627,7 +627,7 @@ public class BlueSide5Spec extends LinearOpMode {
                 if (error > tolerance) {
                     return true; // Motor still moving
                 } else {
-                    motor.setPower(0.0016); // Stop motor once within tolerance
+                    motor.setPower(0.0013); // Stop motor once within tolerance
                     motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER); // Reset to prevent jitter
                     return false; // Action complete
                 }

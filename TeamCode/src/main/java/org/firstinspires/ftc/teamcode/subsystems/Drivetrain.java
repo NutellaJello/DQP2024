@@ -57,13 +57,17 @@ public class Drivetrain {
             double max;
             YawPitchRollAngles robotOrientation;
             robotOrientation = imu.getRobotYawPitchRollAngles();
+            if(gamepad.dpad_up){
+                imu.resetYaw();
+            }
+
 
             if(gamepad.right_bumper){
-                dampSpeedRatio = 0.2;
-                dampTurnRatio = -0.16;
+                dampSpeedRatio = 0.25;
+                dampTurnRatio = -0.2;
             }else{
                 dampSpeedRatio = 1;
-                dampTurnRatio = -1;
+                dampTurnRatio = -0.6;
             }
             double heading   = robotOrientation.getYaw(AngleUnit.RADIANS);
 
@@ -108,8 +112,8 @@ public class Drivetrain {
 
 
             if(gamepad.right_bumper){
-                dampSpeedRatio = 0.2;
-                dampTurnRatio = -0.16;
+                dampSpeedRatio = 0.18;
+                dampTurnRatio = -0.13;
             }else{
                 dampSpeedRatio = 0.8;
                 dampTurnRatio = -0.6;

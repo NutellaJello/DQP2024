@@ -50,7 +50,7 @@ public class BlueSide4Samples extends LinearOpMode {
                         public boolean run(@NonNull TelemetryPacket packet) {
                             intakeClaw.setPosition(0.01);
                             return false;
-                        }}, new SleepAction(0.1)
+                        }}, new SleepAction(0.15)
             );
         }
         public Action openClaw() {
@@ -121,7 +121,7 @@ public class BlueSide4Samples extends LinearOpMode {
                     new Action(){
                         @Override
                         public boolean run(@NonNull TelemetryPacket packet) {
-                            intakeSlides.setPosition(0.59); // 0.49
+                            intakeSlides.setPosition(0.594); // 0.49
                             return false;
                         }}, new SleepAction(0.2)
             );
@@ -199,7 +199,7 @@ public class BlueSide4Samples extends LinearOpMode {
                         public boolean run(@NonNull TelemetryPacket packet) {
                             outtakeRotation.setPosition(0.0);
                             return false;
-                        }}, new SleepAction(0.65)
+                        }}, new SleepAction(0.75)
             );
         }
         public void setPosition(double value){
@@ -286,23 +286,23 @@ public class BlueSide4Samples extends LinearOpMode {
         // Autonomous Actions
 
         TrajectoryActionBuilder tab = drive.actionBuilder(new Pose2d(-37,-60,Math.toRadians(90)))
-                .strafeTo(new Vector2d(-59,-48));
+                .strafeTo(new Vector2d(-57.5,-48));
         Action outtake1 = tab.build();
 
-        TrajectoryActionBuilder tab1 = drive.actionBuilder(new Pose2d(-59, -48, Math.toRadians(90)))
-                .strafeTo(new Vector2d(-42,-41.9));
+        TrajectoryActionBuilder tab1 = drive.actionBuilder(new Pose2d(-57.5, -48, Math.toRadians(90)))
+                .strafeTo(new Vector2d(-42.5,-41.9));
         Action intake2 = tab1.build();
 
-        TrajectoryActionBuilder tab2 = drive.actionBuilder(new Pose2d(-42, -41.9, Math.toRadians(90)))
-                .strafeTo(new Vector2d(-59,-48));
+        TrajectoryActionBuilder tab2 = drive.actionBuilder(new Pose2d(-42.5, -41.9, Math.toRadians(90)))
+                .strafeTo(new Vector2d(-58.5,-48));
         Action outtake2 = tab2.build();
 
 
-        TrajectoryActionBuilder tab3 = drive.actionBuilder(new Pose2d(-59, -48, Math.toRadians(90)))
-                .strafeTo(new Vector2d(-50,-42));
+        TrajectoryActionBuilder tab3 = drive.actionBuilder(new Pose2d(-58.5, -48, Math.toRadians(90)))
+                .strafeTo(new Vector2d(-51,-42));
         Action intake3 = tab3.build();
 
-        TrajectoryActionBuilder tab5 = drive.actionBuilder(new Pose2d(-50,-42, Math.toRadians(90)))
+        TrajectoryActionBuilder tab5 = drive.actionBuilder(new Pose2d(-51,-42, Math.toRadians(90)))
                 .strafeTo(new Vector2d(-59,-48));
         Action outtake3 = tab5.build();
 
@@ -311,10 +311,10 @@ public class BlueSide4Samples extends LinearOpMode {
         Action intake4 = tab6.build();
 
         TrajectoryActionBuilder tab7 = drive.actionBuilder(new Pose2d(-63,-41, Math.toRadians(90)))
-                .strafeTo(new Vector2d(-59,-48));
+                .strafeTo(new Vector2d(-58.5,-48));
         Action outtake4 = tab7.build();
 
-        TrajectoryActionBuilder tab8 = drive.actionBuilder(new Pose2d(-59,-48, Math.toRadians(90)))
+        TrajectoryActionBuilder tab8 = drive.actionBuilder(new Pose2d(-58.5,-48, Math.toRadians(90)))
                 .splineTo(new Vector2d(-23,-8), Math.toRadians(0));
         Action end = tab8.build();
 
@@ -326,14 +326,14 @@ public class BlueSide4Samples extends LinearOpMode {
         // Use utility methods to create actions
         Action slidesUp = createStayingMotorAction(slides, -890, 1,2);      // Slides up
         Action slidesSpecUp = createMotorAction(slides, -650, 2);
-        Action slidesDown = createMotorAction(slides,-118 , 0.9,2);       // Slides down
+        Action slidesDown = createMotorAction(slides,-114 , 0.9,2);       // Slides down
 
         Action slidesUp2 = createStayingMotorAction(slides, -890, 1,2);
-        Action slidesDown2 = createMotorAction(slides,-114 , 0.9,2);
+        Action slidesDown2 = createMotorAction(slides,-112 , 0.9,2);
         Action slidesUp3 = createStayingMotorAction(slides, -890, 1,2);
         // have to add a pause because the transfer on the last one is weird.
         Action slidesPartiallyDown = createMotorAction(slides, -300, 0.9,2);
-        Action slidesDown3 = createMotorAction(slides,-110 , 0.9,2);
+        Action slidesDown3 = createMotorAction(slides,-108 , 0.9,1);
         Action slidesUp4 = createStayingMotorAction(slides, -890, 1,2);
         Action slidesDownFinal = createMotorAction(slides,5 , 1,2);
 
@@ -407,6 +407,7 @@ public class BlueSide4Samples extends LinearOpMode {
 
                         //outtake
                         outtakeRotation.outtakeRotBasket(),
+                        new SleepAction(0.1),
                         outtakeClaw.openClaw(),
                         outtakeRotation.outtakeRotTransfer(),
 

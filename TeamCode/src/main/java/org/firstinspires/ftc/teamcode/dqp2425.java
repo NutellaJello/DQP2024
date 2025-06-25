@@ -35,7 +35,7 @@ public class dqp2425 extends LinearOpMode{
     private DcMotor winch;      // winch: the pulley roller to wind the hook string
     private Servo swing;        // the folded bar that the hook is attached to
 
-    boolean fieldCentric = false;
+    boolean fieldCentric = false; // aiden prefers non fieldCentric and Kyle prefers fieldCentric
 
     double pivotpos=0.53;
     double pivotnuetral = 0.53;
@@ -50,10 +50,11 @@ public class dqp2425 extends LinearOpMode{
     double rotpos= 1;
     double rotin = 0.28;
     double rotout = 0.95;
-    int slidesnuetral = -235;
+    int slidesnuetral = -235;// -235
     int slidesSpeci = -5;
-    int slidesLatchOff = -442;
+    int slidesLatchOff = -440; //-442
     int slidesup = -890;
+    int slidesMiddleBasket = -300;
 
     //outtake claw
     double claw2pos=0.347;
@@ -86,6 +87,7 @@ public class dqp2425 extends LinearOpMode{
     boolean usingJst = false;
     boolean startOuttake = false;
     boolean sampleMode = true;
+    boolean lowBar = false;
 
 
     double f = 0;
@@ -178,6 +180,12 @@ public class dqp2425 extends LinearOpMode{
             // telemetry.addData("coder1", par0.getPositionAndVelocity().rawPosition);
             //telemetry.addData("coder2", par1.getPositionAndVelocity().rawPosition);
             //telemetry.addData("coder3", perp.getPositionAndVelocity().rawPosition);
+
+            if(gamepad1.dpad_left){
+                fieldCentric = !fieldCentric;
+                drivetrain.Teleop(gamepad1,telemetry, fieldCentric);
+                sleep(400);
+            }
 
             if(gamepad2.back){
                 sampleMode = true;
@@ -593,15 +601,27 @@ public class dqp2425 extends LinearOpMode{
             }
 
 
-
+            if(gamepad2.left_stick_button){
+                lowBar = !lowBar;
+            }
 
 
             if (gamepad2.dpad_up || startOuttake) {
-                slides.setTargetPosition(slidesup);
-                slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                slides.setPower(1);
-                c1=1;
-                startOuttake = false;
+                if (lowBar){
+                    slides.setTargetPosition(slidesup);
+                    slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    slides.setPower(1);
+                    c1=1;
+                    startOuttake = false;
+                }
+                else{
+                    slides.setTargetPosition(slidesup);
+                    slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    slides.setPower(1);
+                    c1=1;
+                    startOuttake = false;
+                }
+
 
             }
             if (c1==1 /*&& Math.abs(slides.getCurrentPosition()-slidesup)<=100*/) {
