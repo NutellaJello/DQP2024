@@ -1,8 +1,8 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.teleops;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.qualcomm.hardware.bosch.BNO055IMU;
+
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -112,7 +112,7 @@ public class CameraFusedPID extends LinearOpMode {
 
         controlHubCam.setPipeline(new YellowBlobDetectionPipeline());
 
-        controlHubCam.openCameraDevice();
+        controlHubCam.openCameraDevice(); // i think this can be deleted
         controlHubCam.startStreaming(CAMERA_WIDTH, CAMERA_HEIGHT, OpenCvCameraRotation.UPRIGHT);
     }
     class YellowBlobDetectionPipeline extends OpenCvPipeline {
