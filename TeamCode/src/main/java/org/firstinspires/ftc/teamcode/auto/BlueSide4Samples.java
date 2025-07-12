@@ -290,19 +290,19 @@ public class BlueSide4Samples extends LinearOpMode {
         Action outtake1 = tab.build();
 
         TrajectoryActionBuilder tab1 = drive.actionBuilder(new Pose2d(-57.5, -48, Math.toRadians(90)))
-                .strafeTo(new Vector2d(-42.5,-41.9));
+                .strafeTo(new Vector2d(-42.2,-42.4)); //-42.5, -41.9
         Action intake2 = tab1.build();
 
-        TrajectoryActionBuilder tab2 = drive.actionBuilder(new Pose2d(-42.5, -41.9, Math.toRadians(90)))
+        TrajectoryActionBuilder tab2 = drive.actionBuilder(new Pose2d(-42.2, -42.4, Math.toRadians(90)))
                 .strafeTo(new Vector2d(-58.5,-48));
         Action outtake2 = tab2.build();
 
 
         TrajectoryActionBuilder tab3 = drive.actionBuilder(new Pose2d(-58.5, -48, Math.toRadians(90)))
-                .strafeTo(new Vector2d(-51,-42));
+                .strafeTo(new Vector2d(-50.4,-41)); //-42
         Action intake3 = tab3.build();
 
-        TrajectoryActionBuilder tab5 = drive.actionBuilder(new Pose2d(-51,-42, Math.toRadians(90)))
+        TrajectoryActionBuilder tab5 = drive.actionBuilder(new Pose2d(-50.4,-41, Math.toRadians(90)))
                 .strafeTo(new Vector2d(-59,-48));
         Action outtake3 = tab5.build();
 
@@ -325,15 +325,16 @@ public class BlueSide4Samples extends LinearOpMode {
 
         // Use utility methods to create actions
         Action slidesUp = createStayingMotorAction(slides, -890, 1,2);      // Slides up
-        Action slidesSpecUp = createMotorAction(slides, -650, 2);
-        Action slidesDown = createMotorAction(slides,-114 , 0.9,2);       // Slides down
+        Action slidespartialUp = createMotorAction(slides, -190, 0.9,2);
+        Action slidesDown = createMotorAction(slides,-110 , 0.9,2);       // Slides down 114
 
         Action slidesUp2 = createStayingMotorAction(slides, -890, 1,2);
-        Action slidesDown2 = createMotorAction(slides,-112 , 0.9,2);
+        Action slidespartialUp2 = createMotorAction(slides, -190, 0.9,2);
+        Action slidesDown2 = createMotorAction(slides,-108 , 0.9,2); // -112
         Action slidesUp3 = createStayingMotorAction(slides, -890, 1,2);
         // have to add a pause because the transfer on the last one is weird.
         Action slidesPartiallyDown = createMotorAction(slides, -300, 0.9,2);
-        Action slidesDown3 = createMotorAction(slides,-108 , 0.9,1);
+        Action slidesDown3 = createMotorAction(slides,-105 , 0.9,1);
         Action slidesUp4 = createStayingMotorAction(slides, -890, 1,2);
         Action slidesDownFinal = createMotorAction(slides,5 , 1,2);
 
@@ -355,12 +356,13 @@ public class BlueSide4Samples extends LinearOpMode {
                         outtakeClaw.openClaw(),
                         outtakeRotation.outtakeRotTransfer(),
 
+
                         //2nd sample
-                        new ParallelAction(intake2, slidesDown),
+                        new ParallelAction(intake2, slidespartialUp),
 
                         //intake
                         new ParallelAction(intakeSlides.moveToPosition(), intakePivot.resetPivot()),
-                        new SleepAction(0.3),
+                        new SleepAction(0.2),
                         intakeRotation.intakeRotDown(),
                         intakeClaw.closeClaw(),
                         new SleepAction(0.1),
@@ -371,6 +373,8 @@ public class BlueSide4Samples extends LinearOpMode {
                         new ParallelAction(
                                 outtake2,
                                 new SequentialAction(new ParallelAction(intakeRotation.intakeRotUp(), intakeSlides.retractPosition()),
+                                        slidesDown,
+                                        new SleepAction(0.3),
                                         outtakeClaw.closeClaw(),
                                         new SleepAction(0.3),
                                         intakeClaw.openClaw(),
@@ -382,7 +386,7 @@ public class BlueSide4Samples extends LinearOpMode {
                         outtakeRotation.outtakeRotTransfer(),
 
                         //3rd sample
-                        new ParallelAction(intake3, slidesDown2),
+                        new ParallelAction(intake3, slidespartialUp2),
 
                         //intake
                         new ParallelAction(intakeSlides.moveToPosition(), intakePivot.resetPivot()),
@@ -399,7 +403,8 @@ public class BlueSide4Samples extends LinearOpMode {
                         new ParallelAction(
                                 outtake3,
                                 new SequentialAction(new ParallelAction(intakeRotation.intakeRotUp(), intakeSlides.retractPosition()),
-                                        new SleepAction(0.1),
+                                        slidesDown2,
+                                        new SleepAction(0.3),
                                         outtakeClaw.closeClaw(),
                                         new SleepAction(0.4),
                                         intakeClaw.openClaw(),

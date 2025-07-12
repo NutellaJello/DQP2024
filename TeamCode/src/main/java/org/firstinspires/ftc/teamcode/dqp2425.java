@@ -1,3 +1,6 @@
+
+
+
 package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -50,7 +53,7 @@ public class dqp2425 extends LinearOpMode{
     double rotpos= 1;
     double rotin = 0.28;
     double rotout = 0.95;
-    int slidesnuetral = -235;// -235
+    int slidesnuetral = -230;// -235
     int slidesSpeci = -5;
     int slidesLatchOff = -440; //-442
     int slidesup = -890;
@@ -64,7 +67,7 @@ public class dqp2425 extends LinearOpMode{
 
     //outtake arm rotation
     double rot2pos=0.6;
-    double rot2down = 0.7714;
+    double rot2down = 0.7614;
     double rot2out = 0.0;
     double rot2wall = 1;
     double rot2speci = 0.54;//0.371
@@ -156,7 +159,7 @@ public class dqp2425 extends LinearOpMode{
         if(fieldCentric){
             transferTime = 0.56;
         }else{
-            transferTime = 0.9;// 0.7
+            transferTime = 0.7;// 0.7
         }
 
 //
@@ -211,10 +214,11 @@ public class dqp2425 extends LinearOpMode{
                 slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 start=false;
             }
+            /*
             if(gamepad2.x){
                 claw2.setPosition(claw2open);
                 claw2pos = claw2open;
-            }
+            }*/
             /*if(gamepad2.left_bumper){
                 claw2.setPosition(claw2close);
                 claw2pos = claw2close;
@@ -282,23 +286,35 @@ public class dqp2425 extends LinearOpMode{
                 slides.setTargetPosition((int) (slides.getCurrentPosition() + (100 * gamepad2.right_stick_y)));
                 slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 //slides.setPower(gamepad2.right_stick_y);
-            }/*
-            if(gamepad1.y){
+            }
+            if(gamepad1.dpad_up){ // conflicts with field centric in drivetrain
+//                rotation2.setPosition(0.85);
+//                slides.setTargetPosition(30);
+//                slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//                sleep(100);
                 slides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                 slides.setPower(0);
                 sleep(100);
                 slides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 //slides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
                 slides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            }*/
+            }
             telemetry.addData("slides", slides.getCurrentPosition());
             telemetry.addData("hang", hang.getCurrentPosition());
-
+/*
             if(gamepad2.x){
                 pivotpos = 0.18;
                 pivot.setPosition(pivotpos);
             }//e
+*/
+            if(gamepad2.x){
 
+                rot2pos=rot2out;
+                rotation2.setPosition(rot2pos);
+                slides.setTargetPosition(slidesMiddleBasket); //old is slidesnuetral
+                slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                slides.setPower(1);
+            }
             if (gamepad1.right_trigger>0) {
                 hang.setTargetPosition(actuatorUp);
                 hang.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -601,26 +617,18 @@ public class dqp2425 extends LinearOpMode{
             }
 
 
-            if(gamepad2.left_stick_button){
-                lowBar = !lowBar;
-            }
+
 
 
             if (gamepad2.dpad_up || startOuttake) {
-                if (lowBar){
-                    slides.setTargetPosition(slidesup);
-                    slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    slides.setPower(1);
-                    c1=1;
-                    startOuttake = false;
-                }
-                else{
-                    slides.setTargetPosition(slidesup);
-                    slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    slides.setPower(1);
-                    c1=1;
-                    startOuttake = false;
-                }
+
+
+                slides.setTargetPosition(slidesup);
+                slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                slides.setPower(1);
+                c1=1;
+                startOuttake = false;
+
 
 
             }

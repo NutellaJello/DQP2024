@@ -15,6 +15,7 @@ import com.acmerobotics.roadrunner.TranslationalVelConstraint;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
@@ -30,6 +31,7 @@ import java.util.List;
 
 @Config
 @Autonomous(name = "5 spec")
+@Disabled
 public class BlueSide5Spec extends LinearOpMode {
     // Declare motors and servos
     private DcMotor slides;
@@ -356,24 +358,24 @@ public class BlueSide5Spec extends LinearOpMode {
         Action wall2 = spec2i.build();
 
         TrajectoryActionBuilder toBar2 = drive.actionBuilder(new Pose2d(31, -59, Math.toRadians(90)))
-                .strafeToLinearHeading(new Vector2d(-11.5,-27), Math.toRadians(84));
+                .strafeToLinearHeading(new Vector2d(-10.5,-27), Math.toRadians(84));
         Action bar2 = toBar2.build();
 
-        // 3rd spec
-        TrajectoryActionBuilder spec3i = drive.actionBuilder(new Pose2d(-11.5, -27, Math.toRadians(90)))
-                .strafeToLinearHeading(new Vector2d(31,-60.4),Math.toRadians(85));
+        // 3rd spec most likely needs to go back a bit more
+        TrajectoryActionBuilder spec3i = drive.actionBuilder(new Pose2d(-10.5, -27, Math.toRadians(90)))
+                .strafeToLinearHeading(new Vector2d(31,-60),Math.toRadians(85));
         Action wall3 = spec3i.build();
 
-        TrajectoryActionBuilder toBar3 = drive.actionBuilder(new Pose2d(31, -60.4, Math.toRadians(90)))
-                .strafeToLinearHeading(new Vector2d(-11,-26.8), Math.toRadians(84));
+        TrajectoryActionBuilder toBar3 = drive.actionBuilder(new Pose2d(31, -60, Math.toRadians(90)))
+                .strafeToLinearHeading(new Vector2d(-10.5,-26.8), Math.toRadians(84));
         Action bar3 = toBar3.build();
 
-        // 4th spec
-        TrajectoryActionBuilder spec4i = drive.actionBuilder(new Pose2d(-11, -26.8, Math.toRadians(90)))
-                .strafeToLinearHeading(new Vector2d(31,-61.6),Math.toRadians(83));
+        // 4th spec most likely needs to go back a bit more
+        TrajectoryActionBuilder spec4i = drive.actionBuilder(new Pose2d(-10.5, -26.8, Math.toRadians(90)))
+                .strafeToLinearHeading(new Vector2d(31,-61.3),Math.toRadians(83));
         Action wall4 = spec4i.build();
 
-        TrajectoryActionBuilder toBar4 = drive.actionBuilder(new Pose2d(31, -61.6, Math.toRadians(90)))
+        TrajectoryActionBuilder toBar4 = drive.actionBuilder(new Pose2d(31, -61.3, Math.toRadians(90)))
                 .strafeToLinearHeading(new Vector2d(-10.6,-27), Math.toRadians(82));
         Action bar4 = toBar4.build();
 

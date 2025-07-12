@@ -1,14 +1,10 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.roadrunner.ftc.Encoder;
-import com.acmerobotics.roadrunner.ftc.OverflowEncoder;
-import com.acmerobotics.roadrunner.ftc.RawEncoder;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -18,7 +14,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 @Config
 @TeleOp(name = "pacific rim", group = "TeleOp")
 
-public class dqp2425test extends LinearOpMode{
+public class pacificRim extends LinearOpMode{
     private Drivetrain drivetrain;
 //    private OuttakeSlide outtakeSlide;
     /**
@@ -50,7 +46,7 @@ public class dqp2425test extends LinearOpMode{
     double rotpos= 1;
     double rotin = 0.28;
     double rotout = 0.95;
-    int slidesnuetral = -232;// -235
+    int slidesnuetral = -230;// -235
     int slidesSpeci = -5;
     int slidesLatchOff = -442;
     int slidesup = -890;
@@ -156,7 +152,7 @@ public class dqp2425test extends LinearOpMode{
         if(fieldCentric){
             transferTime = 0.56;
         }else{
-            transferTime = 0.925;// 0.7
+            transferTime = 0.935;// 0.7
         }
 
 //
@@ -238,6 +234,7 @@ public class dqp2425test extends LinearOpMode{
                 rotation.setPosition(rotpos);
                 clawpos = clawopen;
                 claw.setPosition(clawpos);
+                a1=0;
             }
 
             // gamepad1 controls the chassis, this rotation2 is the outtakeArm, it prevents from collision
@@ -384,8 +381,9 @@ public class dqp2425test extends LinearOpMode{
                 e1=0;
             }*/
 
-
-            pivotpos-=gamepad1.right_stick_y*0.017;
+            if((gamepad1.right_stick_y>=0.90 || gamepad1.right_stick_y<=0.90) &&a1==0) {
+                pivotpos -= gamepad1.right_stick_y * 0.013;
+            }
 
             if (pivotpos>1) {
                 pivotpos=1;

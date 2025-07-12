@@ -109,8 +109,7 @@ public class DetectSample extends LinearOpMode
          */
         ImageRegion roi = ImageRegion.asUnityCenterCoordinates(-0.7, 0.7, 0.3, -0.3);
         ColorBlobLocatorProcessor colorLocator = new ColorBlobLocatorProcessor.Builder()
-                //.setTargetColorRange(ColorRange.BLUE)         // use a predefined color match
-                .setTargetColorRange(ColorRange.RED)
+                .setTargetColorRange(ColorRange.YELLOW)// use a predefined color match
 //                .setTargetColorRange(new ColorRange(
 //                        ColorSpace.HSV,
 //                        new Scalar(14, 50, 50),
@@ -121,8 +120,8 @@ public class DetectSample extends LinearOpMode
                 //.setRoi(ImageRegion.asImageCoordinates(30, 50,  70, 100))
                 .setDrawContours(true)                        // Show contours on the Stream Preview
                 .setBlurSize(5)                               // Smooth the transitions between different colors in image
-//                .setErodeSize(3)   // Helps remove small noise & separates touching blobs
-//                .setDilateSize(2)  // Fills in the individual yellow block to prevent gaps
+                .setErodeSize(3)   // Helps remove small noise & separates touching blobs
+                .setDilateSize(2)  // Fills in the individual yellow block to prevent gaps
                 .build();
 
 

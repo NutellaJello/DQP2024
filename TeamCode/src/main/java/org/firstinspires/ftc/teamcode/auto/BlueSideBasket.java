@@ -12,6 +12,7 @@ import com.acmerobotics.roadrunner.TurnConstraints;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
@@ -26,6 +27,7 @@ import java.util.function.Function;
 
 @Config
 @Autonomous(name = "1+3 basket auto")
+@Disabled
 public class BlueSideBasket extends LinearOpMode {
 
     // Declare motors and servos

@@ -112,8 +112,8 @@ public class Drivetrain {
 
 
             if(gamepad.right_bumper){
-                dampSpeedRatio = 0.18;
-                dampTurnRatio = -0.13;
+                dampSpeedRatio = 0.21;
+                dampTurnRatio = -0.15;
             }else{
                 dampSpeedRatio = 0.8;
                 dampTurnRatio = -0.6;

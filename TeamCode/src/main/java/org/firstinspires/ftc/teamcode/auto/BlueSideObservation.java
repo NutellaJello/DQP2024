@@ -324,61 +324,61 @@ public class BlueSideObservation extends LinearOpMode {
 
         // 2nd sample
         TrajectoryActionBuilder spec2 = drive.actionBuilder(new Pose2d(28, -44, Math.toRadians(-80)))
-                .turnTo(Math.toRadians(43.5));
+                .turnTo(Math.toRadians(46)); // 43.5
         Action intake2 = spec2.build();
 
-        TrajectoryActionBuilder spec2d = drive.actionBuilder(new Pose2d(28, -44, Math.toRadians(43.5)))
-                .turnTo(Math.toRadians(-75));
+        TrajectoryActionBuilder spec2d = drive.actionBuilder(new Pose2d(28, -44, Math.toRadians(46)))
+                .turnTo(Math.toRadians(-75)); //-75
         Action drop2 = spec2d.build();
 
         // 3rd sample
         TrajectoryActionBuilder spec3 = drive.actionBuilder(new Pose2d(28, -44, Math.toRadians(-75)))
-                .strafeToLinearHeading(new Vector2d(40, -43), Math.toRadians(32));
+                .strafeToLinearHeading(new Vector2d(40, -43), Math.toRadians(35)); //32
         Action intake3 = spec3.build();
 
-        TrajectoryActionBuilder spec3d = drive.actionBuilder(new Pose2d(40, -43, Math.toRadians(32)))
+        TrajectoryActionBuilder spec3d = drive.actionBuilder(new Pose2d(40, -43, Math.toRadians(35)))
                 .turnTo(Math.toRadians(-75));
         Action drop3 = spec3d.build();
 
         // 1st spec
         TrajectoryActionBuilder spec1i = drive.actionBuilder(new Pose2d(40, -43, Math.toRadians(-75)))
-                .strafeToLinearHeading(new Vector2d(31,-57.2), Math.toRadians(92));
+                .strafeToLinearHeading(new Vector2d(31,-55), Math.toRadians(90)); //- 57.2 -56.6
         Action wall1 = spec1i.build();
 
-        TrajectoryActionBuilder toBar1 = drive.actionBuilder(new Pose2d(31, -57.2, Math.toRadians(92)))
-                .strafeToLinearHeading(new Vector2d(-17,-27.5), Math.toRadians(85));
+        TrajectoryActionBuilder toBar1 = drive.actionBuilder(new Pose2d(31, -55, Math.toRadians(90)))
+                .strafeToLinearHeading(new Vector2d(-16,-27.5), Math.toRadians(85));
         Action bar1 = toBar1.build();
 
 
         // 2nd spec
-        TrajectoryActionBuilder spec2i = drive.actionBuilder(new Pose2d(-17, -27.5, Math.toRadians(90)))
-                .strafeToLinearHeading(new Vector2d(31,-59),Math.toRadians(86));
+        TrajectoryActionBuilder spec2i = drive.actionBuilder(new Pose2d(-16, -27.5, Math.toRadians(90)))
+                .strafeToLinearHeading(new Vector2d(31,-58.3),Math.toRadians(86)); // -59
         Action wall2 = spec2i.build();
 
-        TrajectoryActionBuilder toBar2 = drive.actionBuilder(new Pose2d(31, -59, Math.toRadians(90)))
-                .strafeToLinearHeading(new Vector2d(-16.5,-27.5), Math.toRadians(84));
+        TrajectoryActionBuilder toBar2 = drive.actionBuilder(new Pose2d(31, -58.3, Math.toRadians(90)))
+                .strafeToLinearHeading(new Vector2d(-16,-27.5), Math.toRadians(89));
         Action bar2 = toBar2.build();
 
         // 3rd spec
-        TrajectoryActionBuilder spec3i = drive.actionBuilder(new Pose2d(-16.5, -27.5, Math.toRadians(90)))
-                .strafeToLinearHeading(new Vector2d(31,-59),Math.toRadians(85));
+        TrajectoryActionBuilder spec3i = drive.actionBuilder(new Pose2d(-16, -27.5, Math.toRadians(90)))
+                .strafeToLinearHeading(new Vector2d(31,-58.7),Math.toRadians(89)); //-58
         Action wall3 = spec3i.build();
 
-        TrajectoryActionBuilder toBar3 = drive.actionBuilder(new Pose2d(31, -59, Math.toRadians(90)))
-                .strafeToLinearHeading(new Vector2d(-16,-27.5), Math.toRadians(84));
+        TrajectoryActionBuilder toBar3 = drive.actionBuilder(new Pose2d(31, -58.7, Math.toRadians(90)))
+                .strafeToLinearHeading(new Vector2d(-16,-27.5), Math.toRadians(89));
         Action bar3 = toBar3.build();
 
         // 4th spec
         TrajectoryActionBuilder spec4i = drive.actionBuilder(new Pose2d(-16, -27.5, Math.toRadians(90)))
-                .strafeToLinearHeading(new Vector2d(31,-59),Math.toRadians(83));
+                .strafeToLinearHeading(new Vector2d(31,-58.8),Math.toRadians(90));
         Action wall4 = spec4i.build();
 
-        TrajectoryActionBuilder toBar4 = drive.actionBuilder(new Pose2d(31, -59, Math.toRadians(90)))
-                .strafeToLinearHeading(new Vector2d(-15.6,-27.5), Math.toRadians(82));
+        TrajectoryActionBuilder toBar4 = drive.actionBuilder(new Pose2d(31, -58.8, Math.toRadians(90)))
+                .strafeToLinearHeading(new Vector2d(-16,-27.5), Math.toRadians(90));
         Action bar4 = toBar4.build();
 
         // park
-        TrajectoryActionBuilder goPark = drive.actionBuilder(new Pose2d(-15.6, -27.5, Math.toRadians(90)))
+        TrajectoryActionBuilder goPark = drive.actionBuilder(new Pose2d(-16, -27.5, Math.toRadians(90)))
                 .strafeToLinearHeading(new Vector2d(31,-59),Math.toRadians(90));
         Action park = goPark.build();
 
@@ -389,10 +389,10 @@ public class BlueSideObservation extends LinearOpMode {
         // Use utility methods to create actions
         Action slidesHang0 = createStayingMotorAction(slides,-520,1,2);
 
-        Action slidesWall1 = createMotorAction(slides,-25,1,3);
-        Action slidesWall2 = createMotorAction(slides,-25,1,3);
-        Action slidesWall3 = createMotorAction(slides,-25,1,3);
-        Action slidesWall4 = createMotorAction(slides,-25,1,3);
+        Action slidesWall1 = createMotorAction(slides,-29,1,3); //-25
+        Action slidesWall2 = createMotorAction(slides,-29,1,3);
+        Action slidesWall3 = createMotorAction(slides,-29,1,3);
+        Action slidesWall4 = createMotorAction(slides,-29,1,3);
 
         Action slidesHang1 =createStayingMotorAction(slides,-535,1,2);
         Action slidesHang2 =createStayingMotorAction(slides,-535,1,2);
