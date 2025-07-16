@@ -56,13 +56,13 @@ public class dqp2425 extends LinearOpMode{
     int slidesnuetral = -230;// -235
     int slidesSpeci = -5;
     int slidesLatchOff = -440; //-442
-    int slidesup = -890;
+    int slidesup = -870;
     int slidesMiddleBasket = -300;
 
     //outtake claw
     double claw2pos=0.347;
     double claw2close = 0.53; // 0.523
-    double claw2open = 0.35;
+    double claw2open = 0.412;
 //
 
     //outtake arm rotation
